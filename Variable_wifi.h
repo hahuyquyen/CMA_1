@@ -4,8 +4,8 @@ const uint8_t wifi_conf_format[] = WIFI_CONF_FORMAT;
 
 typedef struct Data_user{
   uint16_t id_RFID;
-  float data_weight;
-  float data_tare;
+  double data_weight;
+  double data_tare;
   long time_detec;
 } data_user;
 

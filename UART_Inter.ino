@@ -38,22 +38,24 @@ static void IRAM_ATTR uart1_intr_handle(void *arg)
    
  }
   uart_clear_intr_status(UART_NUM_0, UART_RXFIFO_FULL_INT_CLR|UART_RXFIFO_TOUT_INT_CLR);//clear UART interrupt status
- uart_write_bytes(UART_NUM_0, (const char*)can_rxbuf, canbuff);
+ //uart_write_bytes(UART_NUM_0, (const char*)can_rxbuf, canbuff);
  
 }
 
 static void IRAM_ATTR uart_intr_handle2(void *arg)
 {
   uint16_t rx_fifo_len;
-  uint16_t i=0;
   rx_fifo_len = UART2.status.rxfifo_cnt; // read number of bytes in UART buffer
   while(rx_fifo_len){
+    
    rfid_rxbuf[rfidbuff++] = UART2.fifo.rw_byte; // read all bytes
    rx_fifo_len--;
+   rfidbuff=rfidbuff+1;
+   if (rfidbuff>40){rfidbuff=0;}
  }
   uart_clear_intr_status(UART_NUM_2, UART_RXFIFO_FULL_INT_CLR|UART_RXFIFO_TOUT_INT_CLR);//clear UART interrupt status
- uart_write_bytes(UART_NUM_2, (const char*)rfid_rxbuf, 40);
- memset_volatile(rfid_rxbuf, '\0',40); 
+ //uart_write_bytes(UART_NUM_2, (const char*)rfid_rxbuf, 40);
+ //memset_volatile(rfid_rxbuf, '\0',40); 
 }
 
 

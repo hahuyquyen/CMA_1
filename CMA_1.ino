@@ -48,7 +48,7 @@ long lastMsg=0;
 void setup()
 {
    // Serial.begin(115200);
-  printf("Begin\n");
+    printf("Begin\n");
     EEPROM.begin(1024);
     WiFi.disconnect(true);
     loadWiFiConf();
@@ -60,7 +60,7 @@ void setup()
     xTaskCreatePinnedToCore(
                         TaskRFID,   /* Function to implement the task */
                         "TaskRFID", /* Name of the task */
-                        10000,      /* Stack size in words */
+                        5000,      /* Stack size in words */
                         NULL,       /* Task input parameter */
                         3,          /* Priority of the task */
                         NULL,       /* Task handle. */
@@ -68,7 +68,7 @@ void setup()
     xTaskCreatePinnedToCore(
                         TaskCAN,   /* Function to implement the task */
                         "TaskCAN", /* Name of the task */
-                        10000,      /* Stack size in words */
+                        3000,      /* Stack size in words */
                         NULL,       /* Task input parameter */
                         3,          /* Priority of the task */
                         NULL,       /* Task handle. */
@@ -76,7 +76,7 @@ void setup()
     xTaskCreatePinnedToCore(
                         Display,   /* Function to implement the task */
                         "Display", /* Name of the task */
-                        10000,      /* Stack size in words */
+                        5000,      /* Stack size in words */
                         NULL,       /* Task input parameter */
                         3,          /* Priority of the task */
                         NULL,       /* Task handle. */

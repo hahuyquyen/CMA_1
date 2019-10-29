@@ -32,13 +32,33 @@ extern volatile uint8_t rfid_data[20];
 int tam= 1;
 int hangtram=0;
 void TaskCAN( void * pvParameters ){
-  float giatri=0;
+  double giatri=0;
     while(true){
-      printf("Wait\n");
       xSemaphoreTake( xCountingSemaphore, portMAX_DELAY );
-      printf("process\n");
-      giatri=0;
+      for (int j=0;j<2;j++){
+        giatri=0;
         tam=1;
+        for (int tang=(j*9)+1;tang<(j*9)+8; tang++){
+           if((rfid_data[tang] == 0x2C) || (rfid_data[tang] == 0x2E)) {hangtram = tang-1; break;}
+        }
+        hangtram=hangtram-1;
+        for (int tang1=(j*9)+1;tang1<(j*9)+8; tang1++){
+          if (rfid_data[tang1] == 0x2D){tam = -1;}
+          else if ((rfid_data[tang1] == 0x2C) || (rfid_data[tang1] == 0x2E)){hangtram=hangtram+1;}
+          else{
+           giatri+=(float)((rfid_data[tang1]-48)*pow(10,hangtram-(tang1-1)));
+            }
+        }
+        if (rfid_data[j*9] == 0x30){congnhan.data_weight=giatri*tam;}
+        else{congnhan.data_tare=giatri*tam;} 
+      }
+      printf("Can weight: %f \n",congnhan.data_weight);
+      printf("Can tare: %f \n", congnhan.data_tare);
+        
+      vTaskDelay(1000);
+      /*giatri=0;
+        tam=1;
+        
         for (int tang=1;tang<8; tang++){
            if((rfid_data[tang] == 0x2C) || (rfid_data[tang] == 0x2E)) {hangtram = tang-1; break;}
         }
@@ -54,50 +74,25 @@ void TaskCAN( void * pvParameters ){
             printf("WW %f \n",giatri);
         }
         if (rfid_data[0] == 0x30){congnhan.data_weight=giatri*tam;}
-        else{congnhan.data_tare=giatri*tam;}    
+        else{congnhan.data_tare=giatri*tam;} */
+/*
+           
         tam= 1;
         hangtram=0;
         giatri=0;
         for (int tang=10;tang<17; tang++){
            if((rfid_data[tang] == 0x2C) || (rfid_data[tang] == 0x2E)) {hangtram = tang-1; break;}
         }
-        printf("hangtram= %d \n",hangtram);
         hangtram=hangtram-1;
         for (int tang1=10;tang1<17; tang1++){
           if (rfid_data[tang1] == 0x2D){tam = -1;}
           else if ((rfid_data[tang1] == 0x2C) || (rfid_data[tang1] == 0x2E)){printf("GT %f \n",giatri);hangtram=hangtram+1;}
           else{
            giatri+=(rfid_data[tang1]-48)*pow(10,hangtram-(tang1-1));
-           printf("ff %d  - %d\n",(rfid_data[tang1]-48),hangtram-(tang1-1));
-            }
-            printf("WW %f \n",giatri);
-        }  
-           
+            } 
+        }    
          if (rfid_data[9] == 0x30){congnhan.data_weight=giatri*tam;}
-         else{congnhan.data_tare=giatri*tam;}    
-     /* tam= 1;
-      hangtram=0;
+         else{congnhan.data_tare=giatri*tam;}    */
         
-        for (int tang=9;tang<17; tang++){
-           if((rfid_data[tang] == 0x2C) || (rfid_data[tang] == 0x2E)) {hangtram = tang-9; break;}
-        }
-        giatri=0;
-        for (int tang1=10;tang1<17; tang1++){
-          if (rfid_data[10] == 0x2D){tam = -1;}
-          else {
-          if (hangtram==(tang1-10)){hangtram=hangtram-1;}
-          else{
-          giatri+=rfid_data[tang1]*pow(10,hangtram);
-          hangtram=hangtram-1;
-          }
-          }
-        }
-          if (rfid_data[9] == 0x30){congnhan.data_weight=giatri*tam;}
-          else{ congnhan.data_tare=giatri*tam; }*/
-     //   uart_write_bytes(UART_NUM_0, (const char*)congnhan.data_weight, 40);
-        printf("weight %f \n",congnhan.data_weight);
-        printf("tare %f \n", congnhan.data_tare);
-        
-      vTaskDelay(1000);
     }
 }
