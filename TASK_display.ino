@@ -3,11 +3,12 @@ void Display( void * pvParameters ){
   pinMode(2, OUTPUT);
   long time_sche=0;
     while(true){
-      if (millis()-time_sche > 1000){
-        time_sche = millis();
+      if (xTaskGetTickCount()-time_sche > 1000){
+        time_sche = xTaskGetTickCount();
       status_led=!status_led;
       digitalWrite(2,status_led);
       
       }
     }
+    vTaskDelete(NULL) ;
 }

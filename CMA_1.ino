@@ -24,8 +24,8 @@ static void IRAM_ATTR uart_intr_handle2(void *arg);
 */
 SemaphoreHandle_t xCountingSemaphore;
 WebServer server(4999);
-WiFiClient espClient;
-PubSubClient client(espClient);
+//WiFiClient espClient;
+//PubSubClient client(espClient);
 //############################
 const char* update_path = "/firmware";
 const char* update_username = "CMA";
@@ -45,6 +45,12 @@ void setting_uart();
 data_user congnhan;
 long lastReconnectAttempt = 0;
 long lastMsg=0;
+void http_re( void * pvParameters ){
+
+    while(true){
+      vTaskDelay(10);
+    }
+}
 void setup()
 {
    // Serial.begin(115200);
@@ -52,44 +58,58 @@ void setup()
     EEPROM.begin(1024);
     WiFi.disconnect(true);
     loadWiFiConf();
+    wifi_connect(WIFI_STA,WiFiConf.sta_ssid,WiFiConf.sta_pwd,WiFiConf.ap_ssid);  
     wifi_staticip(WiFiConf.sta_ip,WiFiConf.sta_gateway,WiFiConf.sta_subnet);   
-    wifi_connect(WIFI_AP_STA,WiFiConf.sta_ssid,WiFiConf.sta_pwd,WiFiConf.ap_ssid);
+  //  wifi_connect(WIFI_AP,WiFiConf.sta_ssid,WiFiConf.sta_pwd,WiFiConf.ap_ssid);
+    WiFi.onEvent(WiFiEvent);
     setupWiFiConf();
     server.begin();
     setting_uart();
     xTaskCreatePinnedToCore(
                         TaskRFID,   /* Function to implement the task */
                         "TaskRFID", /* Name of the task */
-                        5000,      /* Stack size in words */
+                        2048,      /* Stack size in words */
                         NULL,       /* Task input parameter */
-                        3,          /* Priority of the task */
+                        1,          /* Priority of the task */
                         NULL,       /* Task handle. */
                         taskCore);  /* Core where the task should run */
     xTaskCreatePinnedToCore(
                         TaskCAN,   /* Function to implement the task */
                         "TaskCAN", /* Name of the task */
-                        3000,      /* Stack size in words */
+                        2048,      /* Stack size in words */
                         NULL,       /* Task input parameter */
-                        3,          /* Priority of the task */
+                        1,          /* Priority of the task */
                         NULL,       /* Task handle. */
                         1);  /* Core where the task should run */
     xTaskCreatePinnedToCore(
                         Display,   /* Function to implement the task */
                         "Display", /* Name of the task */
-                        5000,      /* Stack size in words */
+                        2048,      /* Stack size in words */
                         NULL,       /* Task input parameter */
-                        3,          /* Priority of the task */
+                        1,          /* Priority of the task */
                         NULL,       /* Task handle. */
                         1);  /* Core where the task should run */   
-
+    xTaskCreatePinnedToCore(
+                        http_re,   /* Function to implement the task */
+                        "http_re", /* Name of the task */
+                        2048,      /* Stack size in words */
+                        NULL,       /* Task input parameter */
+                        1,          /* Priority of the task */
+                        NULL,       /* Task handle. */
+                        0);  /* Core where the task should run */ 
+    
+                        
   //client.setServer("dsds", 1883);
   //client.setCallback(callback_mqtt);
                         
 }
 
 void loop()
-{       
-  server.handleClient();/*
+{       server.handleClient();
+//printf("Main Loop: priority = %d",uxTaskPriorityGet(NULL));
+  
+        vTaskDelay(100);
+  /*
   if (!client.connected()) {
     long now = millis();
     if (now - lastReconnectAttempt > 5000) {

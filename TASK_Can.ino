@@ -18,10 +18,11 @@ stable flag là 01H-00H 01~Stable 00~unstable
 Header :(0) 30H ->net weight
          (4) 34H->tare  
 Net Weight = - 1.20 lb. Tare Weight = 0.45lb. 
+
 STX* |Stable flag| CR |*Header |Net weight| CR| *Header| Tare weight|CR |LF
 1          1        1      1           7     1     1          7       1   1 
 
-
+Vd gửi dữ liệu
 02 01 0D 30 34 35 36 2E 30 30 30 0D 34  32 31 30 2E 36 35 32 0D 0A
  */
 extern volatile uint8_t can_rxbuf[40];
@@ -95,4 +96,5 @@ void TaskCAN( void * pvParameters ){
          else{congnhan.data_tare=giatri*tam;}    */
         
     }
+    vTaskDelete(NULL) ;
 }

@@ -14,9 +14,9 @@ void setupWiFiConf(void) {
     content1 += F("<div class=\"row\">");
     content1 += FPSTR(label1_html);
     content1 += F("'ssid' class=\"req\">SSID : </label>");
-    content1 += F("<input name='ssid'class=\"txt\" id='ssid' maxlength=32 value=") ;
+    content1 += F("<input name='ssid'class=\"txt\" id='ssid' maxlength=32 value=\"") ;
     content1 += WiFiConf.sta_ssid ;
-    content1 += F("></div>");
+    content1 += F("\"></div>");
     content1 += F("<div class=\"row\">");
     content1 += FPSTR(label1_html);
     content1 += F("'pwd' class=\"req\">Password :  </label>");
@@ -80,8 +80,8 @@ void setupWiFiConf(void) {
    server.on("/set1", []() {
     String new_IPHC = server.arg(F("ip"));
     String new_pwdhc = server.arg(F("pwd"));
-    Serial.println(new_IPHC);
-    Serial.println(new_pwdhc);
+    //printf(new_IPHC);
+   // printf(new_pwdhc);
     server.send(200, F("text/html"), new_IPHC);
   });
 }

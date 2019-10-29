@@ -62,9 +62,12 @@ void TaskRFID( void * pvParameters ){
     //Send reset to apply the changes
     txrx(reset_message,5);
     
-    Serial.println("Waiting for card..");
+    printf("Waiting for card..\n");
     while(true){
-      unsigned long currentMillis=xTaskGetTickCount();
-         vTaskDelay(10);
+      
+          unsigned long currentMillis=xTaskGetTickCount();
+          //printf("Time.. %lu \n",currentMillis);
+          vTaskDelay(1000);
     }
+    vTaskDelete(NULL) ;
 }

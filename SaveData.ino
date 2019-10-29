@@ -1,9 +1,9 @@
 
 void printWiFiConf(void) {
-  //Serial.println(WiFiConf.sta_ssid);
+  //printf(WiFiConf.sta_ssid);
 }
 bool loadWiFiConf() {
-  //Serial.println(F("loading WiFiConf"));
+  //printf(F("loading WiFiConf"));
   if (EEPROM.read(WIFI_CONF_START + 0) == wifi_conf_format[0] &&
       EEPROM.read(WIFI_CONF_START + 1) == wifi_conf_format[1] &&
       EEPROM.read(WIFI_CONF_START + 2) == wifi_conf_format[2] &&
