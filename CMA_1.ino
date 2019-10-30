@@ -1,12 +1,17 @@
 #include <EEPROM.h>
-#include <WebServer.h>
-#include <WiFi.h>
 #include "Variable_html.h"
 #include "Variable_wifi.h"
 #include <driver/uart.h>
 #include <ArduinoJson.h>
 #include <PubSubClient.h>
-
+#include <SPIFFS.h>
+#include <WiFi.h>
+#include <ESPAsyncWebServer.h>
+#include <Update.h>
+/*
+ * #include <WebServer.h>
+#include <WiFi.h>
+ */
 #define BUF_SIZE (255)
 //#define UART_NUM_1 UART_NUM_1
 //#define UART_NUM_2 UART_NUM_2
@@ -23,7 +28,7 @@ static void IRAM_ATTR uart_intr_handle2(void *arg);
  UART 2 rxPin = 16;txPin = 17;
 */
 SemaphoreHandle_t xCountingSemaphore;
-WebServer server(4999);
+AsyncWebServer server(4999);
 //WiFiClient espClient;
 //PubSubClient client(espClient);
 //############################
@@ -42,14 +47,21 @@ void wifi_staticip(char *ip_in, char* gateway_in, char* subnet_in);
 void wifi_connect(wifi_mode_t wifi_mode,char *ssid,char *password,char *ap_ssid);
 void setupWiFiConf(void);
 void setting_uart();
+void WiFiEvent(WiFiEvent_t event);
 data_user congnhan;
 long lastReconnectAttempt = 0;
 long lastMsg=0;
+char ledState[64];
+size_t content_len;
+
 void http_re( void * pvParameters ){
 
     while(true){
       vTaskDelay(10);
     }
+}
+void printProgress(size_t prg, size_t sz) {
+  printf("Progress: %d%%\n", (prg*100)/content_len);
 }
 void setup()
 {
@@ -58,12 +70,18 @@ void setup()
     EEPROM.begin(1024);
     WiFi.disconnect(true);
     loadWiFiConf();
+    if(!SPIFFS.begin(true)){
+    Serial.println("An Error has occurred while mounting SPIFFS");
+    return;
+    }
+   
     wifi_connect(WIFI_STA,WiFiConf.sta_ssid,WiFiConf.sta_pwd,WiFiConf.ap_ssid);  
     wifi_staticip(WiFiConf.sta_ip,WiFiConf.sta_gateway,WiFiConf.sta_subnet);   
   //  wifi_connect(WIFI_AP,WiFiConf.sta_ssid,WiFiConf.sta_pwd,WiFiConf.ap_ssid);
     WiFi.onEvent(WiFiEvent);
     setupWiFiConf();
     server.begin();
+    Update.onProgress(printProgress);
     setting_uart();
     xTaskCreatePinnedToCore(
                         TaskRFID,   /* Function to implement the task */
@@ -105,7 +123,7 @@ void setup()
 }
 
 void loop()
-{       server.handleClient();
+{       //server.handleClient();
 //printf("Main Loop: priority = %d",uxTaskPriorityGet(NULL));
   
         vTaskDelay(100);

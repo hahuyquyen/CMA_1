@@ -105,16 +105,19 @@ void wifi_connect(wifi_mode_t wifi_mode,char *ssid,char *password,char *ap_ssid)
     
     WiFi.mode(wifi_mode);
     //WiFi.softAP(ap_ssid,"88888888");
-    WiFi.begin(ssid, password);
+   // printf(ssid);
+   // printf(password);
+    WiFi.begin(ssid,password);
+   // WiFi.begin("Bach Huu Phat", "0908777832");
 }
 
 void wifi_staticip(char *ip_in, char* gateway_in, char* subnet_in){
-  
+  //if (atoi(WiFiConf.choose_dhcp) == 0){
     parseBytes1(ip_in, '.', 1, 4, 10);
     parseBytes1(gateway_in, '.', 2, 4, 10);
     parseBytes1(subnet_in, '.', 3, 4, 10);
     if (!WiFi.config(local_IP, gateway, subnet, primaryDNS, secondaryDNS)) {
         printf("STA Failed to configure");
     }
-    
+  //}
 }

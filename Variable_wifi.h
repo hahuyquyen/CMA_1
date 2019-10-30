@@ -17,10 +17,14 @@ struct WiFiConfStruct {
   char sta_gateway[15];
   char sta_subnet[15];
   char ap_ssid[32];
+  char choose_dhcp[4];
   char mqtt_server[64];
-  uint16_t mqtt_port;
+  char mqtt_port[6];
   char mqtt_user[64]; 
   char mqtt_pass[64]; 
+  char mqtt_subto1[64]; 
+  char mqtt_subto2[64]; 
+  char mqtt_subto3[64]; 
 } WiFiConf = {
   WIFI_CONF_FORMAT,
   "Bach Huu Phat",
@@ -29,10 +33,14 @@ struct WiFiConfStruct {
   "192.168.1.1",
   "255.255.255.0",
   "AP_SSID",
+  "1",
   "mqtt_server",
-  1652,
+  "0",
   "admin",
-  "pass"
+  "pass",
+  "x",
+  "x",
+  "x"
 };
 
 IPAddress local_IP(192, 168, 1, 241);
