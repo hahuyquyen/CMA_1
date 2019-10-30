@@ -11,3 +11,6 @@ WEB_server : Viết giao diện setting wifi, mqtt...
 MQTT 
 GET data RFID
 ```
+![alt text](https://github.com/annhan/CMA_1/blob/master/imgae/main.png)
+![alt text](https://github.com/annhan/CMA_1/blob/master/imgae/mqtt.png)
+![alt text](https://github.com/annhan/CMA_1/blob/master/imgae/wifi.png)
