@@ -4,7 +4,9 @@
 -ESP32 hiển thị (..)
 -ESP32 giao tiếp MQTT
 
-Chương trình xử lý dùng SDK của esp32 trong Arduino   
+Dùng FreeRTOS
+Chương trình xử lý dùng SDK của esp32 trong Arduino cho việc cài đặt ngắt UART.
+  
 ```
 TASK_Can: Chờ data từ uart của cân điện tử, xử lý tách dữ liệu và đưa vào struct
 TASK_RFID: Config RFID, Chờ nhận data RFID từ UART2 và xử lýw
