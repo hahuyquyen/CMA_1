@@ -5,9 +5,11 @@ TASK_Can: Chờ data từ uart của cân điện tử, xử lý tách dữ li�
 TASK_RFID: Config RFID, Chờ nhận data RFID từ UART2 và xử lýw
 MainTask: Xử lý HTML, MQTT
 TASK_display: Xử lý hiển thị vd: led
-2UART xử lý ngắt nhận dữ liệu trong file UART_Inter
+2UART ( UART1, UART2 ) xử lý ngắt nhận dữ liệu trong file UART_Inter
+UART0 dùng debug chương trình
+WEB_server : setting wifi, mqtt, firmware update...
 Todo:
-WEB_server : Viết giao diện setting wifi, mqtt...
+
 MQTT 
 GET data RFID
 ```
