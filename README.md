@@ -1,4 +1,9 @@
-# 
+# Mô tả
+-ESP32 đọc dữ liệu từ cân, RFID 
+-ESP32 chạy web setting.
+-ESP32 hiển thị (..)
+-ESP32 giao tiếp MQTT
+
 Chương trình xử lý dùng SDK của esp32 trong Arduino   
 ```
 TASK_Can: Chờ data từ uart của cân điện tử, xử lý tách dữ liệu và đưa vào struct
