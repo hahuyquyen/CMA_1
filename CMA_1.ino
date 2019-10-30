@@ -12,6 +12,7 @@
  * #include <WebServer.h>
 #include <WiFi.h>
  */
+ //int charrr[50000];
 #define BUF_SIZE (255)
 //#define UART_NUM_1 UART_NUM_1
 //#define UART_NUM_2 UART_NUM_2
@@ -51,9 +52,9 @@ void WiFiEvent(WiFiEvent_t event);
 data_user congnhan;
 long lastReconnectAttempt = 0;
 long lastMsg=0;
-char ledState[64];
+//char ledState[64];
 size_t content_len;
-
+#define using_sta true
 void http_re( void * pvParameters ){
 
     while(true){
@@ -74,18 +75,22 @@ void setup()
     Serial.println("An Error has occurred while mounting SPIFFS");
     return;
     }
-   
-    wifi_connect(WIFI_STA,WiFiConf.sta_ssid,WiFiConf.sta_pwd,WiFiConf.ap_ssid);  
+#ifndef using_sta
+    wifi_connect(WIFI_STA,WiFiConf.sta_ssid,WiFiConf.sta_pwd,WiFiConf.ap_ssid);
+#else
+    wifi_AP(WIFI_AP,"CMA_AU","123789456");
+#endif  
     wifi_staticip(WiFiConf.sta_ip,WiFiConf.sta_gateway,WiFiConf.sta_subnet);   
   //  wifi_connect(WIFI_AP,WiFiConf.sta_ssid,WiFiConf.sta_pwd,WiFiConf.ap_ssid);
     WiFi.onEvent(WiFiEvent);
-    WiFiEventId_t eventID = WiFi.onEvent([](WiFiEvent_t event, WiFiEventInfo_t info){
+    WiFi.onEvent([](WiFiEvent_t event, WiFiEventInfo_t info){
         wifiOnDisconnect();
     }, WiFiEvent_t::SYSTEM_EVENT_STA_DISCONNECTED);
     setupWiFiConf();
     server.begin();
     Update.onProgress(printProgress);
     setting_uart();
+   // charrr[0]=5;
     xTaskCreatePinnedToCore(
                         TaskRFID,   /* Function to implement the task */
                         "TaskRFID", /* Name of the task */

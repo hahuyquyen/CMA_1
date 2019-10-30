@@ -9,7 +9,7 @@ typedef struct Data_user{
   long time_detec;
 } data_user;
 
-struct WiFiConfStruct {
+static struct WiFiConfStruct {
   uint8_t format[4];
   char sta_ssid[32];
   char sta_pwd[64];
@@ -43,8 +43,8 @@ struct WiFiConfStruct {
   "x"
 };
 
-IPAddress local_IP(192, 168, 1, 241);
-IPAddress gateway(192, 168, 1, 1);
-IPAddress subnet(255, 255, 255, 0);
-IPAddress primaryDNS(8, 8, 8, 8); //optional
-IPAddress secondaryDNS(8, 8, 4, 4); //optional
+static IPAddress local_IP(192, 168, 1, 241);
+static IPAddress gateway(192, 168, 1, 1);
+static IPAddress subnet(255, 255, 255, 0);
+static IPAddress primaryDNS(8, 8, 8, 8); //optional
+static IPAddress secondaryDNS(8, 8, 4, 4); //optional
