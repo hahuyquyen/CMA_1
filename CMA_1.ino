@@ -79,6 +79,9 @@ void setup()
     wifi_staticip(WiFiConf.sta_ip,WiFiConf.sta_gateway,WiFiConf.sta_subnet);   
   //  wifi_connect(WIFI_AP,WiFiConf.sta_ssid,WiFiConf.sta_pwd,WiFiConf.ap_ssid);
     WiFi.onEvent(WiFiEvent);
+    WiFiEventId_t eventID = WiFi.onEvent([](WiFiEvent_t event, WiFiEventInfo_t info){
+        wifiOnDisconnect();
+    }, WiFiEvent_t::SYSTEM_EVENT_STA_DISCONNECTED);
     setupWiFiConf();
     server.begin();
     Update.onProgress(printProgress);

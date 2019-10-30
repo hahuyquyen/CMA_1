@@ -1,7 +1,7 @@
 void wifiOnDisconnect()
 {
-  printf("STA Disconnected");
-  delay(1000);
+  printf("STA Disconnected\n");
+  vTaskDelay(1000);
   wifi_connect(WIFI_AP_STA,WiFiConf.sta_ssid,WiFiConf.sta_pwd,WiFiConf.ap_ssid);
 }
 void WiFiEvent(WiFiEvent_t event)
@@ -24,15 +24,9 @@ void WiFiEvent(WiFiEvent_t event)
         case SYSTEM_EVENT_STA_CONNECTED:
             printf("Connected to access point\n");
             break;
-        case SYSTEM_EVENT_STA_DISCONNECTED:
-            printf("Disconnected from WiFi access point\n");
-            break;
-        case SYSTEM_EVENT_STA_AUTHMODE_CHANGE:
-            printf("Authentication mode of access point has changed\n");
-            break;
         case SYSTEM_EVENT_STA_GOT_IP:
-            printf("Obtained IP address:\n ");
-          //  printf(WiFi.localIP());
+            printf(WiFi.localIP().toString().c_str());
+          //  printf();
             break;
         case SYSTEM_EVENT_STA_LOST_IP:
             printf("Lost IP address and IP address is reset to 0\n");
