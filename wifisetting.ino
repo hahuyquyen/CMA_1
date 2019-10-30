@@ -13,7 +13,7 @@ void WiFiEvent(WiFiEvent_t event)
             printf("WiFi interface ready\n");
             break;
         case SYSTEM_EVENT_SCAN_DONE:
-            printf("Completed scan for access points\n");
+            //printf("Completed scan for access points\n");
             break;
         case SYSTEM_EVENT_STA_START:
             printf("WiFi client started\n");
@@ -38,22 +38,22 @@ void WiFiEvent(WiFiEvent_t event)
             printf("Lost IP address and IP address is reset to 0\n");
             break;
         case SYSTEM_EVENT_STA_WPS_ER_SUCCESS:
-            printf("WiFi Protected Setup (WPS): succeeded in enrollee mode\n");
+          //  printf("WiFi Protected Setup (WPS): succeeded in enrollee mode\n");
             break;
         case SYSTEM_EVENT_STA_WPS_ER_FAILED:
-            printf("WiFi Protected Setup (WPS): failed in enrollee mode\n");
+           // printf("WiFi Protected Setup (WPS): failed in enrollee mode\n");
             break;
         case SYSTEM_EVENT_STA_WPS_ER_TIMEOUT:
-            printf("WiFi Protected Setup (WPS): timeout in enrollee mode\n");
+            //printf("WiFi Protected Setup (WPS): timeout in enrollee mode\n");
             break;
         case SYSTEM_EVENT_STA_WPS_ER_PIN:
-            printf("WiFi Protected Setup (WPS): pin code in enrollee mode\n");
+           // printf("WiFi Protected Setup (WPS): pin code in enrollee mode\n");
             break;
         case SYSTEM_EVENT_AP_START:
-            printf("WiFi access point started\n");
+           // printf("WiFi access point started\n");
             break;
         case SYSTEM_EVENT_AP_STOP:
-            printf("WiFi access point  stopped\n");
+           // printf("WiFi access point  stopped\n");
             break;
         case SYSTEM_EVENT_AP_STACONNECTED:
             printf("Client connected\n");
