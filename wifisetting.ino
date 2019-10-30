@@ -45,13 +45,8 @@ void parseBytes1(const char* str, char sep, int address, int maxBytes, int base)
 }
 
 void wifi_connect(wifi_mode_t wifi_mode,char *ssid,char *password,char *ap_ssid){
-    
     WiFi.mode(wifi_mode);
-    //WiFi.softAP(ap_ssid,"88888888");
-   // printf(ssid);
-   // printf(password);
     WiFi.begin(ssid,password);
-   // WiFi.begin("Bach Huu Phat", "0908777832");
 }
 void wifi_AP(wifi_mode_t wifi_mode,char *ssid,char *password){
     

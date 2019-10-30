@@ -13,10 +13,11 @@
 #include <WiFi.h>
  */
  //int charrr[50000];
-#define BUF_SIZE (255)
+#define using_sta true
+#define BUF_SIZE (125)
 //#define UART_NUM_1 UART_NUM_1
 //#define UART_NUM_2 UART_NUM_2
-#define RD_BUF_SIZE (BUF_SIZE)
+//#define RD_BUF_SIZE (BUF_SIZE)
 //static QueueHandle_t uart0_queue;
 static intr_handle_t handle_console_uart1;
 static intr_handle_t handle_console_uart2;
@@ -54,7 +55,7 @@ long lastReconnectAttempt = 0;
 long lastMsg=0;
 //char ledState[64];
 size_t content_len;
-#define using_sta true
+
 void http_re( void * pvParameters ){
 
     while(true){
@@ -75,7 +76,7 @@ void setup()
     Serial.println("An Error has occurred while mounting SPIFFS");
     return;
     }
-#ifndef using_sta
+#ifdef using_sta
     wifi_connect(WIFI_STA,WiFiConf.sta_ssid,WiFiConf.sta_pwd,WiFiConf.ap_ssid);
 #else
     wifi_AP(WIFI_AP,"CMA_AU","123789456");
