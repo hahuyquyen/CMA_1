@@ -35,6 +35,10 @@ int hangtram=0;
 void TaskCAN( void * pvParameters ){
   double giatri=0;
     while(true){
+     /* if( xSemaphoreTake( xSemaphore, ( TickType_t ) 10 ) == pdTRUE )
+        {
+           
+        }*/
       xSemaphoreTake( xCountingSemaphore, portMAX_DELAY );
       for (int j=0;j<2;j++){
         giatri=0;

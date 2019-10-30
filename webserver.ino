@@ -155,6 +155,7 @@ void setupWiFiConf(void) {
     [](AsyncWebServerRequest *request, const String& filename, size_t index, uint8_t *data,
                   size_t len, bool final) {handleDoUpdate(request, filename, index, data, len, final);}
   );
+  server.on("/Reboot", HTTP_GET, [](AsyncWebServerRequest *request){request->send(200, "text/html", "OK.. Rebooting");vTaskDelay(1000);ESP.restart();});
   server.on("/favicon.ico", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send(SPIFFS, "/favicon.ico", "image/png");
 });
