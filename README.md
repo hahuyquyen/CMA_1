@@ -4,8 +4,8 @@
 -ESP32 hiển thị (..)   
 -ESP32 giao tiếp MQTT   
 -xây dựng thư viện cho module RFID:   
-+Set parameter và chờ thông báo trả lời ok của module , có timeout.
-+Kiểm tra check và nhận mã RFID theo 3 thông số trả về:
++Set parameter và chờ thông báo trả lời ok của module , có timeout.   
++Kiểm tra check và nhận mã ID RFID theo 3 thông số trả về:
 
 - The temperature label output format is as follows:
 - The EPC G2 tag variable byte output format is as follows:
