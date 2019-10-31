@@ -12,7 +12,8 @@ void setup()
 unsigned long time_gg=0;
 void loop()
 {
-  if (nano.check() == true){ myEPClength = sizeof(myEPC);
+  if (nano.check() == true){ 
+    myEPClength = sizeof(myEPC);
     if (nano.parseResponse(myEPC,myEPClength)){
         for (byte x = 0 ; x < myEPClength ; x++)
         {

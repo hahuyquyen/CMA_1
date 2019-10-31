@@ -10,7 +10,7 @@ RFID::RFID(void)
 {
   // Constructor
 }
-bool RFID::begin(Stream &serialPort)
+void RFID::begin(Stream &serialPort)
 {
   _RFIDSERIAL = &serialPort; 
   return true;
@@ -24,7 +24,6 @@ uint8_t RFID::calculateCRC (uint8_t * uBuff, uint8_t uBuffLen)
     uSum = uSum + uBuff [i];  
   }  
   uSum = (~ uSum) + 1;  
-//   _RFIDSERIAL->println(uSum);
   return uSum;  
 } 
 void RFID::set_mode_timming (uint8_t mode,uint16_t timeout)  
@@ -34,6 +33,20 @@ void RFID::set_mode_timming (uint8_t mode,uint16_t timeout)
 	else if(mode ==2 )data[3]=0x02;
 	else data[3]=0x03;
 	sendMessage(0x60,data,sizeof(data),timeout,true);
+} 
+void set_buzzer(uint8_t mode,uint16_t timeout)
+{ 
+  uint8_t data[2]={0x00,0x00};
+  if (mode ==0 )data[1]=0x00;
+  else data[1]=0x01;
+  sendMessage(0xB0,data,sizeof(data),timeout,true);
+} 
+void set_relay(uint8_t statu,uint16_t timeout)
+{ 
+  uint8_t data[2]={0x00,0x00};
+  if (statu ==0 )data[1]=0x00;
+  else data[1]=0x01;
+  sendMessage(0xB1,data,sizeof(data),timeout,true);
 } 
 void RFID::set_timing_message(uint8_t timing,uint16_t timeout){
 	uint8_t data[4]={0x00,0x00,0x71,0x02};
@@ -50,6 +63,14 @@ void RFID::set_link_selec(uint8_t mode,uint16_t timeout){
 	uint8_t data[4]={0x00,0x00,0x72,0x02};
 	data[3]=mode;
 	sendMessage(0x60,data,sizeof(data),timeout,true);
+}
+/*
+ * power từ 0 - 150 Transmit power 0 - 150 Power analog
+ */
+void RFID::set_power(uint8_t mode,uint16_t timeout){
+  uint8_t data[4]={0x00,0x00,0x65,0x02}; 
+  data[3]=mode;
+  sendMessage(0x60,data,sizeof(data),timeout,true);
 }
 void RFID::sendMessage(uint8_t opcode, uint8_t *data, uint8_t size, uint16_t timeOut, boolean waitForResponse)
 {
@@ -77,7 +98,7 @@ void RFID::sendCommand(uint16_t timeOut, boolean waitForResponse)
   while (_RFIDSERIAL->available() == false)
   {
     if (xTaskGetTickCount() - startTime > timeOut)
-    {_RFIDSERIAL->println("time out");
+    {
       msg[0] = ERROR_COMMAND_RESPONSE_TIMEOUT;
       return;
     }
@@ -167,7 +188,7 @@ bool RFID::check()
   		return (true);
   	}
     if ( _head > 25){_head =0;memset(msg,0x00,sizeof(msg));}
-    }
+  }
   return (false);
 }
 uint8_t RFID::parseResponse(uint8_t* datareturn, uint8_t &dataLengthRead)
@@ -198,10 +219,9 @@ byte 6-17 8D 48 29 4E D9 00 D9 00 00 00 00 05 ID
 	else if (dataLengthRead < 12) tam=8;
 	else tam=12;
 	if (crc == msg[ _head_par-1 ]){
-
+    memset(datareturn ,0x00, dataLengthRead);
 		if ( _head_par == 13){
 			for (uint8_t x = 0; x < 8; x++)datareturn[x]=msg[x+3];
-      for (uint8_t x = 8; x < 12; x++)datareturn[x]=0x00 ;
 		}
 		else if ( _head_par == 16){
 			for (uint8_t x = 0; x < tam; x++)
