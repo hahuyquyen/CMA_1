@@ -34,14 +34,14 @@ void RFID::set_mode_timming (uint8_t mode,uint16_t timeout)
 	else data[3]=0x03;
 	sendMessage(0x60,data,sizeof(data),timeout,true);
 } 
-void set_buzzer(uint8_t mode,uint16_t timeout)
+void RFID::set_buzzer(uint8_t mode,uint16_t timeout)
 { 
   uint8_t data[2]={0x00,0x00};
   if (mode ==0 )data[1]=0x00;
   else data[1]=0x01;
   sendMessage(0xB0,data,sizeof(data),timeout,true);
 } 
-void set_relay(uint8_t statu,uint16_t timeout)
+void RFID::set_relay(uint8_t statu,uint16_t timeout)
 { 
   uint8_t data[2]={0x00,0x00};
   if (statu ==0 )data[1]=0x00;

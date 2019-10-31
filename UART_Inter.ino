@@ -41,7 +41,7 @@ static void IRAM_ATTR uart1_intr_handle(void *arg)
  //uart_write_bytes(UART_NUM_0, (const char*)can_rxbuf, canbuff);
  
 }
-
+/*
 static void IRAM_ATTR uart_intr_handle2(void *arg)
 {
   uint16_t rx_fifo_len;
@@ -58,7 +58,7 @@ static void IRAM_ATTR uart_intr_handle2(void *arg)
  //memset_volatile(rfid_rxbuf, '\0',40); 
 }
 
-
+*/
 void setting_uart(){
       /*
      * cai UART 1
@@ -77,7 +77,7 @@ void setting_uart(){
   uart_isr_register(UART_NUM_0,uart1_intr_handle, NULL, ESP_INTR_FLAG_IRAM, &handle_console_uart1); // register new UART subroutine
   uart_enable_rx_intr(UART_NUM_0); // enable RX interrupt
 
-  
+  /*
   uart_config_t uart2_config = {
     .baud_rate = 115200,
     .data_bits = UART_DATA_8_BITS,
@@ -91,6 +91,6 @@ void setting_uart(){
   uart_isr_free(UART_NUM_2);// release the pre registered UART handler/subroutine
   uart_isr_register(UART_NUM_2,uart_intr_handle2, NULL, ESP_INTR_FLAG_IRAM, &handle_console_uart2); // register new UART subroutine
   uart_enable_rx_intr(UART_NUM_2); // enable RX interrupt
-
+*/
   xCountingSemaphore = xSemaphoreCreateCounting( 10, 0 );
 }

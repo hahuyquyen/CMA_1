@@ -8,7 +8,8 @@
 #include <WiFi.h>
 #include <ESPAsyncWebServer.h>
 #include <Update.h>
-
+//#include <HardwareSerial.h>
+//HardwareSerial Serial2(2);
 #define using_sta true
 #define BUF_SIZE (125)
 
