@@ -8,17 +8,10 @@
 #include <WiFi.h>
 #include <ESPAsyncWebServer.h>
 #include <Update.h>
-/*
- * #include <WebServer.h>
-#include <WiFi.h>
- */
- //int charrr[50000];
+
 #define using_sta true
 #define BUF_SIZE (125)
-//#define UART_NUM_1 UART_NUM_1
-//#define UART_NUM_2 UART_NUM_2
-//#define RD_BUF_SIZE (BUF_SIZE)
-//static QueueHandle_t uart0_queue;
+
 static intr_handle_t handle_console_uart1;
 static intr_handle_t handle_console_uart2;
 uint16_t urxlen;
@@ -30,6 +23,18 @@ static void IRAM_ATTR uart_intr_handle2(void *arg);
  UART 2 rxPin = 16;txPin = 17;
 */
 SemaphoreHandle_t xCountingSemaphore;
+QueueHandle_t Queue_can;
+//QueueHandle_t Queue_rfid;
+/**************************** 
+ *  Struct Data 
+ ***************************/
+typedef struct Data_user{
+  uint8_t id;
+  uint16_t id_RFID;
+  double data_weight;
+  double data_tare;
+} data_user;
+
 AsyncWebServer server(4999);
 //WiFiClient espClient;
 //PubSubClient client(espClient);
@@ -42,6 +47,7 @@ static int taskCore = 1;
 void TaskRFID( void * pvParameters );
 void TaskCAN( void * pvParameters );
 void Display( void * pvParameters );
+void http_re( void * pvParameters );
 void callback_mqtt(char* topic, byte* payload, unsigned int length) ;
 boolean reconnect_mqtt();
 bool loadWiFiConf();
@@ -50,23 +56,18 @@ void wifi_connect(wifi_mode_t wifi_mode,char *ssid,char *password,char *ap_ssid)
 void setupWiFiConf(void);
 void setting_uart();
 void WiFiEvent(WiFiEvent_t event);
-data_user congnhan;
 long lastReconnectAttempt = 0;
 long lastMsg=0;
 //char ledState[64];
 size_t content_len;
 
-void http_re( void * pvParameters ){
 
-    while(true){
-      vTaskDelay(10);
-    }
-}
 void printProgress(size_t prg, size_t sz) {
   printf("Progress: %d%%\n", (prg*100)/content_len);
 }
 void setup()
-{
+{   Queue_can = xQueueCreate(5,sizeof(data_user));
+    //Queue_rfid = xQueueCreate(5,sizeof(data_user));
    // Serial.begin(115200);
     printf("Begin\n");
     EEPROM.begin(1024);
@@ -97,7 +98,7 @@ void setup()
                         "TaskRFID", /* Name of the task */
                         2048,      /* Stack size in words */
                         NULL,       /* Task input parameter */
-                        1,          /* Priority of the task */
+                        5,          /* Priority of the task */
                         NULL,       /* Task handle. */
                         taskCore);  /* Core where the task should run */
     xTaskCreatePinnedToCore(
@@ -105,15 +106,15 @@ void setup()
                         "TaskCAN", /* Name of the task */
                         2048,      /* Stack size in words */
                         NULL,       /* Task input parameter */
-                        1,          /* Priority of the task */
+                        4,          /* Priority of the task */
                         NULL,       /* Task handle. */
-                        1);  /* Core where the task should run */
+                        0);  /* Core where the task should run */
     xTaskCreatePinnedToCore(
                         Display,   /* Function to implement the task */
                         "Display", /* Name of the task */
                         2048,      /* Stack size in words */
                         NULL,       /* Task input parameter */
-                        1,          /* Priority of the task */
+                        2,          /* Priority of the task */
                         NULL,       /* Task handle. */
                         1);  /* Core where the task should run */   
     xTaskCreatePinnedToCore(
@@ -121,7 +122,7 @@ void setup()
                         "http_re", /* Name of the task */
                         2048,      /* Stack size in words */
                         NULL,       /* Task input parameter */
-                        1,          /* Priority of the task */
+                        3,          /* Priority of the task */
                         NULL,       /* Task handle. */
                         0);  /* Core where the task should run */ 
     
@@ -130,12 +131,14 @@ void setup()
   //client.setCallback(callback_mqtt);
                         
 }
-
+/*
+ * Main Loop luôn chạy Core 1
+ */
 void loop()
-{       //server.handleClient();
-//printf("Main Loop: priority = %d",uxTaskPriorityGet(NULL));
+{  
   
-        vTaskDelay(100);
+  //printf("main loop core :  %d\n",xPortGetCoreID());
+  vTaskDelay(1000);
   /*
   if (!client.connected()) {
     long now = millis();

@@ -3,6 +3,27 @@
  */
 //Calculate the checksum of the message and added as the last byte before sending it over
 //to RFID reader
+/*
+ * ESP-> 0xA0-lenght
+ * Reader->ESP: 0xE4-lenght hoặc 0xE0-lenght
+ */
+
+byte Setting_readdata[] = {0xA0,0x06,0x80,0x00,0x01,0x02,0x01,0xD6};//Reads 1 word of data from the 0x02 address
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 unsigned char CheckSum (unsigned char * uBuff, unsigned char uBuffLen)  
 {  
   unsigned char i, uSum = 0;  
@@ -23,6 +44,9 @@ void txrx(unsigned char * message, unsigned char messageLen)
 
 }
 void TaskRFID( void * pvParameters ){
+  const TickType_t xTicksToWait = pdMS_TO_TICKS(100);
+  data_user Data;
+  Data.id = 2;
   // Reset reader command frame CODE
   // Sẽ trả A0 03 65 00 F8
     byte reset_message[] = {0xA0,0x03,0x65,0x00,0xF8};
@@ -63,11 +87,16 @@ void TaskRFID( void * pvParameters ){
     txrx(reset_message,5);
     
     printf("Waiting for card..\n");
+    long time_sche = 0;
+    int i =0;
     while(true){
-      
-          unsigned long currentMillis=xTaskGetTickCount();
-          //printf("Time.. %lu \n",currentMillis);
-          vTaskDelay(1000);
+                if (xTaskGetTickCount()-time_sche > 2000){
+                    time_sche = xTaskGetTickCount();
+                    i=i+1;
+                    Data.id_RFID = i;
+                    xQueueSend( Queue_can, &Data, xTicksToWait );
+                  }       
+                vTaskDelay(20);
     }
     vTaskDelete(NULL) ;
 }

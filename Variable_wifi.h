@@ -2,12 +2,7 @@
 const uint8_t wifi_conf_format[] = WIFI_CONF_FORMAT;
 #define WIFI_CONF_START 0
 
-typedef struct Data_user{
-  uint16_t id_RFID;
-  double data_weight;
-  double data_tare;
-  long time_detec;
-} data_user;
+
 
 static struct WiFiConfStruct {
   uint8_t format[4];

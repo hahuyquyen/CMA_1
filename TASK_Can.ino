@@ -30,12 +30,16 @@ extern volatile uint8_t canbuff;
 extern volatile uint8_t rfidbuff;
 extern volatile uint8_t rfid_rxbuf[40];
 extern volatile uint8_t rfid_data[20];
-int tam= 1;
-int hangtram=0;
+
 void TaskCAN( void * pvParameters ){
   double giatri=0;
+  const TickType_t xTicksToWait = pdMS_TO_TICKS(5);
+  int tam= 1;
+  int hangtram=0;
+  data_user Data;
+  Data.id = 1;
     while(true){
-     if( xSemaphoreTake( xCountingSemaphore, ( TickType_t ) 10 ) == pdTRUE )
+     if( xSemaphoreTake( xCountingSemaphore, ( TickType_t ) 5 ) == pdTRUE )
      {
       for (int j=0;j<2;j++){
         giatri=0;
@@ -51,13 +55,14 @@ void TaskCAN( void * pvParameters ){
            giatri+=(float)((rfid_data[tang1]-48)*pow(10,hangtram-(tang1-1)));
             }
         }
-        if (rfid_data[j*9] == 0x30){congnhan.data_weight=giatri*tam;}
-        else{congnhan.data_tare=giatri*tam;} 
+        if (rfid_data[j*9] == 0x30){Data.data_weight=giatri*tam;}
+        else{Data.data_tare=giatri*tam;} 
       }
-      printf("Can weight: %f \n",congnhan.data_weight);
-      printf("Can tare: %f \n", congnhan.data_tare);
+      xQueueSend( Queue_can, &Data, xTicksToWait );
+     // printf("Can weight: %f \n",Data.data_weight);
+     // printf("Can tare: %f \n", Data.data_tare);
      }
-      vTaskDelay(10);
+      vTaskDelay(20);
         
     }
     vTaskDelete(NULL) ;
