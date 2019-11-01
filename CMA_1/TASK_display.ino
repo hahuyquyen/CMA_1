@@ -1,3 +1,4 @@
+display_NV Display_NV_TASK;
 void Display( void * pvParameters ){
   boolean status_led= true;
   pinMode(2, OUTPUT);
@@ -7,8 +8,9 @@ void Display( void * pvParameters ){
         time_sche = xTaskGetTickCount();
       status_led=!status_led;
       digitalWrite(2,status_led);
-      
-     // printf("Can tare: %f \n", congnhan.data_tare);
+      }
+      if(xQueueReceive( Queue_display, &Display_NV_TASK,  ( TickType_t ) 2 )== pdPASS ){
+        printf("Hien thi nhan vien \n");
       }
       vTaskDelay(30);
     }

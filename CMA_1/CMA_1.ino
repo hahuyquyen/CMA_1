@@ -14,10 +14,10 @@
 #define BUF_SIZE (125)
 
 static intr_handle_t handle_console_uart1;
-static intr_handle_t handle_console_uart2;
+//static intr_handle_t handle_console_uart2;
 uint16_t urxlen;
 static void IRAM_ATTR uart1_intr_handle(void *arg);
-static void IRAM_ATTR uart_intr_handle2(void *arg);
+//static void IRAM_ATTR uart_intr_handle2(void *arg);
 /*###########################
  UART 0 rxPin = 3;txPin = 1;
  UART 1 rxPin = 9;txPin = 10;
@@ -26,6 +26,7 @@ static void IRAM_ATTR uart_intr_handle2(void *arg);
 SemaphoreHandle_t xCountingSemaphore;
 QueueHandle_t Queue_can;
 QueueHandle_t Queue_mqtt;
+QueueHandle_t Queue_display;
 /**************************** 
  *  Struct Data 
  ***************************/
@@ -35,7 +36,13 @@ typedef struct Data_user{
   double data_weight;
   double data_tare;
 } data_user;
-
+typedef struct Display{
+  uint8_t id;
+  char name_nv[50];
+  double cannang;
+  double tiencong;
+} display_NV;
+display_NV Display_NV;
 AsyncWebServer server(4999);
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -67,6 +74,7 @@ void printProgress(size_t prg, size_t sz) {
 void setup()
 {   Queue_can = xQueueCreate(5,sizeof(data_user));
     Queue_mqtt = xQueueCreate(10,sizeof(data_user));
+    Queue_display = xQueueCreate(3,sizeof(display_NV));
     EEPROM.begin(1024);
     WiFi.disconnect(true);
     loadWiFiConf();
@@ -157,7 +165,12 @@ void loop()
 
 void callback_mqtt(char* topic, byte* payload, unsigned int length) {
   if (strcmp(WiFiConf.mqtt_subto1,topic) == 0){printf("vung 1 \n");
+  
+  xQueueSend( Queue_display, &Display_NV, ( TickType_t ) 2  );
    /* char message[length + 1];
+    *  char* p = (char*)malloc(length + 1);
+    *  memcpy(p,payload,length);
+    *  free(p);
   for (int i = 0; i < length; i++) {
     message[i] = (char)payload[i];
   }

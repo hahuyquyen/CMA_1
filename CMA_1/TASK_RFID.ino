@@ -9,7 +9,10 @@
  */
 
 #include "rfid.h"
-
+static byte myEPC[12]; //Most EPCs are 12 bytes
+static byte myEPClength;
+data_user Data_Task_RFID;
+RFID nano; 
 void array_to_string(byte* array, unsigned int len, char* buffer)
 {
     for (unsigned int i = 0; i < len; i++)
@@ -23,11 +26,7 @@ void array_to_string(byte* array, unsigned int len, char* buffer)
 }
 void TaskRFID( void * pvParameters ){
     const TickType_t xTicksToWait = pdMS_TO_TICKS(2);
-    data_user Data;
-    RFID nano; //Create instance
-    Data.id = 2;
-    byte myEPC[12]; //Most EPCs are 12 bytes
-    byte myEPClength;
+    Data_Task_RFID.id = 2;
     printf("Waiting for card..\n");
     long time_sche = 0;
     int i =0;
@@ -44,8 +43,8 @@ void TaskRFID( void * pvParameters ){
                   if (nano.check() == true){ 
                     myEPClength = sizeof(myEPC);
                     if (nano.parseResponse(myEPC,myEPClength)){
-                        array_to_string(myEPC, 12, Data.id_RFID);
-                        xQueueSend( Queue_can, &Data, xTicksToWait );
+                        array_to_string(myEPC, 12, Data_Task_RFID.id_RFID);
+                        xQueueSend( Queue_can, &Data_Task_RFID, xTicksToWait );
                     }
                   }
                 vTaskDelay(20);
