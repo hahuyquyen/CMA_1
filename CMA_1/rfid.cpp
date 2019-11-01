@@ -214,7 +214,6 @@ byte2-13 E3 00 60 19 D2 6D 1C E9 AA BB CC DD là ID
 byte 6-17 8D 48 29 4E D9 00 D9 00 00 00 00 05 ID
 */
 	uint8_t crc = calculateCRC(&msg[0], _head_par-1);
- _RFIDSERIAL->println(crc);
 	uint8_t tam = 0;
 	if (dataLengthRead < 8) return false;
 	else if (dataLengthRead < 12) tam=8;
