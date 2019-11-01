@@ -1,6 +1,6 @@
 void http_re( void * pvParameters ){
+    const TickType_t xTicksToWait = pdMS_TO_TICKS(2);
     data_user Data_CAN;
-    data_user Data_RF;
     data_user Data;
     long time_count1 = 0;
     long time_count2 = 0;
@@ -17,16 +17,16 @@ void http_re( void * pvParameters ){
       }
       else if(Data_CAN.id == 2){
         strcpy(Data.id_RFID, Data_CAN.id_RFID);
-        printf("RFID: %s \n", Data.id_RFID);
         time_count2=xTaskGetTickCount();
       }
     }
     if (time_count2 > 5000){ time_count = time_count2 > time_count1?time_count2 - time_count1:time_count1 - time_count2;}
-    if (time_count < 500){
+    if (time_count < 3000){
       printf("TimeCount: %ld \n", time_count);
       printf("Can weight: %f \n",Data.data_weight);
       printf("Can tare: %f \n", Data.data_tare);
       printf("RFID: %s \n", Data.id_RFID);
+      xQueueSend( Queue_mqtt, &Data, xTicksToWait );
       time_count = 10000;
       time_count1 = 0;
     }
@@ -36,4 +36,5 @@ void http_re( void * pvParameters ){
       
       vTaskDelay(10);
     }
+    vTaskDelete(NULL) ;
 }
