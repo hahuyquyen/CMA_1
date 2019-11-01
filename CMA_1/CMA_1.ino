@@ -12,10 +12,9 @@
 //HardwareSerial Serial2(2);
 #define using_sta true
 #define BUF_SIZE (125)
-
+#define chedo 0  // 0 là IN,1 là OUT
 static intr_handle_t handle_console_uart1;
-//static intr_handle_t handle_console_uart2;
-uint16_t urxlen;
+//uint16_t urxlen;
 static void IRAM_ATTR uart1_intr_handle(void *arg);
 //static void IRAM_ATTR uart_intr_handle2(void *arg);
 /*###########################
@@ -24,9 +23,11 @@ static void IRAM_ATTR uart1_intr_handle(void *arg);
  UART 2 rxPin = 16;txPin = 17;
 */
 SemaphoreHandle_t xCountingSemaphore;
+SemaphoreHandle_t xSignal_FromRFID;
 QueueHandle_t Queue_can;
 QueueHandle_t Queue_mqtt;
 QueueHandle_t Queue_display;
+QueueHandle_t Queue_can_interrup;
 /**************************** 
  *  Struct Data 
  ***************************/
@@ -43,6 +44,11 @@ typedef struct Display{
   double tiencong;
 } display_NV;
 display_NV Display_NV;
+data_user datatruyen_mqtt;  
+
+/*
+ * Web Server và MQTT
+ */
 AsyncWebServer server(4999);
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -64,17 +70,25 @@ void wifi_connect(wifi_mode_t wifi_mode,char *ssid,char *password,char *ap_ssid)
 void setupWiFiConf(void);
 void setting_uart();
 void WiFiEvent(WiFiEvent_t event);
-//char ledState[64];
 size_t content_len;
+/*
+ * Biến
+ */
+unsigned long _time_lastconnect_mqtt=0;
+extern uint8_t rfid_data[20];
 
-data_user datatruyen_mqtt;  
 void printProgress(size_t prg, size_t sz) {
   printf("Progress: %d%%\n", (prg*100)/content_len);
 }
+
+/*
+ * Setup
+ */
 void setup()
 {   Queue_can = xQueueCreate(5,sizeof(data_user));
     Queue_mqtt = xQueueCreate(10,sizeof(data_user));
     Queue_display = xQueueCreate(3,sizeof(display_NV));
+    Queue_can_interrup= xQueueCreate(3,sizeof(rfid_data));
     EEPROM.begin(1024);
     WiFi.disconnect(true);
     loadWiFiConf();
@@ -88,7 +102,6 @@ void setup()
     wifi_AP(WIFI_AP,"CMA_AU","123789456");
 #endif  
     wifi_staticip(WiFiConf.sta_ip,WiFiConf.sta_gateway,WiFiConf.sta_subnet);   
-  //  wifi_connect(WIFI_AP,WiFiConf.sta_ssid,WiFiConf.sta_pwd,WiFiConf.ap_ssid);
     WiFi.onEvent(WiFiEvent);
     WiFi.onEvent([](WiFiEvent_t event, WiFiEventInfo_t info){
         wifiOnDisconnect();
@@ -97,7 +110,6 @@ void setup()
     server.begin();
     Update.onProgress(printProgress);
     setting_uart();
-   // charrr[0]=5;
     xTaskCreatePinnedToCore(
                         TaskRFID,   /* Function to implement the task */
                         "TaskRFID", /* Name of the task */
@@ -139,33 +151,32 @@ void setup()
 /*
  * Main Loop luôn chạy Core 1
  */
-long lastReconnectAttempt=0;
-long lastMsg=0;
+
 void loop()
 {  
   vTaskDelay(50);
   if (!client.connected()) {
     long now = xTaskGetTickCount();
-    if (now - lastReconnectAttempt > 5000) {
-      lastReconnectAttempt = now;
+    if (now - _time_lastconnect_mqtt > 5000) {
+      _time_lastconnect_mqtt = now;
       if (reconnect_mqtt()) {
-        lastReconnectAttempt = 0;
+        _time_lastconnect_mqtt = 0;
       }
     }
   } else { client.loop();}
-    if(xQueueReceive( Queue_mqtt, &datatruyen_mqtt,  ( TickType_t ) 2 )== pdPASS ){
-      String input ="{\"id\":\"" + String(datatruyen_mqtt.id_RFID)+ "\",\"data\":["+String(datatruyen_mqtt.data_weight)+","+ String(datatruyen_mqtt.data_tare)+"]}";
+  if(xQueueReceive( Queue_mqtt, &datatruyen_mqtt,  ( TickType_t ) 2 )== pdPASS ){
+      String input ="{\"id\":\"" + String(datatruyen_mqtt.id_RFID)+ "\",\"device\":\"" + String(chedo) + "\",\"data\":["+String(datatruyen_mqtt.data_weight)+","+ String(datatruyen_mqtt.data_tare)+"]}";
       int chieudai_mqtt=input.length(); 
       char msg[chieudai_mqtt+1];
       input.toCharArray(msg, sizeof(msg));
       client.publish(datatruyen_mqtt.id_RFID, msg);
-    }
-      
+  }    
 }
 
 void callback_mqtt(char* topic, byte* payload, unsigned int length) {
   if (strcmp(WiFiConf.mqtt_subto1,topic) == 0){printf("vung 1 \n");
-  
+  /*StaticJsonDocument<256> doc;
+  deserializeJson(doc, payload, length);*/
   xQueueSend( Queue_display, &Display_NV, ( TickType_t ) 2  );
    /* char message[length + 1];
     *  char* p = (char*)malloc(length + 1);

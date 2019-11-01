@@ -25,21 +25,58 @@ STX* |Stable flag| CR |*Header |Net weight| CR| *Header| Tare weight|CR |LF
 Vd gửi dữ liệu
 02 01 0D 30 34 35 36 2E 30 30 30 0D 34  32 31 30 2E 36 35 32 0D 0A
  */
-extern volatile uint8_t can_rxbuf[40];
+ /*
+  * Nhiều Chế độ truyền SEPC 52 bit 3
+  * Enable header: SPEC 53 bit 0 bằng 1
+  * SPEC 52 Bit 2 Send STX before text bằng 1 là send
+  * Set 59 bit3 xuống 1 và 52 bit 3 bang 0 là khi master yêu cầu sẽ gửi thông tin
+  * Chế độ này master sẽ gửi kí tự ACK (0x06) xuống để Cân gửi trả dữ liệu.
+  * 3 chê do truyen
+  * - 59 bit 3 =  1 và 52 bit 3 =0 là  bắt tay: master truyền ACK và cân sẽ trả datta
+  * 59 bit 2 =1 và 52 bit 3 = 0 khi nhấn enter trên cân mới truyền data
+  * 59 bit 2 = 0 thì cân sẽ tự động truyền
+  */
+/*extern volatile uint8_t can_rxbuf[40];
 extern volatile uint8_t canbuff;
 extern volatile uint8_t rfidbuff;
 extern volatile uint8_t rfid_rxbuf[40];
-extern volatile uint8_t rfid_data[20];
+extern uint8_t rfid_data[20];*/
 static data_user Data_task_CAN;
 void TaskCAN( void * pvParameters ){
-  double giatri=0;
-  const TickType_t xTicksToWait = pdMS_TO_TICKS(5);
-  int tam= 1;
-  int hangtram=0;
-  //data_user Data;
-  Data_task_CAN.id = 1;
+    double giatri=0;
+    const TickType_t xTicksToWait = pdMS_TO_TICKS(5);
+    int tam= 1;
+    int hangtram=0;
+    Data_task_CAN.id = 1;
+    uint8_t _rfid_data[20];
     while(true){
-     if( xSemaphoreTake( xCountingSemaphore, ( TickType_t ) 5 ) == pdTRUE )
+      /*
+      * Khi nhận được tín hiệu UART truyền qua queue
+      * và task CAN  sẽ phân tích mà tách giá trị cân lưu vào struct đưa vào queue
+      * uint8_t rfid_data[20];
+      */
+      if(xQueueReceive( Queue_can_interrup, &_rfid_data,  ( TickType_t ) 2 )== pdPASS ){
+        for (int j=0;j<2;j++){
+        giatri=0;
+        tam=1;
+        for (int tang=(j*9)+1;tang<(j*9)+8; tang++){
+           if((_rfid_data[tang] == 0x2C) || (_rfid_data[tang] == 0x2E)) {hangtram = tang-1; break;}
+        }
+        hangtram=hangtram-1;
+        for (int tang1=(j*9)+1;tang1<(j*9)+8; tang1++){
+          if (_rfid_data[tang1] == 0x2D){tam = -1;}
+          else if ((_rfid_data[tang1] == 0x2C) || (_rfid_data[tang1] == 0x2E)){hangtram=hangtram+1;}
+          else{
+           giatri+=(double)((_rfid_data[tang1]-48)*pow(10,hangtram-(tang1-1)));
+            }
+        }
+        if (_rfid_data[j*9] == 0x30){Data_task_CAN.data_weight=giatri*tam;}
+        else{Data_task_CAN.data_tare=giatri*tam;} 
+      }
+      xQueueSend( Queue_can, &Data_task_CAN, xTicksToWait );
+     
+      }
+     /*if( xSemaphoreTake( xCountingSemaphore, ( TickType_t ) 5 ) == pdTRUE )
      {
       for (int j=0;j<2;j++){
         giatri=0;
@@ -52,13 +89,21 @@ void TaskCAN( void * pvParameters ){
           if (rfid_data[tang1] == 0x2D){tam = -1;}
           else if ((rfid_data[tang1] == 0x2C) || (rfid_data[tang1] == 0x2E)){hangtram=hangtram+1;}
           else{
-           giatri+=(float)((rfid_data[tang1]-48)*pow(10,hangtram-(tang1-1)));
+           giatri+=(double)((rfid_data[tang1]-48)*pow(10,hangtram-(tang1-1)));
             }
         }
         if (rfid_data[j*9] == 0x30){Data_task_CAN.data_weight=giatri*tam;}
         else{Data_task_CAN.data_tare=giatri*tam;} 
       }
       xQueueSend( Queue_can, &Data_task_CAN, xTicksToWait );
+     }*/
+     /*
+      * Cho kiểu truyền dữ liệu của cân theo cơ chế bắt tay.
+      * Khi nhận được tín hiệu thẻ RFID thì task RFID sẽ mở khóa xSignal_FromRFID
+      * và task CAN nhận được chìa khóa sẽ gửi tín hiệu để cân gửi data về
+      */
+     if( xSemaphoreTake( xSignal_FromRFID, ( TickType_t ) 5 ) == pdTRUE ){
+        printf("Gui tin hieu cho can send data\n");
      }
       vTaskDelay(20);
         

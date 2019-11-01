@@ -27,15 +27,14 @@ void array_to_string(byte* array, unsigned int len, char* buffer)
 void TaskRFID( void * pvParameters ){
     const TickType_t xTicksToWait = pdMS_TO_TICKS(2);
     Data_Task_RFID.id = 2;
-    printf("Waiting for card..\n");
-    long time_sche = 0;
+    unsigned long _time_counting_task_rfid = 0;
     int i =0;
     Serial2.begin(115200);
     nano.begin(Serial2); 
     nano.set_mode_timming(1,1000);
     while(true){
-                if (xTaskGetTickCount()-time_sche > 2000){
-                    time_sche = xTaskGetTickCount();
+                if (xTaskGetTickCount()-_time_counting_task_rfid > 2000){
+                    _time_counting_task_rfid = xTaskGetTickCount();
                     i=i+1;
                     //Data.id_RFID = i;
                     
@@ -44,6 +43,7 @@ void TaskRFID( void * pvParameters ){
                     myEPClength = sizeof(myEPC);
                     if (nano.parseResponse(myEPC,myEPClength)){
                         array_to_string(myEPC, 12, Data_Task_RFID.id_RFID);
+                        xSemaphoreGive(xSignal_FromRFID);
                         xQueueSend( Queue_can, &Data_Task_RFID, xTicksToWait );
                     }
                   }

@@ -2,36 +2,41 @@ void http_re( void * pvParameters ){
     const TickType_t xTicksToWait = pdMS_TO_TICKS(2);
     data_user Data_CAN;
     data_user Data;
-    long time_count1 = 0;
-    long time_count2 = 0;
-    long time_count=10000;
-    long time_sche=0;
+    unsigned long _time_get_data_can = 0;
+    unsigned long _time_get_data_rfid = 0;
+    unsigned long _time_timeout_data=10000;
+    unsigned long _time_counting_task_check=0;
     while(true){
       
-    /* check whether receiving is ok or not == pdPASS*/
+    /* 
+     *  Kiểm tra có tín hiệu queue từ 2 task
+     *  sẽ ghi lại thời gian nhận tín hiệu 2 task
+     *  nếu thời gian nhận dữ liệu cân và rfid quá xa nhau thì sẽ bỏ . Tính là data lôiz
+     *  2 dữ liệu phải nhận trong vòng 2s
+    */
     if(xQueueReceive( Queue_can, &Data_CAN,  ( TickType_t ) 2 )== pdPASS ){
       if(Data_CAN.id == 1){
-        time_count1=xTaskGetTickCount();
+        _time_get_data_can =xTaskGetTickCount();
         Data.data_weight=Data_CAN.data_weight;
         Data.data_tare = Data_CAN.data_tare;
       }
       else if(Data_CAN.id == 2){
         strcpy(Data.id_RFID, Data_CAN.id_RFID);
-        time_count2=xTaskGetTickCount();
+        _time_get_data_rfid=xTaskGetTickCount();
       }
     }
-    if (time_count2 > 5000){ time_count = time_count2 > time_count1?time_count2 - time_count1:time_count1 - time_count2;}
-    if (time_count < 3000){
-      printf("TimeCount: %ld \n", time_count);
+    if (_time_get_data_rfid > 5000){ _time_timeout_data = _time_get_data_rfid > _time_get_data_can?_time_get_data_rfid - _time_get_data_can:_time_get_data_can - _time_get_data_rfid;}
+    if (_time_timeout_data < 3000){
+      printf("TimeCount: %ld \n", _time_timeout_data);
       printf("Can weight: %f \n",Data.data_weight);
       printf("Can tare: %f \n", Data.data_tare);
       printf("RFID: %s \n", Data.id_RFID);
       xQueueSend( Queue_mqtt, &Data, xTicksToWait );
-      time_count = 10000;
-      time_count1 = 0;
+      _time_timeout_data = 10000;
+      _time_get_data_can = 0;
     }
-    if (xTaskGetTickCount()-time_sche > 1000){
-      time_sche=xTaskGetTickCount();
+    if (xTaskGetTickCount()- _time_counting_task_check > 1000){
+      _time_counting_task_check=xTaskGetTickCount();
     }
       
       vTaskDelay(10);

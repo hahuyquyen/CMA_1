@@ -19,7 +19,7 @@ static struct WiFiConfStruct {
   char mqtt_pass[64]; 
   char mqtt_subto1[64]; 
   char mqtt_subto2[64]; 
-  char mqtt_subto3[64]; 
+  char mqtt_subto3[64];
 } WiFiConf = {
   WIFI_CONF_FORMAT,
   "Bach Huu Phat",

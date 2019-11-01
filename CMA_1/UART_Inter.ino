@@ -1,9 +1,9 @@
 
 volatile uint8_t can_rxbuf[40];
 volatile uint8_t canbuff=0;
-volatile uint8_t rfidbuff=0;
-volatile uint8_t rfid_rxbuf[40];
-volatile uint8_t rfid_data[20];
+/*volatile uint8_t rfidbuff=0;
+volatile uint8_t rfid_rxbuf[40];*/
+uint8_t rfid_data[20];
 void memset_volatile(volatile void *s, uint8_t c, size_t n)
 {
     /*volatile uint8_t *p = s;
@@ -32,7 +32,8 @@ static void IRAM_ATTR uart1_intr_handle(void *arg)
     }
     canbuff=0;
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-    xSemaphoreGiveFromISR( xCountingSemaphore, &xHigherPriorityTaskWoken );
+    xQueueSendFromISR ( Queue_can_interrup, &rfid_data, &xHigherPriorityTaskWoken);
+  //  xSemaphoreGiveFromISR( xCountingSemaphore, &xHigherPriorityTaskWoken );
     
    }
    
@@ -93,4 +94,5 @@ void setting_uart(){
   uart_enable_rx_intr(UART_NUM_2); // enable RX interrupt
 */
   xCountingSemaphore = xSemaphoreCreateCounting( 10, 0 );
+  xSignal_FromRFID = xSemaphoreCreateCounting( 10, 0 );
 }

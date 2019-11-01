@@ -1,11 +1,11 @@
 display_NV Display_NV_TASK;
 void Display( void * pvParameters ){
-  boolean status_led= true;
-  pinMode(2, OUTPUT);
-  long time_sche=0;
+    boolean status_led= true;
+    pinMode(2, OUTPUT);
+    unsigned long _time_counting_task_display=0;
     while(true){
-      if (xTaskGetTickCount()-time_sche > 1000){
-        time_sche = xTaskGetTickCount();
+      if (xTaskGetTickCount()- _time_counting_task_display > 1000){
+        _time_counting_task_display = xTaskGetTickCount();
       status_led=!status_led;
       digitalWrite(2,status_led);
       }
