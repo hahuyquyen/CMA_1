@@ -17,7 +17,7 @@ void http_re( void * pvParameters ){
       }
       else if(Data_CAN.id == 2){
         strcpy(Data.id_RFID, Data_CAN.id_RFID);
-        Serial.println(Data.id_RFID);
+        printf("RFID: %s \n", Data.id_RFID);
         time_count2=xTaskGetTickCount();
       }
     }
