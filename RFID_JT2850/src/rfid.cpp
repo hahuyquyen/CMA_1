@@ -1,3 +1,11 @@
+/*
+Pham An Nhàn 1/11/2019
+
+Chưa test thực tế, chỉ dựa vào tài liệu và test theo khung truyền tài liệu đưa.
+
+thanks
+*/
+
 #if (ARDUINO >= 100)
 #include "Arduino.h"
 #else

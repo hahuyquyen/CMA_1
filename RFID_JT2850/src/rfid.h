@@ -1,3 +1,10 @@
+/*
+Pham An Nhàn 1/11/2019
+
+Chưa test thực tế, chỉ dựa vào tài liệu và test theo khung truyền tài liệu đưa.
+
+thanks
+*/
 #include <stdlib.h>
 #include "Arduino.h"
 #include "pins_arduino.h"
