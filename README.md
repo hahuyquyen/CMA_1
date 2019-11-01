@@ -32,7 +32,7 @@ và topic
 E3006019D26D1CE9AABBCCDD
 Todo:
 Thêm thư viện set parameter cho module RFID VD: POWER ....
-MQTT 
+MQTT : Get thông tin sau khi tính toán từ server hiển thị màn hình
 GET data RFID
 ```
 ![alt text](https://github.com/annhan/CMA_1/blob/master/imgae/main.png)
