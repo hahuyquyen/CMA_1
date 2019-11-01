@@ -31,7 +31,7 @@ QueueHandle_t Queue_can;
  ***************************/
 typedef struct Data_user{
   uint8_t id;
-  uint16_t id_RFID;
+  char id_RFID[25];
   double data_weight;
   double data_tare;
 } data_user;

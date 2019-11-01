@@ -16,7 +16,8 @@ void http_re( void * pvParameters ){
         Data.data_tare = Data_CAN.data_tare;
       }
       else if(Data_CAN.id == 2){
-        Data.id_RFID = Data_CAN.id_RFID;
+        strcpy(Data.id_RFID, Data_CAN.id_RFID);
+        Serial.println(Data.id_RFID);
         time_count2=xTaskGetTickCount();
       }
     }
@@ -25,7 +26,7 @@ void http_re( void * pvParameters ){
       printf("TimeCount: %ld \n", time_count);
       printf("Can weight: %f \n",Data.data_weight);
       printf("Can tare: %f \n", Data.data_tare);
-      printf("RFID: %d \n", Data.id_RFID);
+      printf("RFID: %s \n", Data.id_RFID);
       time_count = 10000;
       time_count1 = 0;
     }

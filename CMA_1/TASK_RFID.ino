@@ -10,9 +10,19 @@
 
 #include "rfid.h"
 
-
+void array_to_string(byte* array, unsigned int len, char* buffer)
+{
+    for (unsigned int i = 0; i < len; i++)
+    {
+        byte nib1 = (array[i] >> 4) & 0x0F;
+        byte nib2 = (array[i] >> 0) & 0x0F;
+        buffer[i*2+0] = nib1  < 0xA ? '0' + nib1  : 'A' + nib1  - 0xA;
+        buffer[i*2+1] = nib2  < 0xA ? '0' + nib2  : 'A' + nib2  - 0xA;
+    }
+    buffer[len*2] = '\0';
+}
 void TaskRFID( void * pvParameters ){
-    const TickType_t xTicksToWait = pdMS_TO_TICKS(50);
+    const TickType_t xTicksToWait = pdMS_TO_TICKS(2);
     data_user Data;
     RFID nano; //Create instance
     Data.id = 2;
@@ -23,23 +33,19 @@ void TaskRFID( void * pvParameters ){
     int i =0;
     Serial2.begin(115200);
     nano.begin(Serial2); 
-    nano.set_mode_timming(1,5000);
+    nano.set_mode_timming(1,1000);
     while(true){
                 if (xTaskGetTickCount()-time_sche > 2000){
                     time_sche = xTaskGetTickCount();
                     i=i+1;
-                    Data.id_RFID = i;
-                    xQueueSend( Queue_can, &Data, xTicksToWait );
+                    //Data.id_RFID = i;
+                    
                   }
                   if (nano.check() == true){ 
                     myEPClength = sizeof(myEPC);
                     if (nano.parseResponse(myEPC,myEPClength)){
-                        for (byte x = 0 ; x < myEPClength ; x++)
-                        {
-                          Serial2.print(myEPC[x], HEX);
-                          Serial2.print(" ");
-                        }  
-                        Serial2.println("");
+                        array_to_string(myEPC, 12, Data.id_RFID);
+                        xQueueSend( Queue_can, &Data, xTicksToWait );
                     }
                   }
                 vTaskDelay(20);
