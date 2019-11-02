@@ -2,24 +2,20 @@
 
 void wifiOnDisconnect()
 { status_wifi_connect_AP = false ; 
-  printf("STA Disconnected from  event\n");
+//  printf("STA Disconnected from  event\n");
 }
 void WiFiEvent(WiFiEvent_t event)
 {
    // Serial.printf("[WiFi-event] event: %d\n", event);
 
        switch (event) {
-        case SYSTEM_EVENT_WIFI_READY: 
-            printf("WiFi interface ready\n");
+        case SYSTEM_EVENT_WIFI_READY: //printf("WiFi interface ready\n");
             break;
-        case SYSTEM_EVENT_STA_START:
-            printf("WiFi client started\n");
+        case SYSTEM_EVENT_STA_START: //printf("WiFi client started\n");
             break;
-        case SYSTEM_EVENT_STA_STOP:
-            printf("Stop Wifi\n");
+        case SYSTEM_EVENT_STA_STOP: // printf("Stop Wifi\n");
             break;
-        case SYSTEM_EVENT_STA_CONNECTED:
-            printf("Connected to AP\n");    
+        case SYSTEM_EVENT_STA_CONNECTED: //printf("Connected to AP\n"); 
             break;
         case SYSTEM_EVENT_STA_GOT_IP:
             status_wifi_connect_AP = true;

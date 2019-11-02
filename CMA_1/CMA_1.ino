@@ -160,10 +160,6 @@ void loop()
       }
       else {printf("Ko du heap, reset\n");ESP.restart(); }
       free(msg1);
-      
-      /*
-       * Dung 1 bo nho
-       */
   }    
 }
 

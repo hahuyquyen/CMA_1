@@ -1,7 +1,6 @@
-
-void printWiFiConf(void) {
-  //printf(WiFiConf.sta_ssid);
-}
+/**
+ * Tải Eprom thông tin struct wifi
+ */
 bool loadWiFiConf() {
   //printf(F("loading WiFiConf"));
   if (EEPROM.read(WIFI_CONF_START + 0) == wifi_conf_format[0] &&
@@ -12,16 +11,16 @@ bool loadWiFiConf() {
     for (unsigned int t = 0; t < sizeof(WiFiConf); t++) {
       *((char*)&WiFiConf + t) = EEPROM.read(WIFI_CONF_START + t); //& là địa chỉ  của biến Struc, *là data tức là gán data trong ô nhớ struc bằng eprom đọc dc (char*) là ép kiểu dữ liệu
     }
-    printWiFiConf();
     return true;
-  } else {
-    return false;
-  }
+  } 
+  return false;
 }
+/*
+ * Lưu Eprom thông tin wifi
+ */
 void saveWiFiConf(void) {
   for (unsigned int t = 0; t < sizeof(WiFiConf); t++) {
     EEPROM.write(WIFI_CONF_START + t, *((char*)&WiFiConf + t));
   }
   EEPROM.commit();
-  printWiFiConf();
 }

@@ -25,7 +25,7 @@ void http_re( void * pvParameters ){
         _time_get_data_rfid=xTaskGetTickCount();
       }
     }
-    if (_time_get_data_rfid > 5000){ _time_timeout_data = _time_get_data_rfid > _time_get_data_can?_time_get_data_rfid - _time_get_data_can:_time_get_data_can - _time_get_data_rfid;}
+    if (_time_get_data_rfid > time_2_lan_nhan_data){ _time_timeout_data = _time_get_data_rfid > _time_get_data_can?_time_get_data_rfid - _time_get_data_can:_time_get_data_can - _time_get_data_rfid;}
     if (_time_timeout_data < time_2_lan_nhan_data){
       printf("TimeCount: %ld \n", _time_timeout_data);
       printf("Can weight: %f \n",Data.data_weight);
