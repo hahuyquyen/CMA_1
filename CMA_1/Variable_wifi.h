@@ -12,6 +12,9 @@ unsigned long _time_lastconnect_mqtt=0;
 static uint8_t counter_wifi_disconnect= 0;
 static boolean status_wifi_connect_AP = true ; 
 
+
+
+
 static struct WiFiConfStruct {
   uint8_t format[4];
   char sta_ssid[32];

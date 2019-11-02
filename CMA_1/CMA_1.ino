@@ -25,7 +25,7 @@ void callback_mqtt(char* topic, byte* payload, unsigned int length) ;
 boolean reconnect_mqtt();
 bool loadWiFiConf();
 void wifi_staticip(char *ip_in, char* gateway_in, char* subnet_in);
-void wifi_connect(byte _mode = 0 ,wifi_mode_t wifi_mode = WIFI_AP,char *ssid = "",char *password = "",char *ap_ssid = "ESP AP");
+void wifi_connect(byte _mode = 0 ,wifi_mode_t wifi_mode = WIFI_AP,char *ssid = (char *)"",char *password = (char *)"",char *ap_ssid = (char *)"ESP AP");
 void setupWiFiConf(void);
 void setting_uart();
 void WiFiEvent(WiFiEvent_t event);
@@ -115,7 +115,7 @@ void loop()
     if (counter_wifi_disconnect == 50){
       WiFi.disconnect(true);
       printf("Chuyen\n");
-      wifi_connect(2, WIFI_AP_STA, WiFiConf.sta_ssid, WiFiConf.sta_pwd,"esp32");
+      wifi_connect(2, WIFI_AP_STA, WiFiConf.sta_ssid, WiFiConf.sta_pwd,(char *)"esp32");
       counter_wifi_disconnect++;
     }
     else if (counter_wifi_disconnect < 50) {
@@ -151,13 +151,14 @@ void loop()
       /*
        * Dung heap 
        */
-      size_t size_needed = snprintf(NULL, 0, "{\"id\":\"%s\",\"device\":\"%c\",\"data\":[%g,%g]}", datatruyen_mqtt.id_RFID, chedo, datatruyen_mqtt.data_weight,datatruyen_mqtt.data_tare) + 1;
+      size_t size_needed = snprintf(NULL, 0, "{\"id\":\"%s\",\"device\":\"%s\",\"data\":[%g,%g]}", datatruyen_mqtt.id_RFID, chedo, datatruyen_mqtt.data_weight,datatruyen_mqtt.data_tare) + 1;
       char* msg1 = (char*)malloc(size_needed);
       if (msg1 != NULL) {  // malloc ok
-       sprintf(msg1, "{\"id\":\"%s\",\"device\":\"%c\",\"data\":[%g,%g]}", datatruyen_mqtt.id_RFID,chedo, datatruyen_mqtt.data_weight,datatruyen_mqtt.data_tare) ;
+       sprintf(msg1, "{\"id\":\"%s\",\"device\":\"%s\",\"data\":[%g,%g]}", datatruyen_mqtt.id_RFID,chedo, datatruyen_mqtt.data_weight,datatruyen_mqtt.data_tare) ;
+       printf("mqtt %s\n",msg1);
        client.publish(datatruyen_mqtt.id_RFID, msg1);
       }
-      else {printf("Ko du heap, reset");ESP.restart(); }
+      else {printf("Ko du heap, reset\n");ESP.restart(); }
       free(msg1);
       
       /*

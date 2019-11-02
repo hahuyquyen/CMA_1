@@ -15,13 +15,21 @@ String processor( const String& var){
   else if(var == F("SUBTopic1")){return String(WiFiConf.mqtt_subto1);}
   else if(var == F("SUBTopic2")){return String(WiFiConf.mqtt_subto2);}
   else if(var == F("SUBTopic3")){return String(WiFiConf.mqtt_subto3);}
-  else if(var == F("CHOOSEDHCP")){if (atoi(WiFiConf.choose_dhcp) == 1) return String(1);else return String(0);}
+ // else if(var == F("CHOOSEDHCP")){if (atoi(WiFiConf.choose_dhcp) == 1) return String(1);else return String(0);}
+  else if(var == F("CHOOSEDHCP")){return atoi(WiFiConf.choose_dhcp) == 1?String(1):String(0);}
+
   return String();
 }
 void handleUpdate(AsyncWebServerRequest *request) {
-  char* html = "<form method='POST' action='/doUpdate' enctype='multipart/form-data'><input type='file' name='update'><input type='submit' value='Update'></form>";
+  // 819054   
+   /*  size_t size_needed = snprintf(NULL, 0, "<form method='POST' action='/doUpdate' enctype='multipart/form-data'><input type='file' name='update'><input type='submit' value='Update'></form>") + 1;
+      char* html = (char*)malloc(size_needed);
+      if (html != NULL) {  // malloc ok
+       sprintf(html, "<form method='POST' action='/doUpdate' enctype='multipart/form-data'><input type='file' name='update'><input type='submit' value='Update'></form>") ;
+      }*/
+  char* html = (char *)"<form method='POST' action='/doUpdate' enctype='multipart/form-data'><input type='file' name='update'><input type='submit' value='Update'></form>";
   request->send(200, F("text/html"), html);
-  
+//  free(html);
 }
 
 void handleDoUpdate(AsyncWebServerRequest *request, const String& filename, size_t index, uint8_t *data, size_t len, bool final) {

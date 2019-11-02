@@ -1,6 +1,6 @@
 #define using_sta true
 #define BUF_SIZE_UART (125)
-#define chedo 0  // 0 là IN,1 là OUT
+#define chedo "IN"  // 0 là IN,1 là OUT
 #define web_port 4999
 #define time_2_lan_nhan_data 3000
 #define time_out_set_rfid 1000
