@@ -1,9 +1,5 @@
 
-volatile uint8_t can_rxbuf[40];
-volatile uint8_t canbuff=0;
-/*volatile uint8_t rfidbuff=0;
-volatile uint8_t rfid_rxbuf[40];*/
-uint8_t rfid_data[20];
+
 void memset_volatile(volatile void *s, uint8_t c, size_t n)
 {
     /*volatile uint8_t *p = s;
@@ -16,17 +12,12 @@ void memset_volatile(volatile void *s, uint8_t c, size_t n)
 }
 
 static void IRAM_ATTR uart1_intr_handle(void *arg)
-{
-  uint16_t rx_fifo_len;
-  //status = UART0.int_st.val; // read UART interrupt Status
-  rx_fifo_len = UART0.status.rxfifo_cnt; // read number of bytes in UART buffer
-  while(rx_fifo_len){
+{ volatile uart_dev_t *uart = &UART0;
+  while(uart->status.rxfifo_cnt){
    canbuff=canbuff+1;
    if (canbuff>40){canbuff=0;}
-   can_rxbuf[canbuff] = UART0.fifo.rw_byte; // read all bytes
-   rx_fifo_len--;
-   if ((can_rxbuf[canbuff]== 0x0A) && (can_rxbuf[canbuff-1] == 0x0D)&& (can_rxbuf[canbuff-21] == 0x02)&& (can_rxbuf[canbuff-20] == 0x01)){
-    
+   can_rxbuf[canbuff] = uart->fifo.rw_byte; // read all bytes
+   if ((can_rxbuf[canbuff]== can_LF) && (can_rxbuf[canbuff-1] == can_CR)&& (can_rxbuf[canbuff-21] == 0x02)&& (can_rxbuf[canbuff-20] == 0x01)){   
     for (int ii=4;ii<21;ii++){
       rfid_data[ii-4]=can_rxbuf[ii];     
     }
@@ -34,13 +25,9 @@ static void IRAM_ATTR uart1_intr_handle(void *arg)
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
     xQueueSendFromISR ( Queue_can_interrup, &rfid_data, &xHigherPriorityTaskWoken);
   //  xSemaphoreGiveFromISR( xCountingSemaphore, &xHigherPriorityTaskWoken );
-    
-   }
-   
+   }   
  }
   uart_clear_intr_status(UART_NUM_0, UART_RXFIFO_FULL_INT_CLR|UART_RXFIFO_TOUT_INT_CLR);//clear UART interrupt status
- //uart_write_bytes(UART_NUM_0, (const char*)can_rxbuf, canbuff);
- 
 }
 /*
 static void IRAM_ATTR uart_intr_handle2(void *arg)
@@ -65,18 +52,18 @@ void setting_uart(){
      * cai UART 1
      */
   uart_config_t uart_config = {
-    .baud_rate = 115200,
+    .baud_rate = uart_can_baud_rate,
     .data_bits = UART_DATA_8_BITS,
     .parity = UART_PARITY_DISABLE,
     .stop_bits = UART_STOP_BITS_1,
     .flow_ctrl = UART_HW_FLOWCTRL_DISABLE
   };
-  uart_param_config(UART_NUM_0, &uart_config);
-  uart_set_pin(UART_NUM_0, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
-  uart_driver_install(UART_NUM_0, BUF_SIZE * 2, 0, 0, NULL, 0);//Install UART driver, and get the queue.
-  uart_isr_free(UART_NUM_0);// release the pre registered UART handler/subroutine
-  uart_isr_register(UART_NUM_0,uart1_intr_handle, NULL, ESP_INTR_FLAG_IRAM, &handle_console_uart1); // register new UART subroutine
-  uart_enable_rx_intr(UART_NUM_0); // enable RX interrupt
+  uart_param_config(uart_can_num, &uart_config);
+  uart_set_pin(uart_can_num, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
+  uart_driver_install(uart_can_num, BUF_SIZE_UART * 2, 0, 0, NULL, 0);//Install UART driver, and get the queue.
+  uart_isr_free(uart_can_num);// release the pre registered UART handler/subroutine
+  uart_isr_register(uart_can_num,uart1_intr_handle, NULL, ESP_INTR_FLAG_IRAM, &handle_console_uart1); // register new UART subroutine
+  uart_enable_rx_intr(uart_can_num); // enable RX interrupt
 
   /*
   uart_config_t uart2_config = {

@@ -1,13 +1,25 @@
-display_NV Display_NV_TASK;
+/*
+ * CPU chạy 240mhz
+ * vTaskDelay (x)  x là số stick muốn trì hoãn
+ * Trong freertos nên dùng hàm delay của RTOS thay vì của arduino
+ * Vì khi dùng delay rtos thì task sẽ được chuyển đổi trong delay
+ * 
+ * 
+ */
+
+
+
 void Display( void * pvParameters ){
+    display_NV Display_NV_TASK;
     boolean status_led= true;
     pinMode(2, OUTPUT);
     unsigned long _time_counting_task_display=0;
     while(true){
-      if (xTaskGetTickCount()- _time_counting_task_display > 1000){
+      if (xTaskGetTickCount()- _time_counting_task_display > 2000){
         _time_counting_task_display = xTaskGetTickCount();
-      status_led=!status_led;
-      digitalWrite(2,status_led);
+        status_led=!status_led;
+        digitalWrite(2,status_led);
+        printf("Free Heap %d\n",ESP.getFreeHeap());
       }
       if(xQueueReceive( Queue_display, &Display_NV_TASK,  ( TickType_t ) 2 )== pdPASS ){
         printf("Hien thi nhan vien \n");

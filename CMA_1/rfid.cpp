@@ -168,7 +168,7 @@ uint8_t RFID::readData(uint8_t bank, uint32_t address, uint8_t *dataRead, uint8_
 }
 
 
-bool RFID::check()
+bool IRAM_ATTR RFID::check()
 {
   while (_RFIDSERIAL->available())
   { 
@@ -191,7 +191,7 @@ bool RFID::check()
   }
   return (false);
 }
-uint8_t RFID::parseResponse(uint8_t* datareturn, uint8_t &dataLengthRead)
+uint8_t IRAM_ATTR RFID::parseResponse(uint8_t* datareturn, uint8_t &dataLengthRead)
 {/* 
 14 byte(0-13)
 00 00 08 E2 00 10 71 00 00 52 6F 01 D3 FF

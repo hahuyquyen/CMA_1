@@ -1,5 +1,5 @@
 #include <EEPROM.h>
-#include "Variable_html.h"
+#include "Config.h"
 #include "Variable_wifi.h"
 #include <driver/uart.h>
 #include <ArduinoJson.h>
@@ -8,56 +8,15 @@
 #include <WiFi.h>
 #include <ESPAsyncWebServer.h>
 #include <Update.h>
-//#include <HardwareSerial.h>
-//HardwareSerial Serial2(2);
-#define using_sta true
-#define BUF_SIZE (125)
-#define chedo 0  // 0 là IN,1 là OUT
-static intr_handle_t handle_console_uart1;
-//uint16_t urxlen;
-static void IRAM_ATTR uart1_intr_handle(void *arg);
-//static void IRAM_ATTR uart_intr_handle2(void *arg);
-/*###########################
- UART 0 rxPin = 3;txPin = 1;
- UART 1 rxPin = 9;txPin = 10;
- UART 2 rxPin = 16;txPin = 17;
-*/
-SemaphoreHandle_t xCountingSemaphore;
-SemaphoreHandle_t xSignal_FromRFID;
-QueueHandle_t Queue_can;
-QueueHandle_t Queue_mqtt;
-QueueHandle_t Queue_display;
-QueueHandle_t Queue_can_interrup;
-/**************************** 
- *  Struct Data 
- ***************************/
-typedef struct Data_user{
-  uint8_t id;
-  char id_RFID[25];
-  double data_weight;
-  double data_tare;
-} data_user;
-typedef struct Display{
-  uint8_t id;
-  char name_nv[50];
-  double cannang;
-  double tiencong;
-} display_NV;
-display_NV Display_NV;
-data_user datatruyen_mqtt;  
 
-/*
- * Web Server và MQTT
- */
-AsyncWebServer server(4999);
+AsyncWebServer server(web_port);
 WiFiClient espClient;
 PubSubClient client(espClient);
-//############################
-const char* update_path = "/firmware";
-const char* update_username = "CMA";
-const char* update_password = "123456";
-//##########################################
-static int taskCore = 1;
+
+display_NV Display_NV;
+data_user datatruyen_mqtt; 
+static intr_handle_t handle_console_uart1;
+static void IRAM_ATTR uart1_intr_handle(void *arg);
 void TaskRFID( void * pvParameters );
 void TaskCAN( void * pvParameters );
 void Display( void * pvParameters );
@@ -66,17 +25,14 @@ void callback_mqtt(char* topic, byte* payload, unsigned int length) ;
 boolean reconnect_mqtt();
 bool loadWiFiConf();
 void wifi_staticip(char *ip_in, char* gateway_in, char* subnet_in);
-void wifi_connect(wifi_mode_t wifi_mode,char *ssid,char *password,char *ap_ssid);
+void wifi_connect(byte _mode = 0 ,wifi_mode_t wifi_mode = WIFI_AP,char *ssid = "",char *password = "",char *ap_ssid = "ESP AP");
 void setupWiFiConf(void);
 void setting_uart();
 void WiFiEvent(WiFiEvent_t event);
 size_t content_len;
 /*
- * Biến
+ * WiFi.macAddress()
  */
-unsigned long _time_lastconnect_mqtt=0;
-extern uint8_t rfid_data[20];
-
 void printProgress(size_t prg, size_t sz) {
   printf("Progress: %d%%\n", (prg*100)/content_len);
 }
@@ -97,9 +53,9 @@ void setup()
     return;
     }
 #ifdef using_sta
-    wifi_connect(WIFI_STA,WiFiConf.sta_ssid,WiFiConf.sta_pwd,WiFiConf.ap_ssid);
+    wifi_connect(0,WIFI_STA,WiFiConf.sta_ssid,WiFiConf.sta_pwd,WiFiConf.ap_ssid);
 #else
-    wifi_AP(WIFI_AP,"CMA_AU","123789456");
+    wifi_connect(1,WIFI_AP,WiFiConf.sta_ssid,WiFiConf.sta_pwd,WiFiConf.ap_ssid);
 #endif  
     wifi_staticip(WiFiConf.sta_ip,WiFiConf.sta_gateway,WiFiConf.sta_subnet);   
     WiFi.onEvent(WiFiEvent);
@@ -113,15 +69,15 @@ void setup()
     xTaskCreatePinnedToCore(
                         TaskRFID,   /* Function to implement the task */
                         "TaskRFID", /* Name of the task */
-                        2048,      /* Stack size in words */
+                        8192,      /* Stack size in words */
                         NULL,       /* Task input parameter */
                         5,          /* Priority of the task */
                         NULL,       /* Task handle. */
-                        taskCore);  /* Core where the task should run */
+                        1);  /* Core where the task should run */
     xTaskCreatePinnedToCore(
                         TaskCAN,   /* Function to implement the task */
                         "TaskCAN", /* Name of the task */
-                        2048,      /* Stack size in words */
+                        8192,      /* Stack size in words */
                         NULL,       /* Task input parameter */
                         4,          /* Priority of the task */
                         NULL,       /* Task handle. */
@@ -129,7 +85,7 @@ void setup()
     xTaskCreatePinnedToCore(
                         Display,   /* Function to implement the task */
                         "Display", /* Name of the task */
-                        2048,      /* Stack size in words */
+                        8192,      /* Stack size in words */
                         NULL,       /* Task input parameter */
                         2,          /* Priority of the task */
                         NULL,       /* Task handle. */
@@ -137,7 +93,7 @@ void setup()
     xTaskCreatePinnedToCore(
                         http_re,   /* Function to implement the task */
                         "http_re", /* Name of the task */
-                        2048,      /* Stack size in words */
+                        8192,      /* Stack size in words */
                         NULL,       /* Task input parameter */
                         3,          /* Priority of the task */
                         NULL,       /* Task handle. */
@@ -155,7 +111,23 @@ void setup()
 void loop()
 {  
   vTaskDelay(50);
-  if (!client.connected()) {
+  if (status_wifi_connect_AP == false){
+    if (counter_wifi_disconnect == 50){
+      WiFi.disconnect(true);
+      printf("Chuyen\n");
+      wifi_connect(2, WIFI_AP_STA, WiFiConf.sta_ssid, WiFiConf.sta_pwd,"esp32");
+      counter_wifi_disconnect++;
+    }
+    else if (counter_wifi_disconnect < 50) {
+        vTaskDelay(500);
+        counter_wifi_disconnect = counter_wifi_disconnect + 1;
+        printf("STA Disconnected\n");
+        wifi_connect(0, WIFI_STA,WiFiConf.sta_ssid,WiFiConf.sta_pwd,WiFiConf.ap_ssid);
+    }
+    else printf("qua 50\n");
+    vTaskDelay(500);
+  }
+  else if (!client.connected()) {
     long now = xTaskGetTickCount();
     if (now - _time_lastconnect_mqtt > 5000) {
       _time_lastconnect_mqtt = now;
@@ -165,11 +137,32 @@ void loop()
     }
   } else { client.loop();}
   if(xQueueReceive( Queue_mqtt, &datatruyen_mqtt,  ( TickType_t ) 2 )== pdPASS ){
-      String input ="{\"id\":\"" + String(datatruyen_mqtt.id_RFID)+ "\",\"device\":\"" + String(chedo) + "\",\"data\":["+String(datatruyen_mqtt.data_weight)+","+ String(datatruyen_mqtt.data_tare)+"]}";
+      /*Cách 1: Cấp phát không dùng con trỏ. Bộ nhớ nằm trong Stack.
+       * Stack là bộ nhớ cố định nên nhiều lúc tiết kiệm ta dùng bộ nhớ heap
+       * 819990 bytes (41%)   bytes. 40888 , leaving 286792
+       * 819018                      40888           286792
+       */
+     /* String input ="{\"id\":\"" + String(datatruyen_mqtt.id_RFID) + "\",\"device\":\"" + String(chedo) + "\",\"data\":["+String(datatruyen_mqtt.data_weight)+","+ String(datatruyen_mqtt.data_tare)+"]}";
       int chieudai_mqtt=input.length(); 
       char msg[chieudai_mqtt+1];
       input.toCharArray(msg, sizeof(msg));
-      client.publish(datatruyen_mqtt.id_RFID, msg);
+      client.publish(datatruyen_mqtt.id_RFID, msg);*/
+      //##################################################################
+      /*
+       * Dung heap 
+       */
+      size_t size_needed = snprintf(NULL, 0, "{\"id\":\"%s\",\"device\":\"%c\",\"data\":[%g,%g]}", datatruyen_mqtt.id_RFID, chedo, datatruyen_mqtt.data_weight,datatruyen_mqtt.data_tare) + 1;
+      char* msg1 = (char*)malloc(size_needed);
+      if (msg1 != NULL) {  // malloc ok
+       sprintf(msg1, "{\"id\":\"%s\",\"device\":\"%c\",\"data\":[%g,%g]}", datatruyen_mqtt.id_RFID,chedo, datatruyen_mqtt.data_weight,datatruyen_mqtt.data_tare) ;
+       client.publish(datatruyen_mqtt.id_RFID, msg1);
+      }
+      else {printf("Ko du heap, reset");ESP.restart(); }
+      free(msg1);
+      
+      /*
+       * Dung 1 bo nho
+       */
   }    
 }
 
@@ -189,6 +182,7 @@ void callback_mqtt(char* topic, byte* payload, unsigned int length) {
   }
   if (strcmp(WiFiConf.mqtt_subto2,topic) == 0){printf("vung 2 \n");}
   if (strcmp(WiFiConf.mqtt_subto3,topic) == 0){printf("vung 3 \n");}
+  
 }
 
 boolean reconnect_mqtt() {

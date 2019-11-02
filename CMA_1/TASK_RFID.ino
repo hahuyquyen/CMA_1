@@ -9,11 +9,7 @@
  */
 
 #include "rfid.h"
-static byte myEPC[12]; //Most EPCs are 12 bytes
-static byte myEPClength;
-data_user Data_Task_RFID;
-RFID nano; 
-void array_to_string(byte* array, unsigned int len, char* buffer)
+void IRAM_ATTR array_to_string(byte* array, unsigned int len, char* buffer)
 {
     for (unsigned int i = 0; i < len; i++)
     {
@@ -25,13 +21,15 @@ void array_to_string(byte* array, unsigned int len, char* buffer)
     buffer[len*2] = '\0';
 }
 void TaskRFID( void * pvParameters ){
+    data_user Data_Task_RFID;
+    RFID nano; 
     const TickType_t xTicksToWait = pdMS_TO_TICKS(2);
     Data_Task_RFID.id = 2;
     unsigned long _time_counting_task_rfid = 0;
     int i =0;
-    Serial2.begin(115200);
+    Serial2.begin(uart_rfid_baud_rate);
     nano.begin(Serial2); 
-    nano.set_mode_timming(1,1000);
+    nano.set_mode_timming(1,time_out_set_rfid);
     while(true){
                 if (xTaskGetTickCount()-_time_counting_task_rfid > 2000){
                     _time_counting_task_rfid = xTaskGetTickCount();
