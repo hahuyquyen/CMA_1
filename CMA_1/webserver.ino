@@ -21,7 +21,7 @@ String processor( const String& var){
 void handleUpdate(AsyncWebServerRequest *request) {
   char* html = "<form method='POST' action='/doUpdate' enctype='multipart/form-data'><input type='file' name='update'><input type='submit' value='Update'></form>";
   request->send(200, F("text/html"), html);
-  free(html);
+  
 }
 
 void handleDoUpdate(AsyncWebServerRequest *request, const String& filename, size_t index, uint8_t *data, size_t len, bool final) {
