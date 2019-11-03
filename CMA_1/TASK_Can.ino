@@ -42,8 +42,7 @@ extern volatile uint8_t rfidbuff;
 extern volatile uint8_t rfid_rxbuf[40];
 extern uint8_t rfid_data[20];*/
 
-void TaskCAN( void * pvParameters ){
-    
+void TaskCAN( void * pvParameters ){    
     const TickType_t xTicksToWait = pdMS_TO_TICKS(5);
     static data_user Data_task_CAN;
     Data_task_CAN.id = 1;
