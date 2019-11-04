@@ -45,6 +45,8 @@ void setup()
     Queue_mqtt = xQueueCreate(10,sizeof(data_user));
     Queue_display = xQueueCreate(3,sizeof(display_NV));
     Queue_can_interrup= xQueueCreate(3,sizeof(rfid_data));
+    Queue_Time_blink= xQueueCreate(3,sizeof(uint16_t));
+    
     EEPROM.begin(1024);
     WiFi.disconnect(true);
     loadWiFiConf();
@@ -62,6 +64,9 @@ void setup()
     WiFi.onEvent([](WiFiEvent_t event, WiFiEventInfo_t info){
         wifiOnDisconnect();
     }, WiFiEvent_t::SYSTEM_EVENT_STA_DISCONNECTED);
+    WiFi.onEvent([](WiFiEvent_t event, WiFiEventInfo_t info){
+        wifigotip();
+    }, WiFiEvent_t::SYSTEM_EVENT_STA_GOT_IP);
     setupWiFiConf();
     server.begin();
     Update.onProgress(printProgress);
@@ -112,19 +117,18 @@ void loop()
 {  
   vTaskDelay(50);
   if (status_wifi_connect_AP == false){
-    if (counter_wifi_disconnect == 50){
+    if (counter_wifi_disconnect == 30){
       WiFi.disconnect(true);
       printf("Chuyen\n");
       wifi_connect(2, WIFI_AP_STA, WiFiConf.sta_ssid, WiFiConf.sta_pwd,(char *)"esp32");
       counter_wifi_disconnect++;
     }
-    else if (counter_wifi_disconnect < 50) {
-        vTaskDelay(500);
+    else if (counter_wifi_disconnect < 30) {
+        vTaskDelay(1000);
         counter_wifi_disconnect = counter_wifi_disconnect + 1;
         printf("STA Disconnected\n");
         wifi_connect(0, WIFI_STA,WiFiConf.sta_ssid,WiFiConf.sta_pwd,WiFiConf.ap_ssid);
     }
-    else printf("qua 50\n");
     vTaskDelay(500);
   }
   else if (!client.connected()) {

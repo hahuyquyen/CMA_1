@@ -56,6 +56,7 @@ QueueHandle_t Queue_can;
 QueueHandle_t Queue_mqtt;
 QueueHandle_t Queue_display;
 QueueHandle_t Queue_can_interrup;
+QueueHandle_t Queue_Time_blink;
 /**************************** 
  *  Struct Data 
  ***************************/

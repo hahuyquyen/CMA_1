@@ -5,7 +5,10 @@
 #endif
 
 #include "rfid.h"
-
+/*
+ * '\0'
+ * change memset(a,0x00,x) to memset(a,'\0',x)
+ */
 RFID::RFID(void)
 {
   // Constructor
@@ -187,7 +190,7 @@ bool IRAM_ATTR RFID::check()
   	  _head=0;
   		return (true);
   	}
-    if ( _head > 25){_head =0;memset(msg,0x00,sizeof(msg));}
+    if ( _head > 25){_head =0;memset(msg,'\0',sizeof(msg));}
   }
   return (false);
 }
@@ -220,7 +223,7 @@ byte 6-17 8D 48 29 4E D9 00 D9 00 00 00 00 05 ID
 	else tam=12;
   
 	if (crc == msg[ _head_par-1 ]){
-    memset(datareturn ,0x00, dataLengthRead);
+    memset(datareturn ,'\0', dataLengthRead);
 		if ( _head_par == 13){
 			for (uint8_t x = 0; x < 8; x++)datareturn[x]=msg[x+3];
 		}

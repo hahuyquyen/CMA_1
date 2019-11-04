@@ -14,8 +14,10 @@ void Display( void * pvParameters ){
     boolean status_led= true;
     pinMode(2, OUTPUT);
     unsigned long _time_counting_task_display=0;
+    uint16_t Time_blink= 1000;
     while(true){
-      if (xTaskGetTickCount()- _time_counting_task_display > 2000){
+      xQueueReceive( Queue_Time_blink, &Time_blink,  ( TickType_t ) 2 );
+      if (xTaskGetTickCount()- _time_counting_task_display > Time_blink){
         _time_counting_task_display = xTaskGetTickCount();
         status_led=!status_led;
         digitalWrite(2,status_led);

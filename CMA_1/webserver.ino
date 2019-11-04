@@ -19,11 +19,12 @@ String processor( const String& var){
 
   return String();
 }
+/*
 void handleUpdate(AsyncWebServerRequest *request) {
   char* html = (char *)"<form method='POST' action='/doUpdate' enctype='multipart/form-data'><input type='file' name='update'><input type='submit' value='Update'></form>";
   request->send(200, F("text/html"), html);
 }
-
+*/
 void handleDoUpdate(AsyncWebServerRequest *request, const String& filename, size_t index, uint8_t *data, size_t len, bool final) {
  
   if (!index){
@@ -81,7 +82,8 @@ void setupWiFiConf(void) {
         request->send(200, F("text/plain"), F("OK"));
     });
     
-    server.on("/firmware", HTTP_GET, [](AsyncWebServerRequest *request){handleUpdate(request);});
+    server.on("/firmware", HTTP_GET, [](AsyncWebServerRequest *request){request->send(SPIFFS, F("/update.html"));});
+   // server.on("/firmware", HTTP_GET, [](AsyncWebServerRequest *request){request->send(SPIFFS, F("/index.html"));});
     server.on("/doUpdate", HTTP_POST,[](AsyncWebServerRequest *request) {},
           [](AsyncWebServerRequest *request, const String& filename, size_t index, uint8_t *data,
                   size_t len, bool final) {handleDoUpdate(request, filename, index, data, len, final);});
