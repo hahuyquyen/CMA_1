@@ -1,11 +1,24 @@
+ /*
+  * 
+  * 
+  * 
+QoS
+Ở đây có 3 tuỳ chọn *QoS (Qualities of service) * khi "publish" và "subscribe":
+
+QoS0 Broker/client sẽ gởi dữ liệu đúng 1 lần, quá trình gởi được xác nhận bởi chỉ giao thức TCP/IP, giống kiểu đem con bỏ chợ.
+QoS1 Broker/client sẽ gởi dữ liệu với ít nhất 1 lần xác nhận từ đầu kia, nghĩa là có thể có nhiều hơn 1 lần xác nhận đã nhận được dữ liệu.
+QoS2 Broker/client đảm bảm khi gởi dữ liệu thì phía nhận chỉ nhận được đúng 1 lần, quá trình này phải trải qua 4 bước bắt tay.
+  */
+ 
+ 
  void connectToMqtt() {
   mqttClient.connect();
 }
 void truyen_mqtt(){
-      size_t size_needed = snprintf(NULL, 0, "{\"id\":\"%s\",\"device\":\"%s\",\"data\":[%g,%g]}", datatruyen_mqtt.id_RFID, chedo, datatruyen_mqtt.data_weight,datatruyen_mqtt.data_tare) + 1;
+      size_t size_needed = snprintf(NULL, 0, "{\"id\":\"%s\",\"device\":\"%s\",\"data\":[%g,%g]}", datatruyen_mqtt.id_RFID, WiFiConf.mqtt_choose_inout, datatruyen_mqtt.data_weight,datatruyen_mqtt.data_tare) + 1;
       char* msg1 = (char*)malloc(size_needed);
       if (msg1 != NULL) {  // malloc ok
-       sprintf(msg1, "{\"id\":\"%s\",\"device\":\"%s\",\"data\":[%g,%g]}", datatruyen_mqtt.id_RFID,chedo, datatruyen_mqtt.data_weight,datatruyen_mqtt.data_tare) ;
+       sprintf(msg1, "{\"id\":\"%s\",\"device\":\"%s\",\"data\":[%g,%g]}", datatruyen_mqtt.id_RFID,WiFiConf.mqtt_choose_inout, datatruyen_mqtt.data_weight,datatruyen_mqtt.data_tare) ;
        printf("mqtt %s\n",msg1);
        uint16_t packetIdPub1 = mqttClient.publish(datatruyen_mqtt.id_RFID, 2, true, msg1);
       //  printf("Publishing at QoS 1, packetId: %f\n",packetIdPub1);

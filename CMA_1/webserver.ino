@@ -15,6 +15,7 @@ String processor( const String& var){
   else if(var == F("SUBTopic1")){return String(WiFiConf.mqtt_subto1);}
   else if(var == F("SUBTopic2")){return String(WiFiConf.mqtt_subto2);}
   else if(var == F("SUBTopic3")){return String(WiFiConf.mqtt_subto3);}
+  else if(var == F("CHOOINOUT")){return String(WiFiConf.mqtt_choose_inout);}
   else if(var == F("CHOOSEDHCP")){return atoi(WiFiConf.choose_dhcp) == 1?String(1):String(0);}
 
   return String();
@@ -67,6 +68,7 @@ void setupWiFiConf(void) {
         if (request->hasParam("html_gateway_wifi", true)) {request->getParam("html_gateway_wifi", true)->value().toCharArray(WiFiConf.sta_gateway, sizeof(WiFiConf.sta_gateway));} 
         if (request->hasParam("html_sub_wifi", true)) {request->getParam("html_sub_wifi", true)->value().toCharArray(WiFiConf.sta_subnet, sizeof(WiFiConf.sta_subnet));} 
         if (request->hasParam("button", true)) {request->getParam("button", true)->value().toCharArray(WiFiConf.choose_dhcp, sizeof(WiFiConf.choose_dhcp));} 
+        if (request->hasParam("chooseinout", true)) {request->getParam("chooseinout", true)->value().toCharArray(WiFiConf.mqtt_choose_inout, sizeof(WiFiConf.mqtt_choose_inout));} 
         saveWiFiConf();
         request->send(200, F("text/plain"), F("OK BABY"));
     });

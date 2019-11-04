@@ -9,7 +9,7 @@ html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockq
 
 }
 label {
-  margin: 0;
+  margin: 10;
   padding: 0;
   border: 0;
   font-size: 100%;
@@ -286,7 +286,8 @@ form .txt:focus:valid, form .txtarea:focus:valid {
      height: 50px;width: 150px; 
      background-color: #4CAF50; 
      color: white; 
-     padding: 10px; 
-     font-size: 20px;   
+     padding: 15px; 
+	 padding-right: 30px;
+     font-size: 15px;
  } 
 .close:hover { background: #00d9ff; }
