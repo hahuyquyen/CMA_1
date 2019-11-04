@@ -1,17 +1,23 @@
+extern "C" {
+  #include "freertos/FreeRTOS.h"
+  #include "freertos/timers.h"
+}
+#include <AsyncMqttClient.h>
 #include <EEPROM.h>
 #include "Config.h"
 #include "Variable_wifi.h"
 #include <driver/uart.h>
 #include <ArduinoJson.h>
-#include <PubSubClient.h>
 #include <SPIFFS.h>
 #include <WiFi.h>
 #include <ESPAsyncWebServer.h>
 #include <Update.h>
 
+
+AsyncMqttClient mqttClient;
+TimerHandle_t mqttReconnectTimer;
 AsyncWebServer server(web_port);
 WiFiClient espClient;
-PubSubClient client(espClient);
 
 display_NV Display_NV;
 data_user datatruyen_mqtt; 
@@ -40,13 +46,14 @@ void printProgress(size_t prg, size_t sz) {
 /*
  * Setup
  */
+
 void setup()
 {   Queue_can = xQueueCreate(5,sizeof(data_user));
     Queue_mqtt = xQueueCreate(10,sizeof(data_user));
     Queue_display = xQueueCreate(3,sizeof(display_NV));
     Queue_can_interrup= xQueueCreate(3,sizeof(rfid_data));
     Queue_Time_blink= xQueueCreate(3,sizeof(uint16_t));
-    
+  //  Serial.begin(115200);
     EEPROM.begin(1024);
     WiFi.disconnect(true);
     loadWiFiConf();
@@ -102,12 +109,16 @@ void setup()
                         NULL,       /* Task input parameter */
                         3,          /* Priority of the task */
                         NULL,       /* Task handle. */
-                        0);  /* Core where the task should run */ 
-    
-                    
-  client.setServer(WiFiConf.mqtt_server, atoi(WiFiConf.mqtt_port));
-  client.setCallback(callback_mqtt);
-  reconnect_mqtt();                   
+                        0);  /* Core where the task should run */       
+  mqttReconnectTimer = xTimerCreate("mqttTimer", pdMS_TO_TICKS(2000), pdFALSE, (void*)0, reinterpret_cast<TimerCallbackFunction_t>(connectToMqtt));
+  mqttClient.onConnect(onMqttConnect);
+  mqttClient.onDisconnect(onMqttDisconnect);
+  mqttClient.onSubscribe(onMqttSubscribe);
+  mqttClient.onUnsubscribe(onMqttUnsubscribe);
+  mqttClient.onMessage(onMqttMessage);
+  mqttClient.onPublish(onMqttPublish);
+  mqttClient.setServer(WiFiConf.mqtt_server, atoi(WiFiConf.mqtt_port));       
+  mqttClient.setCredentials(WiFiConf.mqtt_user,WiFiConf.mqtt_pass);           
 }
 /*
  * Main Loop luôn chạy Core 1
@@ -131,67 +142,14 @@ void loop()
     }
     vTaskDelay(500);
   }
-  else if (!client.connected()) {
-    long now = xTaskGetTickCount();
-    if (now - _time_lastconnect_mqtt > 5000) {
-      _time_lastconnect_mqtt = now;
-      if (reconnect_mqtt()) {
-        _time_lastconnect_mqtt = 0;
-      }
-    }
-  } else { client.loop();}
   if(xQueueReceive( Queue_mqtt, &datatruyen_mqtt,  ( TickType_t ) 2 )== pdPASS ){
-      /*Cách 1: Cấp phát không dùng con trỏ. Bộ nhớ nằm trong Stack.
-       * Stack là bộ nhớ cố định nên nhiều lúc tiết kiệm ta dùng bộ nhớ heap
-       * 819990 bytes (41%)   bytes. 40888 , leaving 286792
-       * 819018                      40888           286792
-       */
-     /* String input ="{\"id\":\"" + String(datatruyen_mqtt.id_RFID) + "\",\"device\":\"" + String(chedo) + "\",\"data\":["+String(datatruyen_mqtt.data_weight)+","+ String(datatruyen_mqtt.data_tare)+"]}";
-      int chieudai_mqtt=input.length(); 
-      char msg[chieudai_mqtt+1];
-      input.toCharArray(msg, sizeof(msg));
-      client.publish(datatruyen_mqtt.id_RFID, msg);*/
-      //##################################################################
-      /*
-       * Dung heap 
-       */
-      size_t size_needed = snprintf(NULL, 0, "{\"id\":\"%s\",\"device\":\"%s\",\"data\":[%g,%g]}", datatruyen_mqtt.id_RFID, chedo, datatruyen_mqtt.data_weight,datatruyen_mqtt.data_tare) + 1;
-      char* msg1 = (char*)malloc(size_needed);
-      if (msg1 != NULL) {  // malloc ok
-       sprintf(msg1, "{\"id\":\"%s\",\"device\":\"%s\",\"data\":[%g,%g]}", datatruyen_mqtt.id_RFID,chedo, datatruyen_mqtt.data_weight,datatruyen_mqtt.data_tare) ;
-       printf("mqtt %s\n",msg1);
-       client.publish(datatruyen_mqtt.id_RFID, msg1);
-      }
-      else {printf("Ko du heap, reset\n");ESP.restart(); }
-      free(msg1);
+    truyen_mqtt();
   }    
 }
 
-void callback_mqtt(char* topic, byte* payload, unsigned int length) {
-  if (strcmp(WiFiConf.mqtt_subto1,topic) == 0){printf("vung 1 \n");
-  /*StaticJsonDocument<256> doc;
-  deserializeJson(doc, payload, length);*/
-  xQueueSend( Queue_display, &Display_NV, ( TickType_t ) 2  );
-   /* char message[length + 1];
-    *  char* p = (char*)malloc(length + 1);
-    *  memcpy(p,payload,length);
-    *  free(p);
-  for (int i = 0; i < length; i++) {
-    message[i] = (char)payload[i];
-  }
-  message[length] = '\0';*/
-  }
-  if (strcmp(WiFiConf.mqtt_subto2,topic) == 0){printf("vung 2 \n");}
-  if (strcmp(WiFiConf.mqtt_subto3,topic) == 0){printf("vung 3 \n");}
-  
-}
 
-boolean reconnect_mqtt() {
-  if (client.connect("NHANESP32",WiFiConf.mqtt_user,WiFiConf.mqtt_pass)) {
-        if (WiFiConf.mqtt_subto1[0] != 'x'){client.subscribe( WiFiConf.mqtt_subto1 );}
-        if (WiFiConf.mqtt_subto2[0] != 'x'){client.subscribe(WiFiConf.mqtt_subto2);}
-        if (WiFiConf.mqtt_subto3[0] != 'x'){client.subscribe(WiFiConf.mqtt_subto3);}  
-  }
-  return client.connected();
-}
+
+
+
+
  

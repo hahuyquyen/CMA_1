@@ -43,6 +43,7 @@ void setting_uart(){
   uart_isr_free(uart_can_num);// release the pre registered UART handler/subroutine
   uart_isr_register(uart_can_num,uart1_intr_handle, NULL, ESP_INTR_FLAG_IRAM, &handle_console_uart1); // register new UART subroutine
   uart_enable_rx_intr(uart_can_num); // enable RX interrupt
+  //gpio_set_pull_mode(BUTTON1, GPIO_PULLUP_ONLY);
   xCountingSemaphore = xSemaphoreCreateCounting( 10, 0 );
   xSignal_FromRFID = xSemaphoreCreateCounting( 10, 0 );
 }

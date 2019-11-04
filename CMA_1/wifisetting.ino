@@ -1,12 +1,12 @@
 
 
 void wifiOnDisconnect()
-{            uint16_t* time_blink = (uint16_t*)malloc(sizeof(uint16_t));
-            *time_blink = 200;
-            xQueueSend(Queue_Time_blink, time_blink, (TickType_t) 1);
-            free(time_blink);
-  status_wifi_connect_AP = false ; 
-//  printf("STA Disconnected from  event\n");
+{   uint16_t* time_blink = (uint16_t*)malloc(sizeof(uint16_t));
+    *time_blink = 200;
+    xQueueSend(Queue_Time_blink, time_blink, (TickType_t) 1);
+    free(time_blink);            
+    xTimerStop(mqttReconnectTimer, 0); // tat tu dong ket noi mqtt
+    status_wifi_connect_AP = false ; 
 }
 void wifigotip()
 {            
@@ -16,8 +16,9 @@ void wifigotip()
             printf("Wifi %s\n",WiFi.localIP().toString().c_str());
             uint16_t* time_blink = (uint16_t*)malloc(sizeof(uint16_t));
             *time_blink = 2000;
-            xQueueSend(Queue_Time_blink, time_blink, (TickType_t) 1);
+            xQueueSend(Queue_Time_blink, time_blink, (TickType_t) 1);    
             free(time_blink);
+            connectToMqtt();
 }
 void WiFiEvent(WiFiEvent_t event)
 {
@@ -32,12 +33,6 @@ void WiFiEvent(WiFiEvent_t event)
             break;
         case SYSTEM_EVENT_STA_CONNECTED: //printf("Connected to AP\n"); 
             break;
-       /* case SYSTEM_EVENT_STA_GOT_IP:
-            status_wifi_connect_AP = true;
-            counter_wifi_disconnect=0;
-            WiFi.softAPdisconnect(true);
-            printf("Wifi %s\n",WiFi.localIP().toString().c_str());
-            break;*/
         default: break;
     }}
 
