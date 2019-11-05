@@ -55,7 +55,7 @@ void wifi_connect(byte _mode,wifi_mode_t wifi_mode,char *ssid,char *password,cha
   else   if (_mode ==1){WiFi.softAP(ap_ssid,"12345678");} //mode AP
   else{
     WiFi.begin(ssid,password);
-    WiFi.softAP(ap_ssid,password);
+    WiFi.softAP(ap_ssid,"12345678");
   }   
 }
 void wifi_staticip(char *ip_in, char* gateway_in, char* subnet_in){

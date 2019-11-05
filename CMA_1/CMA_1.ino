@@ -129,6 +129,7 @@ void loop()
   vTaskDelay(50);
   if (status_wifi_connect_AP == false){
     if (counter_wifi_disconnect == 30){
+      vTaskDelay(500);
       WiFi.disconnect(true);
       printf("Chuyen\n");
       wifi_connect(2, WIFI_AP_STA, WiFiConf.sta_ssid, WiFiConf.sta_pwd,(char *)"esp32");
@@ -140,7 +141,6 @@ void loop()
         printf("STA Disconnected\n");
         wifi_connect(0, WIFI_STA,WiFiConf.sta_ssid,WiFiConf.sta_pwd,WiFiConf.ap_ssid);
     }
-    vTaskDelay(500);
   }
   if(xQueueReceive( Queue_mqtt, &datatruyen_mqtt,  ( TickType_t ) 2 )== pdPASS ){
     truyen_mqtt();
