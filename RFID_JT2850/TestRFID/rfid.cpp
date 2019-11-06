@@ -5,15 +5,17 @@
 #endif
 
 #include "rfid.h"
-
+/*
+ * '\0'
+ * change memset(a,0x00,x) to memset(a,'\0',x)
+ */
 RFID::RFID(void)
 {
   // Constructor
 }
 void RFID::begin(Stream &serialPort)
 {
-  _RFIDSERIAL = &serialPort; 
-  return true;
+  _RFIDSERIAL = &serialPort;
 }
 
 uint8_t RFID::calculateCRC (uint8_t * uBuff, uint8_t uBuffLen)  
@@ -49,7 +51,7 @@ void RFID::set_relay(uint8_t statu,uint16_t timeout)
   sendMessage(0xB1,data,sizeof(data),timeout,true);
 } 
 void RFID::set_timing_message(uint8_t timing,uint16_t timeout){
-	uint8_t data[4]={0x00,0x00,0x71,0x02};
+	uint8_t data[4]={0x00,0x00,0x71,0x64};
 	data[3]=timing;
 	sendMessage(0x60,data,sizeof(data),timeout,true);
 }
@@ -115,7 +117,10 @@ void RFID::sendCommand(uint16_t timeOut, boolean waitForResponse)
     }
     if (_RFIDSERIAL->available())
     {
-      msg[spot++] = _RFIDSERIAL->read();
+      msg[spot] = _RFIDSERIAL->read();
+     // Serial.print(msg[spot],HEX);
+    //  Serial.print(",");
+      spot++;
       if (spot == 2) messageLength = msg[1] + 2; 
     }
   }
@@ -169,11 +174,13 @@ uint8_t RFID::readData(uint8_t bank, uint32_t address, uint8_t *dataRead, uint8_
 }
 
 
-bool RFID::check()
+bool IRAM_ATTR RFID::check()
 {
   while (_RFIDSERIAL->available())
-  {
+  { 
     uint8_t incomingData = _RFIDSERIAL->read();
+   // Serial.print(incomingData,HEX);
+   // Serial.print("-");
   	if (incomingData == 0x00 && _head == 0){
   		msg[_head++] = incomingData;
   	}
@@ -182,16 +189,16 @@ bool RFID::check()
   	}
   	else if (incomingData == 0xFF){
   		msg[_head]=0xFF;
-  		for (uint8_t x = _head; x < MAX_MSG_SIZE; x++) msg[x] = 0;
+  		for (uint8_t x = _head; x < MAX_MSG_SIZE; x++) msg[x] = 0x00;
   		_head_par = _head;
   	  _head=0;
   		return (true);
   	}
-    if ( _head > 25){_head =0;memset(msg,0x00,sizeof(msg));}
+    if ( _head > 25){_head =0;memset(msg,'\0',sizeof(msg));} //
   }
   return (false);
 }
-uint8_t RFID::parseResponse(uint8_t* datareturn, uint8_t &dataLengthRead)
+uint8_t IRAM_ATTR RFID::parseResponse(uint8_t* datareturn, uint8_t &dataLengthRead)
 {/* 
 14 byte(0-13)
 00 00 08 E2 00 10 71 00 00 52 6F 01 D3 FF
@@ -218,16 +225,17 @@ byte 6-17 8D 48 29 4E D9 00 D9 00 00 00 00 05 ID
 	if (dataLengthRead < 8) return false;
 	else if (dataLengthRead < 12) tam=8;
 	else tam=12;
+  //Serial.printf("\n so phan tu %d \n", _head_par);
 	if (crc == msg[ _head_par-1 ]){
-    memset(datareturn ,0x00, dataLengthRead);
-		if ( _head_par == 13){
+    memset(datareturn ,'\0', dataLengthRead);
+		if ( _head_par == 14){
 			for (uint8_t x = 0; x < 8; x++)datareturn[x]=msg[x+3];
 		}
-		else if ( _head_par == 16){
+		else if ( _head_par == 17){
 			for (uint8_t x = 0; x < tam; x++)
 				datareturn[x]=msg[x+2];
 		}
-		else if ( _head_par == 19){
+		else if ( _head_par == 20){
 			for (uint8_t x = 0; x < tam; x++)
 				datareturn[x]=msg[x+6];
 		}
