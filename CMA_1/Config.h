@@ -15,4 +15,4 @@
 #define uart_can_num UART_NUM_0
 
 #define uart_can_baud_rate 115200
-#define uart_rfid_baud_rate 115200
+#define uart_rfid_baud_rate 9600

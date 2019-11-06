@@ -1,47 +1,3 @@
-/*
- * ngõ ra cân là rs232, tốc độ baud 9600, tần số 10hz
- * 
-z Text Command
-CR (0DH) The end of data
-LF (0AH) The end of text
-0 - 9 (30H-39H) Numeric data
-- (2DH) Minus
-. (2EH) Decimal Point
-STX (02H) Start of Text
-SOH (01H) Weight stable flag
-NUL (00H) Weight un-stable flag 
-0~9 là 30->39H
-. 2EH
-, 2CH
-- 2DH 
-stable flag là 01H-00H 01~Stable 00~unstable
-Header :(0) 30H ->net weight
-         (4) 34H->tare  
-Net Weight = - 1.20 lb. Tare Weight = 0.45lb. 
-
-STX* |Stable flag| CR |*Header |Net weight| CR| *Header| Tare weight|CR |LF
-1          1        1      1           7     1     1          7       1   1 
-
-Vd gửi dữ liệu
-02 01 0D 30 34 35 36 2E 30 30 30 0D 34  32 31 30 2E 36 35 32 0D 0A
- */
- /*
-  * Nhiều Chế độ truyền SEPC 52 bit 3
-  * Enable header: SPEC 53 bit 0 bằng 1
-  * SPEC 52 Bit 2 Send STX before text bằng 1 là send
-  * Set 59 bit3 xuống 1 và 52 bit 3 bang 0 là khi master yêu cầu sẽ gửi thông tin
-  * Chế độ này master sẽ gửi kí tự ACK (0x06) xuống để Cân gửi trả dữ liệu.
-  * 3 chê do truyen
-  * - 59 bit 3 =  1 và 52 bit 3 =0 là  bắt tay: master truyền ACK và cân sẽ trả datta
-  * 59 bit 2 =1 và 52 bit 3 = 0 khi nhấn enter trên cân mới truyền data
-  * 59 bit 2 = 0 thì cân sẽ tự động truyền
-  */
-/*extern volatile uint8_t can_rxbuf[40];
-extern volatile uint8_t canbuff;
-extern volatile uint8_t rfidbuff;
-extern volatile uint8_t rfid_rxbuf[40];
-extern uint8_t rfid_data[20];*/
-
 uint8_t uart_bien[11];
 double can_data=0;
 double can_data_old=0;
@@ -50,57 +6,37 @@ void TaskCAN( void * pvParameters ){
     static data_user Data_task_CAN;
     Data_task_CAN.id = 1;
     uint8_t _rfid_data[20];
-   // void tachdata_can(uint8_t* datain,data_user* dataout);
-   
     int tam=0;
     while(true){
-      if (Serial1.available())
-      { 
+      if (Serial1.available()){ 
        uint8_t incomingData = Serial1.read();
        if ( incomingData == 0x3D){tam=0;}
        else if ( incomingData == 0x0D) {
-        can_data = tach();
-        if (can_data!=can_data_old){
-          can_data_old=can_data;
-             printf("Can weight: %f \n",can_data_old);
-        }
+        if(tach(&can_data)){if (can_data!=can_data_old){can_data_old=can_data;printf("Can weight: %f \n",can_data_old);}}
        }
-       else {
-        uart_bien[tam]=incomingData;
-        tam++;
-        if(tam>10)tam=0;
-       }
-        
+       else {uart_bien[tam++]=incomingData;if(tam>10)tam=0;}  
      }
-     /*
-      * Cho kiểu truyền dữ liệu của cân theo cơ chế bắt tay.
-      * Khi nhận được tín hiệu thẻ RFID thì task RFID sẽ mở khóa xSignal_FromRFID
-      * và task CAN nhận được chìa khóa sẽ gửi tín hiệu để cân gửi data về
-      */
-     if( xSemaphoreTake( xSignal_FromRFID, ( TickType_t ) 5 ) == pdTRUE ){
-        printf("Gui tin hieu cho can send data\n");
-     }
-      vTaskDelay(20);
-        
+      vTaskDelay(25);   
     }
     vTaskDelete(NULL) ;
 }
-double tach(){
+boolean tach(double* soky){
   int tam1=0;
   int hangtram=0;
-  int soam= 1;
-  double soky=0;
+  double soam= 1;
+  *soky=0;
   for (int j=0;j<sizeof(uart_bien);j++){ if (uart_bien[j] != 0x20){tam1=j;break;} }
   for(int j=tam1;j<sizeof(uart_bien);j++){if(uart_bien[j] == 0x2E){hangtram=(j-tam1)-1;break;}}
   for(int j=tam1;j<sizeof(uart_bien);j++){
-                  if ((uart_bien[j] == 0x41)||(uart_bien[j] == 0x40)||(uart_bien[j] == 0x42)||(uart_bien[j] == 0x43)){break;}
+                //  Serial.print(uart_bien[j],HEX);
+                 // Serial.print(" ");
+                  if ((uart_bien[j] == 0x41)||(uart_bien[j] == 0x40)||(uart_bien[j] == 0x47)||(uart_bien[j] == 0x44)||(uart_bien[j] == 0x43)||(uart_bien[j] == 0x47)){*soky=0;return false;break;}
+                  if ((uart_bien[j] == 0x42)||(uart_bien[j] == 0x46)){*soky = *soky * soam;return true;break;} // so on dinh
                   else if (uart_bien[j] == 0x2D){soam=-1;}
                   else if (uart_bien[j] == 0x2E){hangtram=hangtram+1;}
-                  else soky+=(double)((uart_bien[j] - 48)*pow(10,hangtram-(j-tam1)));          
+                  else *soky+=(double)((uart_bien[j] - 48)*pow(10,hangtram-(j-tam1)));          
    }
-   soky=soky*soam;
- 
-   return soky;
+   return false;
 }
 
 /*void tachdata_can(uint8_t* datain,data_user* dataout){

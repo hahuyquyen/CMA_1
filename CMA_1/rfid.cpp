@@ -51,7 +51,7 @@ void RFID::set_relay(uint8_t statu,uint16_t timeout)
   sendMessage(0xB1,data,sizeof(data),timeout,true);
 } 
 void RFID::set_timing_message(uint8_t timing,uint16_t timeout){
-	uint8_t data[4]={0x00,0x00,0x71,0x02};
+	uint8_t data[4]={0x00,0x00,0x71,0x64};
 	data[3]=timing;
 	sendMessage(0x60,data,sizeof(data),timeout,true);
 }
@@ -117,7 +117,10 @@ void RFID::sendCommand(uint16_t timeOut, boolean waitForResponse)
     }
     if (_RFIDSERIAL->available())
     {
-      msg[spot++] = _RFIDSERIAL->read();
+      msg[spot] = _RFIDSERIAL->read();
+     // Serial.print(msg[spot],HEX);
+    //  Serial.print(",");
+      spot++;
       if (spot == 2) messageLength = msg[1] + 2; 
     }
   }
@@ -176,7 +179,8 @@ bool IRAM_ATTR RFID::check()
   while (_RFIDSERIAL->available())
   { 
     uint8_t incomingData = _RFIDSERIAL->read();
-    
+   // Serial.print(incomingData,HEX);
+   // Serial.print("-");
   	if (incomingData == 0x00 && _head == 0){
   		msg[_head++] = incomingData;
   	}
@@ -185,12 +189,12 @@ bool IRAM_ATTR RFID::check()
   	}
   	else if (incomingData == 0xFF){
   		msg[_head]=0xFF;
-  		for (uint8_t x = _head; x < MAX_MSG_SIZE; x++) msg[x] = 0;
+  		for (uint8_t x = _head; x < MAX_MSG_SIZE; x++) msg[x] = 0x00;
   		_head_par = _head;
   	  _head=0;
   		return (true);
   	}
-    if ( _head > 25){_head =0;memset(msg,'\0',sizeof(msg));}
+    if ( _head > 25){_head =0;memset(msg,'\0',sizeof(msg));} //
   }
   return (false);
 }
@@ -221,17 +225,17 @@ byte 6-17 8D 48 29 4E D9 00 D9 00 00 00 00 05 ID
 	if (dataLengthRead < 8) return false;
 	else if (dataLengthRead < 12) tam=8;
 	else tam=12;
-  
+  //Serial.printf("\n so phan tu %d \n", _head_par);
 	if (crc == msg[ _head_par-1 ]){
     memset(datareturn ,'\0', dataLengthRead);
-		if ( _head_par == 13){
+		if ( _head_par == 14){
 			for (uint8_t x = 0; x < 8; x++)datareturn[x]=msg[x+3];
 		}
-		else if ( _head_par == 16){
+		else if ( _head_par == 17){
 			for (uint8_t x = 0; x < tam; x++)
 				datareturn[x]=msg[x+2];
 		}
-		else if ( _head_par == 19){
+		else if ( _head_par == 20){
 			for (uint8_t x = 0; x < tam; x++)
 				datareturn[x]=msg[x+6];
 		}

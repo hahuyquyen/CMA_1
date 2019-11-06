@@ -59,6 +59,7 @@ void setup()
     EEPROM.begin(1024);
     WiFi.disconnect(true);
      Serial1.begin(9600, SERIAL_8N1, 13, 12); //12 tx 13 là rx
+     Serial.begin(115200);
     loadWiFiConf();
     if(!SPIFFS.begin(true)){
     Serial.println("An Error has occurred while mounting SPIFFS");
@@ -141,7 +142,7 @@ void loop()
     else if (counter_wifi_disconnect < 30) {
         vTaskDelay(1000);
         counter_wifi_disconnect = counter_wifi_disconnect + 1;
-        printf("STA Disconnected\n");
+       // printf("STA Disconnected\n");
         wifi_connect(0, WIFI_STA,WiFiConf.sta_ssid,WiFiConf.sta_pwd,WiFiConf.ap_ssid);
     }
   }

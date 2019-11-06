@@ -1,3 +1,9 @@
+/*
+ * cma2018LHP515
+ * 
+ * 
+ */
+
 #define WIFI_CONF_FORMAT {0, 0, 0, 1}
 const uint8_t wifi_conf_format[] = WIFI_CONF_FORMAT;
 #define WIFI_CONF_START 0
@@ -19,9 +25,9 @@ static struct WiFiConfStruct {
   uint8_t format[4];
   char sta_ssid[32];
   char sta_pwd[64];
-  char sta_ip[15];
-  char sta_gateway[15];
-  char sta_subnet[15];
+  char sta_ip[16];
+  char sta_gateway[16];
+  char sta_subnet[16];
   char ap_ssid[32];
   char choose_dhcp[4];
   char mqtt_server[64];
@@ -68,7 +74,7 @@ typedef struct Data_user{
   double data_weight;
   double data_tare;
 } data_user;
-
+char id_RFID_old[25];
 typedef struct Display{
   uint8_t id;
   char name_nv[50];

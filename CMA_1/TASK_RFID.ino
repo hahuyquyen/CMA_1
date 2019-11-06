@@ -29,7 +29,10 @@ void TaskRFID( void * pvParameters ){
     int i =0;
     Serial2.begin(uart_rfid_baud_rate);
     nano.begin(Serial2); 
-    nano.set_mode_timming(1,time_out_set_rfid);
+    nano.set_mode_timming(2,5000); // Set mode eprom 0x70, timeout chờ kết quả 5000ms
+    nano.set_timing_message(0x64,5000);
+    nano.set_power(0x20,5000);
+    nano.set_reset_reader(2000);
     while(true){
                 if (xTaskGetTickCount()-_time_counting_task_rfid > 2000){
                     _time_counting_task_rfid = xTaskGetTickCount();
@@ -41,8 +44,12 @@ void TaskRFID( void * pvParameters ){
                     myEPClength = sizeof(myEPC);
                     if (nano.parseResponse(myEPC,myEPClength)){
                         array_to_string(myEPC, 12, Data_Task_RFID.id_RFID);
-                        xSemaphoreGive(xSignal_FromRFID);
-                        xQueueSend( Queue_can, &Data_Task_RFID, xTicksToWait );
+                         if (strcmp(Data_Task_RFID.id_RFID,id_RFID_old) != 0){
+                            strncpy(id_RFID_old, Data_Task_RFID.id_RFID, sizeof(id_RFID_old));
+                            printf("So TAB: %s\n",id_RFID_old);
+                          //  xSemaphoreGive(xSignal_FromRFID);
+                            xQueueSend( Queue_can, &Data_Task_RFID, xTicksToWait );
+                         }
                     }
                   }
                 vTaskDelay(20);
