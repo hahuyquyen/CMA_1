@@ -10,7 +10,7 @@ void memset_volatile(volatile void *s, uint8_t c, size_t n)
       s[i]=' ';
     }*/
 }
-/*
+
 static void IRAM_ATTR uart1_intr_handle(void *arg)
 { volatile uart_dev_t *uart = &UART0;
   while(uart->status.rxfifo_cnt){
@@ -47,4 +47,3 @@ void setting_uart(){
   xCountingSemaphore = xSemaphoreCreateCounting( 10, 0 );
   xSignal_FromRFID = xSemaphoreCreateCounting( 10, 0 );
 }
-*/

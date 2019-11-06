@@ -53,12 +53,9 @@ void setup()
     Queue_display = xQueueCreate(3,sizeof(display_NV));
     Queue_can_interrup= xQueueCreate(3,sizeof(rfid_data));
     Queue_Time_blink= xQueueCreate(3,sizeof(uint16_t));
-     xCountingSemaphore = xSemaphoreCreateCounting( 10, 0 );
-    xSignal_FromRFID = xSemaphoreCreateCounting( 10, 0 );
   //  Serial.begin(115200);
     EEPROM.begin(1024);
     WiFi.disconnect(true);
-     Serial1.begin(9600, SERIAL_8N1, 13, 12); //12 tx 13 là rx
     loadWiFiConf();
     if(!SPIFFS.begin(true)){
     Serial.println("An Error has occurred while mounting SPIFFS");
@@ -80,7 +77,7 @@ void setup()
     setupWiFiConf();
     server.begin();
     Update.onProgress(printProgress);
-    //setting_uart();
+    setting_uart();
     xTaskCreatePinnedToCore(
                         TaskRFID,   /* Function to implement the task */
                         "TaskRFID", /* Name of the task */

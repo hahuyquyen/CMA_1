@@ -42,36 +42,25 @@ extern volatile uint8_t rfidbuff;
 extern volatile uint8_t rfid_rxbuf[40];
 extern uint8_t rfid_data[20];*/
 
-uint8_t uart_bien[11];
-double can_data=0;
-double can_data_old=0;
 void TaskCAN( void * pvParameters ){    
     const TickType_t xTicksToWait = pdMS_TO_TICKS(5);
     static data_user Data_task_CAN;
     Data_task_CAN.id = 1;
     uint8_t _rfid_data[20];
-   // void tachdata_can(uint8_t* datain,data_user* dataout);
-   
-    int tam=0;
+    void tachdata_can(uint8_t* datain,data_user* dataout);
     while(true){
-      if (Serial1.available())
-      { 
-       uint8_t incomingData = Serial1.read();
-       if ( incomingData == 0x3D){tam=0;}
-       else if ( incomingData == 0x0D) {
-        can_data = tach();
-        if (can_data!=can_data_old){
-          can_data_old=can_data;
-             printf("Can weight: %f \n",can_data_old);
-        }
-       }
-       else {
-        uart_bien[tam]=incomingData;
-        tam++;
-        if(tam>10)tam=0;
-       }
-        
-     }
+      /*
+      * Khi nhận được tín hiệu UART truyền qua queue
+      * và task CAN  sẽ phân tích mà tách giá trị cân lưu vào struct đưa vào queue
+      * uint8_t rfid_data[20];
+      */
+      if(xQueueReceive( Queue_can_interrup, &_rfid_data,  ( TickType_t ) 2 )== pdPASS ){
+        tachdata_can(&_rfid_data[0],&Data_task_CAN);
+        xQueueSend( Queue_can, &Data_task_CAN, xTicksToWait );
+        Data_task_CAN.data_weight = 0;
+        Data_task_CAN.data_tare = 0 ;
+      }
+      
      /*
       * Cho kiểu truyền dữ liệu của cân theo cơ chế bắt tay.
       * Khi nhận được tín hiệu thẻ RFID thì task RFID sẽ mở khóa xSignal_FromRFID
@@ -85,25 +74,7 @@ void TaskCAN( void * pvParameters ){
     }
     vTaskDelete(NULL) ;
 }
-double tach(){
-  int tam1=0;
-  int hangtram=0;
-  int soam= 1;
-  double soky=0;
-  for (int j=0;j<sizeof(uart_bien);j++){ if (uart_bien[j] != 0x20){tam1=j;break;} }
-  for(int j=tam1;j<sizeof(uart_bien);j++){if(uart_bien[j] == 0x2E){hangtram=(j-tam1)-1;break;}}
-  for(int j=tam1;j<sizeof(uart_bien);j++){
-                  if ((uart_bien[j] == 0x41)||(uart_bien[j] == 0x40)||(uart_bien[j] == 0x42)||(uart_bien[j] == 0x43)){break;}
-                  else if (uart_bien[j] == 0x2D){soam=-1;}
-                  else if (uart_bien[j] == 0x2E){hangtram=hangtram+1;}
-                  else soky+=(double)((uart_bien[j] - 48)*pow(10,hangtram-(j-tam1)));          
-   }
-   soky=soky*soam;
- 
-   return soky;
-}
-
-/*void tachdata_can(uint8_t* datain,data_user* dataout){
+void tachdata_can(uint8_t* datain,data_user* dataout){
           double giatri=0;
           int hangtram=0;
           int tam= 1;
@@ -126,7 +97,7 @@ double tach(){
           }
 }
 
-*/
+
 
 
 

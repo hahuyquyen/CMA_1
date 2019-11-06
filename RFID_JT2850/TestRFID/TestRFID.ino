@@ -23,7 +23,7 @@ void setup()
   nano.begin(Serial2); 
   nano.set_mode_timming(2,5000); // Set mode eprom 0x70, timeout chờ kết quả 5000ms
   nano.set_timing_message(0x64,5000);
-  nano.set_power(0x14,5000);
+  nano.set_power(0x20,5000);
   nano.set_reset_reader(2000);
 }
 unsigned long time_gg=0;
