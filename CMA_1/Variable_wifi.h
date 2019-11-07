@@ -74,6 +74,15 @@ typedef struct Data_user{
   double data_weight;
   double data_tare;
 } data_user;
+typedef struct Data_CAN{
+  double data_can;
+  unsigned long time_get;
+} Data_CAN;
+typedef struct Data_RFID{
+  char id_RFID[25];
+  char id_RFID_Old[25];
+  unsigned long time_get;
+} Data_RFID;
 char id_RFID_old[25];
 typedef struct Display{
   uint8_t id;

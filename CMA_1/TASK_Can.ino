@@ -5,21 +5,21 @@ void TaskCAN( void * pvParameters ){
     const TickType_t xTicksToWait = pdMS_TO_TICKS(5);
     static data_user Data_task_CAN;
     Data_task_CAN.id = 1;
+    static Data_CAN Data_CAN;
     uint8_t _rfid_data[20];
     int tam=0;
     while(true){
       if (Serial1.available()){ 
        uint8_t incomingData = Serial1.read();
        if ( incomingData == 0x3D){tam=0;}
-       else if ( incomingData == 0x0D) {
-        if(tach(&can_data)){if (can_data!=can_data_old){can_data_old=can_data;printf("Can weight: %f \n",can_data_old);}}
-       }
+       else if ( incomingData == 0x0D) {if(tach(&can_data)){if (can_data!=Data_CAN.data_can){Data_CAN.data_can=can_data;printf("Can weight: %f \n",Data_CAN.data_can);Data_CAN.time_get=xTaskGetTickCount();}}}
        else {uart_bien[tam++]=incomingData;if(tam>10)tam=0;}  
      }
       vTaskDelay(25);   
     }
     vTaskDelete(NULL) ;
 }
+
 boolean tach(double* soky){
   int tam1=0;
   int hangtram=0;
@@ -39,57 +39,3 @@ boolean tach(double* soky){
    return false;
 }
 
-/*void tachdata_can(uint8_t* datain,data_user* dataout){
-          double giatri=0;
-          int hangtram=0;
-          int tam= 1;
-          for (int j=0;j<2;j++){
-                giatri=0;
-                tam=1;
-                for (int tang=(j*9)+1;tang<(j*9)+8; tang++){
-                   if((datain[tang] == can_dau_cham) || (datain[tang] == can_dau_phay)) {hangtram = tang-1; break;}
-                }
-                hangtram=hangtram-1;
-                for (int tang1=(j*9)+1;tang1<(j*9)+8; tang1++){
-                  if (datain[tang1] == can_Minus ){tam = -1;}
-                  else if ((datain[tang1] == can_dau_cham) || (datain[tang1] == can_dau_phay)){hangtram=hangtram+1;}
-                  else{
-                   giatri+=(double)((datain[tang1]-48)*pow(10,hangtram-(tang1-1)));
-                    }
-                }
-                if (datain[j*9] == can_header_weight ){dataout->data_weight=giatri*tam;}
-                else{dataout->data_tare=giatri*tam;} 
-          }
-}
-
-*/
-
-
-
-/*
- * 
- * 
- * 
- * if(xQueueReceive( Queue_can_interrup, &_rfid_data,  ( TickType_t ) 2 )== pdPASS ){
-        tachdata_can(&_rfid_data[0],&Data_task_CAN);
-        for (int j=0;j<2;j++){
-        giatri=0;
-        tam=1;
-        for (int tang=(j*9)+1;tang<(j*9)+8; tang++){
-           if((_rfid_data[tang] == can_dau_cham) || (_rfid_data[tang] == can_dau_phay)) {hangtram = tang-1; break;}
-        }
-        hangtram=hangtram-1;
-        for (int tang1=(j*9)+1;tang1<(j*9)+8; tang1++){
-          if (_rfid_data[tang1] == can_Minus ){tam = -1;}
-          else if ((_rfid_data[tang1] == can_dau_cham) || (_rfid_data[tang1] == can_dau_phay)){hangtram=hangtram+1;}
-          else{
-           giatri+=(double)((_rfid_data[tang1]-48)*pow(10,hangtram-(tang1-1)));
-            }
-        }
-        if (_rfid_data[j*9] == can_header_weight ){Data_task_CAN.data_weight=giatri*tam;}
-        else{Data_task_CAN.data_tare=giatri*tam;} 
-      }
-      xQueueSend( Queue_can, &Data_task_CAN, xTicksToWait );
-     
-      }
- */

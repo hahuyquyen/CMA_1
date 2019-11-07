@@ -22,6 +22,7 @@ void IRAM_ATTR array_to_string(byte* array, unsigned int len, char* buffer)
 }
 void TaskRFID( void * pvParameters ){
     data_user Data_Task_RFID;
+    Data_RFID Data_rfid;
     RFID nano; 
     const TickType_t xTicksToWait = pdMS_TO_TICKS(2);
     Data_Task_RFID.id = 2;
@@ -36,17 +37,15 @@ void TaskRFID( void * pvParameters ){
     while(true){
                 if (xTaskGetTickCount()-_time_counting_task_rfid > 2000){
                     _time_counting_task_rfid = xTaskGetTickCount();
-                    i=i+1;
-                    //Data.id_RFID = i;
-                    
+                    i=i+1; 
                   }
                   if (nano.check() == true){ 
                     myEPClength = sizeof(myEPC);
                     if (nano.parseResponse(myEPC,myEPClength)){
-                        array_to_string(myEPC, 12, Data_Task_RFID.id_RFID);
-                         if (strcmp(Data_Task_RFID.id_RFID,id_RFID_old) != 0){
-                            strncpy(id_RFID_old, Data_Task_RFID.id_RFID, sizeof(id_RFID_old));
-                            printf("So TAB: %s\n",id_RFID_old);
+                        array_to_string(myEPC, 12, Data_rfid.id_RFID);
+                         if (strcmp(Data_rfid.id_RFID,Data_rfid.id_RFID_Old) != 0){
+                            strncpy( Data_rfid.id_RFID_Old,Data_rfid.id_RFID, sizeof(Data_rfid.id_RFID));
+                            printf("So TAB: %s\n",Data_rfid.id_RFID);
                           //  xSemaphoreGive(xSignal_FromRFID);
                             xQueueSend( Queue_can, &Data_Task_RFID, xTicksToWait );
                          }
