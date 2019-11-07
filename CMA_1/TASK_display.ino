@@ -13,17 +13,32 @@ void Display( void * pvParameters ){
     display_NV Display_NV_TASK;
     boolean status_led= true;
     pinMode(2, OUTPUT);
+    pinMode(4, OUTPUT);
     unsigned long _time_counting_task_display=0;
     unsigned long _time_counting_task_send_heap=0;
+    unsigned long _time_out_display=0;
     uint16_t Time_blink= 1000;
+    uint16_t Time_check= 3000;
     while(true){
+      if(xSemaphoreTake(xSignal_Display_check, 10)){
+        digitalWrite(4,HIGH);
+        _time_out_display = xTaskGetTickCount();
+      }
+      if(xSemaphoreTake(xSignal_Display_checkdone, 10)){
+        digitalWrite(4,LOW);
+      }
+#ifdef USING_IN
+    Time_check = 6000;
+#endif
+      if (xTaskGetTickCount() - _time_out_display > Time_check){digitalWrite(4,LOW);_time_out_display=xTaskGetTickCount();}
       xQueueReceive( Queue_Time_blink, &Time_blink,  ( TickType_t ) 2 );
       if (xTaskGetTickCount()- _time_counting_task_display > Time_blink){
         _time_counting_task_display = xTaskGetTickCount();
         status_led=!status_led;
         digitalWrite(2,status_led);
+        
       }
-      if (xTaskGetTickCount()- _time_counting_task_send_heap > 5000){
+      if (xTaskGetTickCount()- _time_counting_task_send_heap > 15000){
         _time_counting_task_send_heap = xTaskGetTickCount();
         printf("Free Heap %d\n",ESP.getFreeHeap());
       }

@@ -12,7 +12,10 @@ void TaskCAN( void * pvParameters ){
       if (Serial1.available()){ 
        uint8_t incomingData = Serial1.read();
        if ( incomingData == 0x3D){tam=0;}
-       else if ( incomingData == 0x0D) {if(tach(&can_data)){if (can_data!=Data_CAN.data_can){Data_CAN.data_can=can_data;printf("Can weight: %f \n",Data_CAN.data_can);Data_CAN.time_get=xTaskGetTickCount();}}}
+       else if ( incomingData == 0x0D) {if(tach(&can_data)){
+        if(can_data!=Data_CAN.data_can){Data_CAN.data_can=can_data;Data_CAN.time_get=xTaskGetTickCount();if(can_data > 0.1){xQueueSend( Queue_can, &Data_CAN, xTicksToWait );}}//printf("CAN Nang : %f \n",can_data);
+        }
+        }
        else {uart_bien[tam++]=incomingData;if(tam>10)tam=0;}  
      }
       vTaskDelay(25);   
@@ -28,10 +31,10 @@ boolean tach(double* soky){
   for (int j=0;j<sizeof(uart_bien);j++){ if (uart_bien[j] != 0x20){tam1=j;break;} }
   for(int j=tam1;j<sizeof(uart_bien);j++){if(uart_bien[j] == 0x2E){hangtram=(j-tam1)-1;break;}}
   for(int j=tam1;j<sizeof(uart_bien);j++){
-                //  Serial.print(uart_bien[j],HEX);
+               //   Serial.print(uart_bien[j],HEX);
                  // Serial.print(" ");
-                  if ((uart_bien[j] == 0x41)||(uart_bien[j] == 0x40)||(uart_bien[j] == 0x47)||(uart_bien[j] == 0x44)||(uart_bien[j] == 0x43)||(uart_bien[j] == 0x47)){*soky=0;return false;break;}
-                  if ((uart_bien[j] == 0x42)||(uart_bien[j] == 0x46)){*soky = *soky * soam;return true;break;} // so on dinh
+                  if ((uart_bien[j] == 0x41)||(uart_bien[j] == 0x40)||(uart_bien[j] == 0x48)||(uart_bien[j] == 0x44)||(uart_bien[j] == 0x45)){*soky=0; return false;break;}//Serial.println(" ");
+                  if ((uart_bien[j] == 0x43)||(uart_bien[j] == 0x47)||(uart_bien[j] == 0x42)||(uart_bien[j] == 0x46)){*soky = *soky * soam;return true;break;} // so on dinh
                   else if (uart_bien[j] == 0x2D){soam=-1;}
                   else if (uart_bien[j] == 0x2E){hangtram=hangtram+1;}
                   else *soky+=(double)((uart_bien[j] - 48)*pow(10,hangtram-(j-tam1)));          

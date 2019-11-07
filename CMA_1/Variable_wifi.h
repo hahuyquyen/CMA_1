@@ -60,7 +60,11 @@ static struct WiFiConfStruct {
 
 SemaphoreHandle_t xCountingSemaphore;
 SemaphoreHandle_t xSignal_FromRFID;
+SemaphoreHandle_t xSignal_Display_check;
+SemaphoreHandle_t xSignal_Display_checkdone;
 QueueHandle_t Queue_can;
+QueueHandle_t Queue_RFID;
+QueueHandle_t Queue_RFID_NV;
 QueueHandle_t Queue_mqtt;
 QueueHandle_t Queue_display;
 QueueHandle_t Queue_can_interrup;
@@ -74,6 +78,12 @@ typedef struct Data_user{
   double data_weight;
   double data_tare;
 } data_user;
+typedef struct Data_TH{
+  char id_RFID[25];
+  char id_RFID_NV[25];
+  double data_weight;
+} Data_TH;
+
 typedef struct Data_CAN{
   double data_can;
   unsigned long time_get;
@@ -83,7 +93,7 @@ typedef struct Data_RFID{
   char id_RFID_Old[25];
   unsigned long time_get;
 } Data_RFID;
-char id_RFID_old[25];
+//char id_RFID_old[25];
 typedef struct Display{
   uint8_t id;
   char name_nv[50];

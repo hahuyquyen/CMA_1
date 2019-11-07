@@ -20,7 +20,7 @@ AsyncWebServer server(web_port);
 WiFiClient espClient;
 
 display_NV Display_NV;
-data_user datatruyen_mqtt; 
+Data_TH datatruyen_mqtt; 
 static intr_handle_t handle_console_uart1;
 static void IRAM_ATTR uart1_intr_handle(void *arg);
 void TaskRFID( void * pvParameters );
@@ -48,13 +48,17 @@ void printProgress(size_t prg, size_t sz) {
  */
 
 void setup()
-{   Queue_can = xQueueCreate(5,sizeof(data_user));
-    Queue_mqtt = xQueueCreate(10,sizeof(data_user));
+{   Queue_can = xQueueCreate(5,sizeof(Data_CAN));
+    Queue_RFID= xQueueCreate(5,sizeof(Data_RFID));
+    Queue_RFID_NV= xQueueCreate(5,sizeof(Data_RFID));
+    Queue_mqtt = xQueueCreate(10,sizeof(Data_TH));
     Queue_display = xQueueCreate(3,sizeof(display_NV));
     Queue_can_interrup= xQueueCreate(3,sizeof(rfid_data));
     Queue_Time_blink= xQueueCreate(3,sizeof(uint16_t));
      xCountingSemaphore = xSemaphoreCreateCounting( 10, 0 );
     xSignal_FromRFID = xSemaphoreCreateCounting( 10, 0 );
+    xSignal_Display_check = xSemaphoreCreateCounting( 10, 0 );
+    xSignal_Display_checkdone = xSemaphoreCreateCounting( 2, 0 );
   //  Serial.begin(115200);
     EEPROM.begin(1024);
     WiFi.disconnect(true);

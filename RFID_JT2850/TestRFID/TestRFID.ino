@@ -25,7 +25,7 @@ void setup()
   nano.set_timing_message(0x64,5000);
   nano.set_power(0x20,5000);
   nano.set_out_mode(1,5000);
-  nano.set_time_ner(0x0A,5000);
+  nano.set_time_ner(0x05,5000);
  // nano.set_OFFdelaytime(0x60,5000);
   nano.set_reset_reader(2000);
   

@@ -15,16 +15,16 @@ QoS2 Broker/client đảm bảm khi gởi dữ liệu thì phía nhận chỉ nh
   mqttClient.connect();
 }
 void truyen_mqtt(){
-      size_t size_needed = snprintf(NULL, 0, "{\"id\":\"%s\",\"device\":\"%s\",\"data\":[%g,%g]}", datatruyen_mqtt.id_RFID, WiFiConf.mqtt_choose_inout, datatruyen_mqtt.data_weight,datatruyen_mqtt.data_tare) + 1;
+      /*size_t size_needed = snprintf(NULL, 0, "{\"id\":\"%s\",\"device\":\"%s\",\"data\":[%g,%g]}", datatruyen_mqtt.id_RFID, WiFiConf.mqtt_choose_inout, datatruyen_mqtt.data_weight,datatruyen_mqtt.data_tare) + 1;
       char* msg1 = (char*)malloc(size_needed);
       if (msg1 != NULL) {  // malloc ok
-       sprintf(msg1, "{\"id\":\"%s\",\"device\":\"%s\",\"data\":[%g,%g]}", datatruyen_mqtt.id_RFID,WiFiConf.mqtt_choose_inout, datatruyen_mqtt.data_weight,datatruyen_mqtt.data_tare) ;
+       sprintf(msg1, "{\"id\":\"%s\",\"device\":\"%s\",\"data\":[%g,%g]}", datatruyen_mqtt.id_RFID,WiFiConf.mqtt_choose_inout, datatruyen_mqtt.id_RFID_RO,datatruyen_mqtt.data_weight) ;
        printf("mqtt %s\n",msg1);
        uint16_t packetIdPub1 = mqttClient.publish(datatruyen_mqtt.id_RFID, 2, true, msg1);
       //  printf("Publishing at QoS 1, packetId: %f\n",packetIdPub1);
       }
       else {printf("Ko du heap, reset\n");ESP.restart(); }
-      free(msg1);
+      free(msg1);*/
 }
 void onMqttConnect(bool sessionPresent) {
         if (WiFiConf.mqtt_subto1[0] != 'x'){mqttClient.subscribe( WiFiConf.mqtt_subto1,2 );}  //0,1,2 laf qos
