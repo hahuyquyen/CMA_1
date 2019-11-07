@@ -14,14 +14,25 @@ void Display( void * pvParameters ){
     boolean status_led= true;
     pinMode(2, OUTPUT);
     unsigned long _time_counting_task_display=0;
+    unsigned long _time_counting_send_heap=0;
     uint16_t Time_blink= 1000;
     while(true){
       xQueueReceive( Queue_Time_blink, &Time_blink,  ( TickType_t ) 2 );
+      /*
+       * Time blink led
+       */
       if (xTaskGetTickCount()- _time_counting_task_display > Time_blink){
         _time_counting_task_display = xTaskGetTickCount();
         status_led=!status_led;
         digitalWrite(2,status_led);
-        printf("Free Heap %d\n",ESP.getFreeHeap());
+      // printf("Free Heap %d\n",ESP.getFreeHeap());
+      }
+      /*
+       * time send heap free
+       */
+      if (xTaskGetTickCount()- _time_counting_send_heap > 5000){
+        _time_counting_send_heap = xTaskGetTickCount();
+         printf("Free Heap %d\n",ESP.getFreeHeap());
       }
       if(xQueueReceive( Queue_display, &Display_NV_TASK,  ( TickType_t ) 2 )== pdPASS ){
         printf("Hien thi nhan vien \n");

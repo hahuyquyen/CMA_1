@@ -24,3 +24,20 @@ void saveWiFiConf(void) {
   }
   EEPROM.commit();
 }
+
+void EEPROM_writeDouble(int ee, uint32_t value)
+{
+   byte* p = (byte*)(void*)&value;
+   for (int i = 0; i < sizeof(value); i++)
+       EEPROM.write(ee++, *p++);
+   
+}
+
+uint32_t EEPROM_readDouble(int ee)
+{
+   uint32_t value = 0.0;
+   byte* p = (byte*)(void*)&value;
+   for (int i = 0; i < sizeof(value); i++)
+       *p++ = EEPROM.read(ee++);
+   return value;
+}

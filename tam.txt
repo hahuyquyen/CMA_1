@@ -1,12 +1,35 @@
-
-Sketch uses 803050 bytes (40%) of program storage space. Maximum is 1966080 bytes.
-Global variables use 40448 bytes (12%) of dynamic memory, leaving 287232 bytes for local variables. Maximum is 327680 bytes.
-Sketch uses 802966 bytes (40%) of program storage space. Maximum is 1966080 bytes.
-Global variables use 40448 bytes (12%) of dynamic memory, leaving 287232 bytes for local variables. Maximum is 327680 bytes.
-
-Sketch uses 802966 bytes (40%) of program storage space. Maximum is 1966080 bytes.
-Global variables use 40448 bytes (12%) of dynamic memory, leaving 287232 bytes for local variables. Maximum is 327680 bytes.
-Sketch uses 802590 bytes (40%) of program storage space. Maximum is 1966080 bytes.
-Global variables use 40448 bytes (12%) of dynamic memory, leaving 287232 bytes for local variables. Maximum is 327680 bytes.
-Sketch uses 802486 bytes (40%) of program storage space. Maximum is 1966080 bytes.
-Global variables use 40448 bytes (12%) of dynamic memory, leaving 287232 bytes for local variables. Maximum is 327680 bytes.
+u8g2.clearBuffer();          // clear the internal memory
+  u8g2.setFont(u8g2_font_amstrad_cpc_extended_8f);  // choose a suitable font
+  start_test ();
+  u8g2.setCursor(3,10);
+  u8g2.print ("Date : ");
+  u8g2.setCursor(55,10);
+  u8g2.print(now.month(), DEC);
+  u8g2.print('/');
+  u8g2.print(now.day(), DEC);
+  u8g2.print('/');
+  u8g2.print(now.year(), DEC);
+  u8g2.setCursor(3,19);
+  u8g2.print ("Time : ");
+  u8g2.setCursor(62,19);
+  u8g2.print(now.hour(), DEC);
+  u8g2.print(':');
+  u8g2.print(now.minute(), DEC);
+  u8g2.print(':');
+  u8g2.print(now.second(), DEC);
+  u8g2.setCursor (3, 37);
+  u8g2.print ("Humidity :");
+  u8g2.print (dat [0], DEC); // display the humidity-bit integer;
+  u8g2.print ('.');
+  u8g2.print (dat [1], DEC); // display the humidity decimal places;
+  u8g2.println ('%');
+  u8g2.setCursor(3,28);
+  u8g2.print ("Temp :    ");
+  u8g2.print (dat [2], DEC); // display the temperature of integer bits;
+  u8g2.print ('.');
+  u8g2.print (dat [3], DEC); // display the temperature of decimal places;
+  u8g2.println ('C');
+  u8g2.setFont(u8g2_font_profont22_tf);
+  u8g2.drawStr(10,62,"VMFAT-101");
+  u8g2.drawFrame(0, 0, 128, 64);
+  u8g2.sendBuffer();
