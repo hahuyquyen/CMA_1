@@ -10,7 +10,7 @@
 #define RESPONSE_FAIL 12
 
 #define MAX_MSG_SIZE 30
-#define COMMAND_TIME_OUT 200 
+#define COMMAND_TIME_OUT 2000 
 class RFID
 {
 public:
@@ -29,8 +29,8 @@ public:
   void set_power(uint8_t mode,uint16_t timeout);
 	uint8_t readData(uint8_t bank, uint32_t address, uint8_t *dataRead, uint8_t &dataLengthRead, uint16_t timeOut);
 	uint8_t readTagEPC(uint8_t *epc, uint8_t &epcLength, uint16_t timeOut);
-	bool check();
-	uint8_t parseResponse(uint8_t* datareturn, uint8_t &dataLengthRead);
+	bool IRAM_ATTR check();
+	uint8_t IRAM_ATTR parseResponse(uint8_t* datareturn, uint8_t &dataLengthRead);
 	
 private:
 	Stream *_RFIDSERIAL;
