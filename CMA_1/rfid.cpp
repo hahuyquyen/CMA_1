@@ -84,7 +84,7 @@ void RFID::set_link_selec(uint8_t mode,uint16_t timeout){
 	sendMessage(0x60,data,sizeof(data),timeout,true);
 }
 /*
- * power từ 0 - 150 Transmit power 0 - 150 Power analog
+ * power tá»« 0 - 150 Transmit power 0 - 150 Power analog
  */
 void RFID::set_power(uint8_t mode,uint16_t timeout){
   uint8_t data[4]={0x00,0x00,0x65,0x02}; 
@@ -225,16 +225,16 @@ byte 3-10:   E2 00 10 71 00 00 52 6F ID
 
 17 byte
 00 00 E3 00 60 19 D2 6D 1C E9 AA BB CC DD 01 51 FF
-byte2-13 E3 00 60 19 D2 6D 1C E9 AA BB CC DD là ID
-01 là anten
+byte2-13 E3 00 60 19 D2 6D 1C E9 AA BB CC DD lÃ  ID
+01 lÃ  anten
 
 20 byte
 00 00 12 1F 15 05 8D 48 29 4E D9 00 D9 00 00 00 00 05 01 8A FF
 
 12  datalenght
 1F RSSI
-15 nhiệt độ giá trị, giá trị là hex chuyển qua dec
-05  nhiệt độ label
+15 nhiá»‡t Ä‘á»™ giÃ¡ trá»‹, giÃ¡ trá»‹ lÃ  hex chuyá»ƒn qua dec
+05  nhiá»‡t Ä‘á»™ label
 byte 6-17 8D 48 29 4E D9 00 D9 00 00 00 00 05 ID
 */
 	uint8_t crc = calculateCRC(&msg[0], _head_par-1);
@@ -248,10 +248,14 @@ byte 6-17 8D 48 29 4E D9 00 D9 00 00 00 00 05 ID
 		if ( _head_par == 14){
 			for (uint8_t x = 0; x < 8; x++)datareturn[x]=msg[x+3];
 		}
-		else if ( _head_par == 17){
+		/*else if ( _head_par == 17){
 			for (uint8_t x = 0; x < tam; x++)
 				datareturn[x]=msg[x+3];
-		}
+		}*/
+   else if ( _head_par == 17){
+     for (uint8_t x = 0; x < tam; x++)
+        datareturn[x]=msg[x+3];
+    }
 		else if ( _head_par == 20){
 			for (uint8_t x = 0; x < tam; x++)
 				datareturn[x]=msg[x+6];
@@ -267,3 +271,4 @@ byte 6-17 8D 48 29 4E D9 00 D9 00 00 00 00 05 ID
  * A0 05 61 00 00 65 95
  * 00 00 E3 00 60 19 D2 6D 1C E9 AA BB CC DD 01 51 FF
  */
+

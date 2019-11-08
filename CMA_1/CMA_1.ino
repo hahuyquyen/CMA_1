@@ -12,6 +12,18 @@ extern "C" {
 #include <WiFi.h>
 #include <ESPAsyncWebServer.h>
 #include <Update.h>
+#include <Arduino.h>
+#include <U8g2lib.h>
+
+#ifdef U8X8_HAVE_HW_SPI
+#include <SPI.h>
+#endif
+#ifdef U8X8_HAVE_HW_I2C
+#include <Wire.h>
+#endif
+
+U8G2_ST7920_128X64_F_SW_SPI u8g2(U8G2_R0, /* clock=*/ 18, /* data=*/ 5, /* CS=*/ U8X8_PIN_NONE);
+
 
 
 AsyncMqttClient mqttClient;
@@ -52,17 +64,22 @@ void setup()
     Queue_RFID= xQueueCreate(5,sizeof(Data_RFID));
     Queue_RFID_NV= xQueueCreate(5,sizeof(Data_RFID));
     Queue_mqtt = xQueueCreate(10,sizeof(Data_TH));
-    Queue_display = xQueueCreate(3,sizeof(display_NV));
+    Queue_display = xQueueCreate(3,sizeof(Data_TH));
     Queue_can_interrup= xQueueCreate(3,sizeof(rfid_data));
     Queue_Time_blink= xQueueCreate(3,sizeof(uint16_t));
      xCountingSemaphore = xSemaphoreCreateCounting( 10, 0 );
     xSignal_FromRFID = xSemaphoreCreateCounting( 10, 0 );
     xSignal_Display_check = xSemaphoreCreateCounting( 10, 0 );
     xSignal_Display_checkdone = xSemaphoreCreateCounting( 2, 0 );
+    xreset_id_nv = xSemaphoreCreateCounting( 2, 0 );
+    pinMode(Pin_choose_IN_OUT, INPUT);
+    if (digitalRead(Pin_choose_IN_OUT)==HIGH){
+      status_IN_or_OUT = false;
+    }
   //  Serial.begin(115200);
     EEPROM.begin(1024);
     WiFi.disconnect(true);
-     Serial1.begin(9600, SERIAL_8N1, 13, 12); //12 tx 13 là rx
+     Serial1.begin(9600, SERIAL_8N1, 13, 12); //12 tx 13 lÃ  rx
      Serial.begin(115200);
     loadWiFiConf();
     if(!SPIFFS.begin(true)){
@@ -129,7 +146,7 @@ void setup()
   mqttClient.setCredentials(WiFiConf.mqtt_user,WiFiConf.mqtt_pass);           
 }
 /*
- * Main Loop luôn chạy Core 1
+ * Main Loop luÃ´n cháº¡y Core 1
  */
 
 void loop()
@@ -161,3 +178,4 @@ void loop()
 
 
  
+

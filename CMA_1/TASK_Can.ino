@@ -8,13 +8,23 @@ void TaskCAN( void * pvParameters ){
     static Data_CAN Data_CAN;
     uint8_t _rfid_data[20];
     int tam=0;
+    unsigned long time_send_para_can=0;
     while(true){
       if (Serial1.available()){ 
        uint8_t incomingData = Serial1.read();
        if ( incomingData == 0x3D){tam=0;}
-       else if ( incomingData == 0x0D) {if(tach(&can_data)){
-        if(can_data!=Data_CAN.data_can){Data_CAN.data_can=can_data;Data_CAN.time_get=xTaskGetTickCount();if(can_data > 0.1){xQueueSend( Queue_can, &Data_CAN, xTicksToWait );}}//printf("CAN Nang : %f \n",can_data);
-        }
+       else if ( incomingData == 0x0D) {
+        if(tach(&can_data)){
+                if(can_data!=Data_CAN.data_can){
+                  Data_CAN.data_can=can_data;
+                  Data_CAN.time_get=xTaskGetTickCount();
+                  if(can_data > 0.1){xQueueSend( Queue_can, &Data_CAN, xTicksToWait );}
+                  }//printf("CAN Nang : %f \n",can_data);
+                else if (xTaskGetTickCount() - time_send_para_can > 2000){
+                  time_send_para_can=xTaskGetTickCount();
+                  xQueueSend( Queue_can, &Data_CAN, xTicksToWait );
+                  }
+                }
         }
        else {uart_bien[tam++]=incomingData;if(tam>10)tam=0;}  
      }
@@ -41,4 +51,5 @@ boolean tach(double* soky){
    }
    return false;
 }
+
 

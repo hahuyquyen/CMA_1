@@ -17,7 +17,7 @@ unsigned long _time_lastconnect_mqtt=0;
 
 static uint8_t counter_wifi_disconnect= 0;
 static boolean status_wifi_connect_AP = true ; 
-
+static boolean status_IN_or_OUT = true ; 
 
 
 
@@ -62,6 +62,7 @@ SemaphoreHandle_t xCountingSemaphore;
 SemaphoreHandle_t xSignal_FromRFID;
 SemaphoreHandle_t xSignal_Display_check;
 SemaphoreHandle_t xSignal_Display_checkdone;
+SemaphoreHandle_t xreset_id_nv;
 QueueHandle_t Queue_can;
 QueueHandle_t Queue_RFID;
 QueueHandle_t Queue_RFID_NV;
@@ -103,7 +104,7 @@ typedef struct Display{
  
 
 /*
- * Web Server và MQTT
+ * Web Server vÃ  MQTT
  */
 
 //############################
@@ -116,3 +117,4 @@ static IPAddress gateway(192, 168, 1, 1);
 static IPAddress subnet(255, 255, 255, 0);
 static IPAddress primaryDNS(8, 8, 8, 8); //optional
 static IPAddress secondaryDNS(8, 8, 4, 4); //optional
+

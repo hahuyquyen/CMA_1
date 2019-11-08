@@ -94,3 +94,4 @@ void setupWiFiConf(void) {
     request->send(SPIFFS, F("/favicon.ico"), F("image/png"));
 });
 }
+
