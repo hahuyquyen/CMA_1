@@ -7,31 +7,41 @@
  * 
  */
 
-void LCD_thong_tin(uint8_t chedo_HT,Data_TH* Data_TH){
+void LCD_thong_tin(uint8_t chedo_HT,Data_TH* Data_TH , uint8_t daucham = 0){
     u8g2.clearBuffer();
   if (chedo_HT == 0){
           u8g2.setFont(u8g2_font_5x7_tf); // u8g2_font_6x10_tf
-          u8g2.drawStr(0,10,"IP:");
-          u8g2.setCursor(15, 10);
+          u8g2.setCursor(0, 10);
+          if (status_IN_or_OUT) u8g2.print("Dau Ra");
+          else u8g2.print("Dau vao");
+          u8g2.print("-");
           if (status_wifi_connect_AP) u8g2.print(WiFi.localIP().toString().c_str());
           else u8g2.print("Not connect");
-          u8g2.drawStr(0,25,"ID1:");
+          u8g2.setFont(u8g2_font_6x12_tf); 
+          u8g2.drawStr(0,25,"NV:");
           u8g2.setCursor(25, 25);
           u8g2.print(Data_TH->id_RFID_NV);
-          u8g2.drawStr(0,40,"ID:");
-          u8g2.setCursor(20, 40);
+          u8g2.drawStr(0,40,"Ro:");
+          u8g2.setCursor(25, 40);
           u8g2.print(Data_TH->id_RFID);
           u8g2.drawStr(0,55,"Kg:");
-          u8g2.setCursor(20, 55);
+          u8g2.setCursor(25, 55);
           u8g2.print(Data_TH->data_weight);
   }
    else if (chedo_HT == 1) {
           u8g2.setFont(u8g2_font_5x7_tf); // u8g2_font_6x10_tf
-          u8g2.drawStr(0,10,"IP:");
-          u8g2.setCursor(15, 10);
+          u8g2.setCursor(0, 10);
+          if (status_IN_or_OUT) u8g2.print("Dau Ra");
+          else u8g2.print("Dau vao");
+          u8g2.print("-");
           if (status_wifi_connect_AP) u8g2.print(WiFi.localIP().toString().c_str());
           else u8g2.print("Not connect");
-          u8g2.drawStr(25,25,"Waiting");
+          u8g2.setFont(u8g2_font_6x12_tf); 
+          u8g2.drawStr(35,25,"Waiting");
+          u8g2.setCursor(35, 45);
+          for (int i=0;i<daucham;i++){
+            u8g2.print(".");
+          }
    }
     u8g2.sendBuffer();  
 }
@@ -48,25 +58,28 @@ void Display( void * pvParameters ){
     unsigned long _time_counting_task_send_heap=0;
     unsigned long _time_out_display =0;
     unsigned long _time_out_display_LCD=0;
+    unsigned long _time_blink_LCD=0;
     uint16_t Time_blink= 1000;
     uint16_t Time_check= 3000;  
     u8g2.begin();
     LCD_thong_tin(1,&Data_TH);
- 
+    uint8_t state_LCD_Display = 1;
+    uint8_t daucham_lcd = 0;
     while(true){
       if(xSemaphoreTake(xSignal_Display_check, 10)){
         digitalWrite(Pin_Coi,HIGH);
         _time_out_display = xTaskGetTickCount();
       }
       if(xSemaphoreTake(xSignal_Display_checkdone, 10)){ //Che do IN qua timeout se tat 
-        LCD_thong_tin(1,&Data_TH);
+        
+        state_LCD_Display = 1;
         digitalWrite(Pin_Coi,LOW);
       }
     if (status_IN_or_OUT){  // Neu che do OUT thi tu tat sau 3s
-        if (xTaskGetTickCount() - _time_out_display > Time_check){digitalWrite(4,LOW);LCD_thong_tin(1,&Data_TH);_time_out_display=xTaskGetTickCount();}
+        if (xTaskGetTickCount() - _time_out_display > Time_check){digitalWrite(4,LOW);state_LCD_Display = 0;_time_out_display=xTaskGetTickCount();}
     }
       if(xQueueReceive( Queue_display, &Data_TH,  ( TickType_t ) 2 )== pdPASS ){
-        LCD_thong_tin(0,&Data_TH);
+        state_LCD_Display = 0;
         _time_out_display_LCD = xTaskGetTickCount();
       }
 
@@ -79,6 +92,25 @@ void Display( void * pvParameters ){
       if (xTaskGetTickCount()- _time_counting_task_send_heap > 15000){
         _time_counting_task_send_heap = xTaskGetTickCount();
         printf("Free Heap %d\n",ESP.getFreeHeap());
+      }
+      switch (state_LCD_Display){
+        case 0:
+              
+              LCD_thong_tin(0,&Data_TH,daucham_lcd);
+              state_LCD_Display=4;
+              break;
+        case 1:
+              if (xTaskGetTickCount()- _time_blink_LCD > 1000){
+                 daucham_lcd ++ ;
+                if (daucham_lcd > 5)daucham_lcd=0;
+                _time_blink_LCD = xTaskGetTickCount();
+                 LCD_thong_tin(1,&Data_TH,daucham_lcd);
+              }
+              break;
+        case 2:
+              state_LCD_Display=4;
+              break;
+        default: break;
       }
       vTaskDelay(30);
     }
