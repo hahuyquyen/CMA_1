@@ -36,6 +36,25 @@ void RFID::set_mode_timming (uint8_t mode,uint16_t timeout)
 	else data[3]=0x03;
 	sendMessage(0x60,data,sizeof(data),timeout,true);
 } 
+void RFID::set_OFFdelaytime (uint8_t mode,uint16_t timeout)  {
+  uint8_t data[4]={0x00,0x00,0x84,0x02};
+  data[3]=mode;
+
+  sendMessage(0x60,data,sizeof(data),timeout,true);
+}
+void RFID::set_time_ner(uint8_t mode,uint16_t timeout)  {
+    uint8_t data[4]={0x00,0x00,0x7A,0x02};
+  data[3]=mode;
+
+  sendMessage(0x60,data,sizeof(data),timeout,true);
+}
+void RFID::set_out_mode (uint8_t mode,uint16_t timeout)  
+{ 
+  uint8_t data[4]={0x00,0x00,0x7B,0x02};
+  if (mode ==1 )data[3]=0x01;
+  else data[3]=0x02;
+  sendMessage(0x60,data,sizeof(data),timeout,true);
+} 
 void RFID::set_buzzer(uint8_t mode,uint16_t timeout)
 { 
   uint8_t data[2]={0x00,0x00};
@@ -233,7 +252,7 @@ byte 6-17 8D 48 29 4E D9 00 D9 00 00 00 00 05 ID
 		}
 		else if ( _head_par == 17){
 			for (uint8_t x = 0; x < tam; x++)
-				datareturn[x]=msg[x+2];
+				datareturn[x]=msg[x+3];
 		}
 		else if ( _head_par == 20){
 			for (uint8_t x = 0; x < tam; x++)

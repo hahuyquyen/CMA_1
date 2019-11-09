@@ -3,11 +3,11 @@
   * 
   * 
 QoS
-Ở đây có 3 tuỳ chọn *QoS (Qualities of service) * khi "publish" và "subscribe":
+á»ž Ä‘Ã¢y cÃ³ 3 tuá»³ chá»�n *QoS (Qualities of service) * khi "publish" vÃ  "subscribe":
 
-QoS0 Broker/client sẽ gởi dữ liệu đúng 1 lần, quá trình gởi được xác nhận bởi chỉ giao thức TCP/IP, giống kiểu đem con bỏ chợ.
-QoS1 Broker/client sẽ gởi dữ liệu với ít nhất 1 lần xác nhận từ đầu kia, nghĩa là có thể có nhiều hơn 1 lần xác nhận đã nhận được dữ liệu.
-QoS2 Broker/client đảm bảm khi gởi dữ liệu thì phía nhận chỉ nhận được đúng 1 lần, quá trình này phải trải qua 4 bước bắt tay.
+QoS0 Broker/client sáº½ gá»Ÿi dá»¯ liá»‡u Ä‘Ãºng 1 láº§n, quÃ¡ trÃ¬nh gá»Ÿi Ä‘Æ°á»£c xÃ¡c nháº­n bá»Ÿi chá»‰ giao thá»©c TCP/IP, giá»‘ng kiá»ƒu Ä‘em con bá»� chá»£.
+QoS1 Broker/client sáº½ gá»Ÿi dá»¯ liá»‡u vá»›i Ã­t nháº¥t 1 láº§n xÃ¡c nháº­n tá»« Ä‘áº§u kia, nghÄ©a lÃ  cÃ³ thá»ƒ cÃ³ nhiá»�u hÆ¡n 1 láº§n xÃ¡c nháº­n Ä‘Ã£ nháº­n Ä‘Æ°á»£c dá»¯ liá»‡u.
+QoS2 Broker/client Ä‘áº£m báº£m khi gá»Ÿi dá»¯ liá»‡u thÃ¬ phÃ­a nháº­n chá»‰ nháº­n Ä‘Æ°á»£c Ä‘Ãºng 1 láº§n, quÃ¡ trÃ¬nh nÃ y pháº£i tráº£i qua 4 bÆ°á»›c báº¯t tay.
   */
  
  
@@ -15,10 +15,10 @@ QoS2 Broker/client đảm bảm khi gởi dữ liệu thì phía nhận chỉ nh
   mqttClient.connect();
 }
 void truyen_mqtt(){
-      size_t size_needed = snprintf(NULL, 0, "{\"id\":\"%s\",\"device\":\"%s\",\"data\":[%g,%g]}", datatruyen_mqtt.id_RFID, WiFiConf.mqtt_choose_inout, datatruyen_mqtt.data_weight,datatruyen_mqtt.data_tare) + 1;
+      size_t size_needed = snprintf(NULL, 0, "{\"id\":\"%s\",\"device\":\"%s\",\"data\":[%g,0]}", datatruyen_mqtt.id_RFID, datatruyen_mqtt.id_RFID_NV, datatruyen_mqtt.data_weight) + 1;
       char* msg1 = (char*)malloc(size_needed);
       if (msg1 != NULL) {  // malloc ok
-       sprintf(msg1, "{\"id\":\"%s\",\"device\":\"%s\",\"data\":[%g,%g]}", datatruyen_mqtt.id_RFID,WiFiConf.mqtt_choose_inout, datatruyen_mqtt.data_weight,datatruyen_mqtt.data_tare) ;
+       sprintf(msg1, "{\"id\":\"%s\",\"device\":\"%s\",\"data\":[%g,0]}", datatruyen_mqtt.id_RFID, datatruyen_mqtt.id_RFID_NV, datatruyen_mqtt.data_weight) ;
        printf("mqtt %s\n",msg1);
        uint16_t packetIdPub1 = mqttClient.publish(datatruyen_mqtt.id_RFID, 2, true, msg1);
       //  printf("Publishing at QoS 1, packetId: %f\n",packetIdPub1);
@@ -61,3 +61,4 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
 void onMqttPublish(uint16_t packetId) {
  printf("Publish acknowledged: %d \n",packetId);
 }
+

@@ -23,8 +23,12 @@ void setup()
   nano.begin(Serial2); 
   nano.set_mode_timming(2,5000); // Set mode eprom 0x70, timeout chờ kết quả 5000ms
   nano.set_timing_message(0x64,5000);
-  nano.set_power(0x14,5000);
+  nano.set_power(0x20,5000);
+  nano.set_out_mode(1,5000);
+  nano.set_time_ner(0x05,5000);
+ // nano.set_OFFdelaytime(0x60,5000);
   nano.set_reset_reader(2000);
+  
 }
 unsigned long time_gg=0;
 void loop()
@@ -33,11 +37,11 @@ void loop()
     myEPClength = sizeof(myEPC);
     if (nano.parseResponse(myEPC,myEPClength)){
       array_to_string(myEPC, 12, id_RFID);
-      if (strcmp(id_RFID, id_RFID_old) != 0){
+     // if (strcmp(id_RFID, id_RFID_old) != 0){
         strncpy(id_RFID_old, id_RFID, sizeof(id_RFID_old));
         Serial.print("So TAB: ");
         Serial.println(id_RFID);
-        }
+    //    }
     }
   }  
 }

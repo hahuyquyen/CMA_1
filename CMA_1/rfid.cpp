@@ -36,6 +36,23 @@ void RFID::set_mode_timming (uint8_t mode,uint16_t timeout)
 	else data[3]=0x03;
 	sendMessage(0x60,data,sizeof(data),timeout,true);
 } 
+void RFID::set_OFFdelaytime (uint8_t mode,uint16_t timeout)  {
+  uint8_t data[4]={0x00,0x00,0x84,0x02};
+  data[3]=mode;
+  sendMessage(0x60,data,sizeof(data),timeout,true);
+}
+void RFID::set_time_ner(uint8_t mode,uint16_t timeout)  {
+  uint8_t data[4]={0x00,0x00,0x7A,0x02};
+  data[3]=mode;
+  sendMessage(0x60,data,sizeof(data),timeout,true);
+}
+void RFID::set_out_mode (uint8_t mode,uint16_t timeout)  
+{ 
+  uint8_t data[4]={0x00,0x00,0x7B,0x02};
+  if (mode ==1 )data[3]=0x01;
+  else data[3]=0x02;
+  sendMessage(0x60,data,sizeof(data),timeout,true);
+} 
 void RFID::set_buzzer(uint8_t mode,uint16_t timeout)
 { 
   uint8_t data[2]={0x00,0x00};
@@ -51,7 +68,7 @@ void RFID::set_relay(uint8_t statu,uint16_t timeout)
   sendMessage(0xB1,data,sizeof(data),timeout,true);
 } 
 void RFID::set_timing_message(uint8_t timing,uint16_t timeout){
-	uint8_t data[4]={0x00,0x00,0x71,0x02};
+	uint8_t data[4]={0x00,0x00,0x71,0x64};
 	data[3]=timing;
 	sendMessage(0x60,data,sizeof(data),timeout,true);
 }
@@ -67,7 +84,7 @@ void RFID::set_link_selec(uint8_t mode,uint16_t timeout){
 	sendMessage(0x60,data,sizeof(data),timeout,true);
 }
 /*
- * power từ 0 - 150 Transmit power 0 - 150 Power analog
+ * power tá»« 0 - 150 Transmit power 0 - 150 Power analog
  */
 void RFID::set_power(uint8_t mode,uint16_t timeout){
   uint8_t data[4]={0x00,0x00,0x65,0x02}; 
@@ -117,7 +134,10 @@ void RFID::sendCommand(uint16_t timeOut, boolean waitForResponse)
     }
     if (_RFIDSERIAL->available())
     {
-      msg[spot++] = _RFIDSERIAL->read();
+      msg[spot] = _RFIDSERIAL->read();
+     // Serial.print(msg[spot],HEX);
+    //  Serial.print(",");
+      spot++;
       if (spot == 2) messageLength = msg[1] + 2; 
     }
   }
@@ -143,7 +163,7 @@ void RFID::sendCommand(uint16_t timeOut, boolean waitForResponse)
 */
 uint8_t RFID::readTagEPC(uint8_t *epc, uint8_t &epcLength, uint16_t timeOut)
 {
-  uint8_t bank = 0x01;    //User data bank
+  uint8_t bank = 0x01;    //User data bank                       
   uint8_t address = 0x02; //Starts at 2
 
   return (readData(bank, address, epc, epcLength, timeOut));
@@ -176,7 +196,8 @@ bool IRAM_ATTR RFID::check()
   while (_RFIDSERIAL->available())
   { 
     uint8_t incomingData = _RFIDSERIAL->read();
-    
+   // Serial.print(incomingData,HEX);
+   // Serial.print("-");
   	if (incomingData == 0x00 && _head == 0){
   		msg[_head++] = incomingData;
   	}
@@ -185,12 +206,12 @@ bool IRAM_ATTR RFID::check()
   	}
   	else if (incomingData == 0xFF){
   		msg[_head]=0xFF;
-  		for (uint8_t x = _head; x < MAX_MSG_SIZE; x++) msg[x] = 0;
+  		for (uint8_t x = _head; x < MAX_MSG_SIZE; x++) msg[x] = 0x00;
   		_head_par = _head;
   	  _head=0;
   		return (true);
   	}
-    if ( _head > 25){_head =0;memset(msg,'\0',sizeof(msg));}
+    if ( _head > 25){_head =0;memset(msg,'\0',sizeof(msg));} //
   }
   return (false);
 }
@@ -204,16 +225,16 @@ byte 3-10:   E2 00 10 71 00 00 52 6F ID
 
 17 byte
 00 00 E3 00 60 19 D2 6D 1C E9 AA BB CC DD 01 51 FF
-byte2-13 E3 00 60 19 D2 6D 1C E9 AA BB CC DD là ID
-01 là anten
+byte2-13 E3 00 60 19 D2 6D 1C E9 AA BB CC DD lÃ  ID
+01 lÃ  anten
 
 20 byte
 00 00 12 1F 15 05 8D 48 29 4E D9 00 D9 00 00 00 00 05 01 8A FF
 
 12  datalenght
 1F RSSI
-15 nhiệt độ giá trị, giá trị là hex chuyển qua dec
-05  nhiệt độ label
+15 nhiá»‡t Ä‘á»™ giÃ¡ trá»‹, giÃ¡ trá»‹ lÃ  hex chuyá»ƒn qua dec
+05  nhiá»‡t Ä‘á»™ label
 byte 6-17 8D 48 29 4E D9 00 D9 00 00 00 00 05 ID
 */
 	uint8_t crc = calculateCRC(&msg[0], _head_par-1);
@@ -221,17 +242,21 @@ byte 6-17 8D 48 29 4E D9 00 D9 00 00 00 00 05 ID
 	if (dataLengthRead < 8) return false;
 	else if (dataLengthRead < 12) tam=8;
 	else tam=12;
-  
+  //Serial.printf("\n so phan tu %d \n", _head_par);
 	if (crc == msg[ _head_par-1 ]){
     memset(datareturn ,'\0', dataLengthRead);
-		if ( _head_par == 13){
+		if ( _head_par == 14){
 			for (uint8_t x = 0; x < 8; x++)datareturn[x]=msg[x+3];
 		}
-		else if ( _head_par == 16){
+		/*else if ( _head_par == 17){
 			for (uint8_t x = 0; x < tam; x++)
-				datareturn[x]=msg[x+2];
-		}
-		else if ( _head_par == 19){
+				datareturn[x]=msg[x+3];
+		}*/
+   else if ( _head_par == 17){
+     for (uint8_t x = 0; x < tam; x++)
+        datareturn[x]=msg[x+3];
+    }
+		else if ( _head_par == 20){
 			for (uint8_t x = 0; x < tam; x++)
 				datareturn[x]=msg[x+6];
 		}
@@ -240,8 +265,10 @@ byte 6-17 8D 48 29 4E D9 00 D9 00 00 00 00 05 ID
 	}
 	return false;
 }
+
 /*
  * E0 06 60 00 71 02
  * A0 05 61 00 00 65 95
  * 00 00 E3 00 60 19 D2 6D 1C E9 AA BB CC DD 01 51 FF
  */
+
