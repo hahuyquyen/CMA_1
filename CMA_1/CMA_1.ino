@@ -2,6 +2,7 @@ extern "C" {
   #include "freertos/FreeRTOS.h"
   #include "freertos/timers.h"
 }
+#include "FS.h"
 #include <AsyncMqttClient.h>
 #include <EEPROM.h>
 #include "Config.h"
@@ -79,13 +80,17 @@ void setup()
   //  Serial.begin(115200);
     EEPROM.begin(1024);
     WiFi.disconnect(true);
+
      Serial1.begin(9600, SERIAL_8N1, 13, 12); //12 tx 13 lÃ  rx
      Serial.begin(115200);
+
+    number_line_save_mqtt=EEPROM.readUInt(800);
+    printf("So line %u \n",number_line_save_mqtt);
+
     loadWiFiConf();
-    if(!SPIFFS.begin(true)){
-    Serial.println("An Error has occurred while mounting SPIFFS");
-    return;
-    }
+    if(!SPIFFS.begin(true)){printf("An Error has occurred while mounting SPIFFS\n");}
+    listDir(SPIFFS, "/", 0);
+    check_file_exit();
 #ifdef using_sta
     wifi_connect(0,WIFI_STA,WiFiConf.sta_ssid,WiFiConf.sta_pwd,WiFiConf.ap_ssid);
 #else
@@ -168,13 +173,37 @@ void loop()
     }
   }
   if(xQueueReceive( Queue_mqtt, &datatruyen_mqtt,  ( TickType_t ) 2 )== pdPASS ){
-    truyen_mqtt();
-  }    
+    if (status_mqtt_connect){truyen_mqtt();}
+    else {
+    // Save_data_mqtt_to_local(&datatruyen_mqtt);
+      read_data_mqtt_to_local();
+      }
+  }
+  else if (status_mqtt_connect){
+    /*
+     * read file save
+     * if (number_line_save_mqtt >0){read1line;send mqtt}
+     * number_line_save_mqtt = number_line_save_mqtt-1
+     */
+  }   
 }
 
 
-
-
+void Save_data_mqtt_to_local(data_user* datain){
+  number_line_save_mqtt = number_line_save_mqtt + 1;
+  EEPROM.writeUInt(800,number_line_save_mqtt);
+  EEPROM.commit();
+  size_t size_needed = snprintf(NULL, 0, "{\"id\":\"%s\",\"device\":\"%s\",\"data\":[%g,%g]}\n", datatruyen_mqtt.id_RFID, WiFiConf.mqtt_choose_inout, datatruyen_mqtt.data_weight,datatruyen_mqtt.data_tare) + 1;
+  char* msg1 = (char*)malloc(size_needed);
+  if (msg1 != NULL) {  // malloc ok
+  sprintf(msg1, "{\"id\":\"%s\",\"device\":\"%s\",\"data\":[%g,%g]}\n", datatruyen_mqtt.id_RFID,WiFiConf.mqtt_choose_inout, datatruyen_mqtt.data_weight,datatruyen_mqtt.data_tare) ;
+  printf("mqtt %s\n",msg1);
+  appendFile(SPIFFS, "/save_mqtt.txt", msg1);
+  }
+}
+void read_data_mqtt_to_local(){
+  readFile(SPIFFS, "/save_mqtt.txt");
+}
 
 
  
