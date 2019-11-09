@@ -10,14 +10,6 @@
 void LCD_thong_tin(uint8_t chedo_HT,Data_TH* Data_TH , uint8_t daucham = 0){
     u8g2.clearBuffer();
   if (chedo_HT == 0){
-        /*  u8g2.setFont(u8g2_font_5x7_tf); // u8g2_font_6x10_tf
-          u8g2.setCursor(0, 10);
-          if (status_IN_or_OUT) u8g2.print("Dau Ra");
-          else u8g2.print("Dau vao");
-          u8g2.print("-");
-          if (status_wifi_connect_AP) u8g2.print(WiFi.localIP().toString().c_str());
-          else u8g2.print("Not connect");
-          u8g2.setFont(u8g2_font_6x12_tf); */
           u8g2.setFont(u8g2_font_unifont_t_vietnamese1);
           u8g2.setCursor(0, 12);
           u8g2.print("NV:");
@@ -147,4 +139,3 @@ double  8   %lf
 long double 12    %Lf
 We can use the sizeof() operator to check the size of a variable. See the following C program for
  */
-
