@@ -22,7 +22,7 @@ extern "C" {
 #include <Wire.h>
 #endif
 
-U8G2_ST7920_128X64_F_SW_SPI u8g2(U8G2_R0, /* clock=*/ 18, /* data=*/ 5, /* CS=*/ U8X8_PIN_NONE);
+U8G2_ST7920_128X64_F_SW_SPI u8g2(U8G2_R0, /* clock=*/ 27, /* data=*/ 26, /* CS=*/ U8X8_PIN_NONE);
 
 
 
