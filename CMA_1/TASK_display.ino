@@ -10,14 +10,6 @@
 void LCD_thong_tin(uint8_t chedo_HT,Data_TH* Data_TH , uint8_t daucham = 0){
     u8g2.clearBuffer();
   if (chedo_HT == 0){
-        /*  u8g2.setFont(u8g2_font_5x7_tf); // u8g2_font_6x10_tf
-          u8g2.setCursor(0, 10);
-          if (status_IN_or_OUT) u8g2.print("Dau Ra");
-          else u8g2.print("Dau vao");
-          u8g2.print("-");
-          if (status_wifi_connect_AP) u8g2.print(WiFi.localIP().toString().c_str());
-          else u8g2.print("Not connect");
-          u8g2.setFont(u8g2_font_6x12_tf); */
           u8g2.setFont(u8g2_font_unifont_t_vietnamese1);
           u8g2.setCursor(0, 12);
           u8g2.print("NV:");
@@ -66,10 +58,14 @@ void Display( void * pvParameters ){
     pinMode(Pin_Coi, OUTPUT);
     uint8_t mode_ht = 0;
     unsigned long _time_counting_task_display=0;
+
     unsigned long _time_counting_task_send_heap=0;
     unsigned long _time_out_display =0;
     unsigned long _time_out_display_LCD=0;
     unsigned long _time_blink_LCD=0;
+
+    unsigned long _time_counting_send_heap=0;
+
     uint16_t Time_blink= 1000;
     uint16_t Time_check= 3000;  
     u8g2.begin();
@@ -78,6 +74,7 @@ void Display( void * pvParameters ){
     uint8_t state_LCD_Display = 1;
     uint8_t daucham_lcd = 0;
     while(true){
+
       if(xSemaphoreTake(xSignal_Display_check, 10)){
         digitalWrite(Pin_Coi,HIGH);
         _time_out_display = xTaskGetTickCount();
@@ -96,14 +93,31 @@ void Display( void * pvParameters ){
       }
 
      xQueueReceive( Queue_Time_blink, &Time_blink,  ( TickType_t ) 2 );
+
+      xQueueReceive( Queue_Time_blink, &Time_blink,  ( TickType_t ) 2 );
+      /*
+       * Time blink led
+       */
+
       if (xTaskGetTickCount()- _time_counting_task_display > Time_blink){
         _time_counting_task_display = xTaskGetTickCount();
         status_led=!status_led;
         digitalWrite(2,status_led);
+
       }
       if (xTaskGetTickCount()- _time_counting_task_send_heap > 15000){
         _time_counting_task_send_heap = xTaskGetTickCount();
         printf("Free Heap %d\n",ESP.getFreeHeap());
+
+      // printf("Free Heap %d\n",ESP.getFreeHeap());
+      }
+      /*
+       * time send heap free
+       */
+      if (xTaskGetTickCount()- _time_counting_send_heap > 5000){
+        _time_counting_send_heap = xTaskGetTickCount();
+         printf("Free Heap %d\n",ESP.getFreeHeap());
+
       }
       switch (state_LCD_Display){
         case 0:
@@ -147,4 +161,3 @@ double  8   %lf
 long double 12    %Lf
 We can use the sizeof() operator to check the size of a variable. See the following C program for
  */
-

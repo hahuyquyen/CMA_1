@@ -27,6 +27,7 @@ void truyen_mqtt(){
       free(msg1);
 }
 void onMqttConnect(bool sessionPresent) {
+  status_mqtt_connect = true;
         if (WiFiConf.mqtt_subto1[0] != 'x'){mqttClient.subscribe( WiFiConf.mqtt_subto1,2 );}  //0,1,2 laf qos
         if (WiFiConf.mqtt_subto2[0] != 'x'){mqttClient.subscribe(WiFiConf.mqtt_subto2,2);}
         if (WiFiConf.mqtt_subto3[0] != 'x'){mqttClient.subscribe(WiFiConf.mqtt_subto3,2);}  
@@ -35,8 +36,8 @@ void onMqttConnect(bool sessionPresent) {
 
 void onMqttDisconnect(AsyncMqttClientDisconnectReason reason) {
  // printf("Disconnected to MQTT.\n");
-  if (WiFi.isConnected()) {xTimerStart(mqttReconnectTimer, 0);
-  }
+ status_mqtt_connect = false;
+  if (WiFi.isConnected()) {xTimerStart(mqttReconnectTimer, 0);}
 }
 
 void onMqttSubscribe(uint16_t packetId, uint8_t qos) {//printf("Subscribe acknowledged: %f\n",packetId);

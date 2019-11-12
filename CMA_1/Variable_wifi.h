@@ -18,6 +18,8 @@ unsigned long _time_lastconnect_mqtt=0;
 static uint8_t counter_wifi_disconnect= 0;
 static boolean status_wifi_connect_AP = true ; 
 static boolean status_IN_or_OUT = true ; 
+static boolean status_mqtt_connect = false ; 
+static uint32_t number_line_save_mqtt =0;
 
 
 
@@ -76,6 +78,7 @@ QueueHandle_t Queue_Time_blink;
 typedef struct Data_user{
   uint8_t id;
   char id_RFID[25];
+  char id_RFID_Ro[25];
   double data_weight;
   double data_tare;
 } data_user;
