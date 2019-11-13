@@ -58,7 +58,6 @@ void Display( void * pvParameters ){
     pinMode(Pin_Coi, OUTPUT);
     uint8_t mode_ht = 0;
     unsigned long _time_counting_task_display=0;
-
     unsigned long _time_counting_task_send_heap=0;
     unsigned long _time_out_display =0;
     unsigned long _time_out_display_LCD=0;
@@ -91,8 +90,6 @@ void Display( void * pvParameters ){
         state_LCD_Display = 0;
         _time_out_display_LCD = xTaskGetTickCount();
       }
-
-     xQueueReceive( Queue_Time_blink, &Time_blink,  ( TickType_t ) 2 );
 
       xQueueReceive( Queue_Time_blink, &Time_blink,  ( TickType_t ) 2 );
       /*

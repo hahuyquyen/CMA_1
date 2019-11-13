@@ -89,7 +89,7 @@ void setup()
 
     loadWiFiConf();
     if(!SPIFFS.begin(true)){printf("An Error has occurred while mounting SPIFFS\n");}
-    listDir(SPIFFS, "/", 0);
+  //  listDir(SPIFFS, "/", 0);
     check_file_exit();
 #ifdef using_sta
     wifi_connect(0,WIFI_STA,WiFiConf.sta_ssid,WiFiConf.sta_pwd,WiFiConf.ap_ssid);
@@ -113,7 +113,7 @@ void setup()
                         "TaskRFID", /* Name of the task */
                         8192,      /* Stack size in words */
                         NULL,       /* Task input parameter */
-                        5,          /* Priority of the task */
+                        15,          /* Priority of the task */
                         NULL,       /* Task handle. */
                         1);  /* Core where the task should run */
     xTaskCreatePinnedToCore(
@@ -121,7 +121,7 @@ void setup()
                         "TaskCAN", /* Name of the task */
                         8192,      /* Stack size in words */
                         NULL,       /* Task input parameter */
-                        4,          /* Priority of the task */
+                        14,          /* Priority of the task */
                         NULL,       /* Task handle. */
                         0);  /* Core where the task should run */
     xTaskCreatePinnedToCore(
@@ -129,7 +129,7 @@ void setup()
                         "Display", /* Name of the task */
                         8192,      /* Stack size in words */
                         NULL,       /* Task input parameter */
-                        2,          /* Priority of the task */
+                        12,          /* Priority of the task */
                         NULL,       /* Task handle. */
                         1);  /* Core where the task should run */   
     xTaskCreatePinnedToCore(
@@ -137,9 +137,17 @@ void setup()
                         "http_re", /* Name of the task */
                         8192,      /* Stack size in words */
                         NULL,       /* Task input parameter */
-                        3,          /* Priority of the task */
+                        13,          /* Priority of the task */
                         NULL,       /* Task handle. */
                         0);  /* Core where the task should run */       
+  xTaskCreatePinnedToCore(
+                        Check_button,   /* Function to implement the task */
+                        "Check_button", /* Name of the task */
+                        2048,      /* Stack size in words */
+                        NULL,       /* Task input parameter */
+                        11,          /* Priority of the task */
+                        NULL,       /* Task handle. */
+                        0);  /* Core where the task should run */                             
   mqttReconnectTimer = xTimerCreate("mqttTimer", pdMS_TO_TICKS(2000), pdFALSE, (void*)0, reinterpret_cast<TimerCallbackFunction_t>(connectToMqtt));
   mqttClient.onConnect(onMqttConnect);
   mqttClient.onDisconnect(onMqttDisconnect);
@@ -148,7 +156,8 @@ void setup()
   mqttClient.onMessage(onMqttMessage);
   mqttClient.onPublish(onMqttPublish);
   mqttClient.setServer(WiFiConf.mqtt_server, atoi(WiFiConf.mqtt_port));       
-  mqttClient.setCredentials(WiFiConf.mqtt_user,WiFiConf.mqtt_pass);           
+  mqttClient.setCredentials(WiFiConf.mqtt_user,WiFiConf.mqtt_pass);      
+  printf("END set \n");     
 }
 /*
  * Main Loop luÃ´n cháº¡y Core 1
@@ -174,35 +183,15 @@ void loop()
   }
   if(xQueueReceive( Queue_mqtt, &datatruyen_mqtt,  ( TickType_t ) 2 )== pdPASS ){
     if (status_mqtt_connect){truyen_mqtt();}
-    else {
-    // Save_data_mqtt_to_local(&datatruyen_mqtt);
-      read_data_mqtt_to_local();
-      }
+    else {}
   }
-  else if (status_mqtt_connect){
-    /*
-     * read file save
-     * if (number_line_save_mqtt >0){read1line;send mqtt}
-     * number_line_save_mqtt = number_line_save_mqtt-1
-     */
-  }   
+  else if (status_mqtt_connect){}   
 }
 
 
-void Save_data_mqtt_to_local(data_user* datain){
-  number_line_save_mqtt = number_line_save_mqtt + 1;
-  EEPROM.writeUInt(800,number_line_save_mqtt);
-  EEPROM.commit();
-  size_t size_needed = snprintf(NULL, 0, "{\"id\":\"%s\",\"device\":\"%s\",\"data\":[%g,%g]}\n", datatruyen_mqtt.id_RFID, WiFiConf.mqtt_choose_inout, datatruyen_mqtt.data_weight,datatruyen_mqtt.data_tare) + 1;
-  char* msg1 = (char*)malloc(size_needed);
-  if (msg1 != NULL) {  // malloc ok
-  sprintf(msg1, "{\"id\":\"%s\",\"device\":\"%s\",\"data\":[%g,%g]}\n", datatruyen_mqtt.id_RFID,WiFiConf.mqtt_choose_inout, datatruyen_mqtt.data_weight,datatruyen_mqtt.data_tare) ;
-  printf("mqtt %s\n",msg1);
-  appendFile(SPIFFS, "/save_mqtt.txt", msg1);
-  }
+void Save_data_mqtt_to_local(){
 }
 void read_data_mqtt_to_local(){
-  readFile(SPIFFS, "/save_mqtt.txt");
 }
 
 

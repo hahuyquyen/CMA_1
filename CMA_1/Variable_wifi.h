@@ -75,13 +75,13 @@ QueueHandle_t Queue_Time_blink;
 /**************************** 
  *  Struct Data 
  ***************************/
-typedef struct Data_user{
+/*typedef struct Data_user{
   uint8_t id;
   char id_RFID[25];
   char id_RFID_Ro[25];
   double data_weight;
   double data_tare;
-} data_user;
+} data_user;*/
 typedef struct Data_TH{
   char id_RFID[25];
   char id_RFID_NV[25];
