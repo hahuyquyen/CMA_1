@@ -20,9 +20,56 @@ static boolean status_wifi_connect_AP = true ;
 static boolean status_IN_or_OUT = true ; 
 static boolean status_mqtt_connect = false ; 
 static uint32_t number_line_save_mqtt =0;
+/*
+ * 
+ */
+namespace PhanLoai {
+    enum PhanLoai: uint8_t { 
+      Not_Choose=0, 
+      Fil_IN, 
+      Fil_OUT, 
+      LANG_IN, 
+      LANG_OUT 
+    };
+}
 
 
-
+/*
+ * 
+ */
+namespace LoaiCa {
+enum LoaiCa: uint8_t { 
+      Not_Choose=0, 
+      CaTra, 
+      caLoc, 
+      Caro, 
+      CAAA,
+      CA1,
+      CA2,
+      CA3,
+      CA4,
+      CA5,
+      CA6,
+      CA7,
+      CA8 
+    };
+}
+struct chonloaicaStruct{
+  PhanLoai::PhanLoai PhanLoaiKV;
+  LoaiCa::LoaiCa TSL;
+  uint8_t SL_LoaiCa;
+  uint8_t STT_LoaiCa[15];
+  uint8_t STT_user_choose;
+}chonloaica={
+  PhanLoai::Not_Choose,
+  LoaiCa::Not_Choose,
+  0,
+  0,
+  0
+};
+/*
+ * 
+ */
 static struct WiFiConfStruct {
   uint8_t format[4];
   char sta_ssid[32];

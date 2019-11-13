@@ -30,11 +30,18 @@ void LCD_thong_tin(uint8_t chedo_HT,Data_TH* Data_TH , uint8_t daucham = 0){
    else if (chedo_HT == 1) {
           u8g2.setCursor(2, 16);
           u8g2.setFont(u8g2_font_unifont_t_vietnamese1);
-          if (status_IN_or_OUT) u8g2.print("Đầu ra");
-          else u8g2.print("Đầu Vào");
+          switch (chonloaica.PhanLoaiKV){
+            case PhanLoai::Not_Choose : u8g2.print("Chưa Chọn");break;
+            case PhanLoai::Fil_IN : u8g2.print("FILLER-Đầu Vào");break;
+            case PhanLoai::Fil_OUT : u8g2.print("FILLER-Đầu Ra");break;
+            case PhanLoai::LANG_IN : u8g2.print("LẠNG Da-Đầu Vào");break;
+            case PhanLoai::LANG_OUT : u8g2.print("LẠNG Da-Đầu Ra");break;
+          }
+         // if (status_IN_or_OUT) 
+         // else u8g2.print("Đầu Vào");
           u8g2.setCursor(2, 32);
           u8g2.print("Chờ Thẻ");
-          u8g2.setCursor(68, 16);  
+          u8g2.setCursor(68, 32);  
           u8g2.print("Kg:"); 
         //  u8g2.setCursor(72, 32);  
           u8g2.print(can_data);     
@@ -43,8 +50,29 @@ void LCD_thong_tin(uint8_t chedo_HT,Data_TH* Data_TH , uint8_t daucham = 0){
             u8g2.print(".");
           }
           u8g2.setCursor(2, 64); 
-            if (status_wifi_connect_AP) u8g2.print(WiFi.localIP().toString().c_str());
-            else u8g2.print("Not connect");
+          /*      Not_Choose=0, 
+      CaTra, 
+      caLoc, 
+      Caro, 
+      CAAA,
+      CA1,
+      CA2,
+      CA3,
+      CA4,
+      */
+          switch (chonloaica.STT_LoaiCa[chonloaica.STT_user_choose]){
+            case LoaiCa::Not_Choose : u8g2.print("Chưa Chọn Cá");break;
+            case LoaiCa::CaTra : u8g2.print("CaTra");break;
+            case LoaiCa::caLoc : u8g2.print("caLoc");break;
+            case LoaiCa::Caro : u8g2.print("Caro");break;
+            case LoaiCa::CA1 : u8g2.print("ca1");break;
+            case LoaiCa::CA2 : u8g2.print("ca2");break;
+            case LoaiCa::CA3 : u8g2.print("ca3");break;
+            case LoaiCa::CA4 : u8g2.print("ca4");break;
+            case LoaiCa::CAAA : u8g2.print("CAAA");break;
+          }
+           /* if (status_wifi_connect_AP) u8g2.print(WiFi.localIP().toString().c_str());
+            else u8g2.print("Not connect");*/
    }
     u8g2.sendBuffer();  
 }
@@ -79,13 +107,16 @@ void Display( void * pvParameters ){
         _time_out_display = xTaskGetTickCount();
       }
       if(xSemaphoreTake(xSignal_Display_checkdone, 10)){ //Che do IN qua timeout se tat 
-        
         state_LCD_Display = 1;
         digitalWrite(Pin_Coi,LOW);
       }
-    if (status_IN_or_OUT){  // Neu che do OUT thi tu tat sau 3s
-        if (xTaskGetTickCount() - _time_out_display > Time_check){digitalWrite(4,LOW);state_LCD_Display = 0;_time_out_display=xTaskGetTickCount();}
-    }
+      switch (chonloaica.PhanLoaiKV){
+            case PhanLoai::Not_Choose : 
+                if (xTaskGetTickCount() - _time_out_display > Time_check){digitalWrite(4,LOW);state_LCD_Display = 1;_time_out_display=xTaskGetTickCount();}
+                break;
+            case PhanLoai::Fil_OUT : if (xTaskGetTickCount() - _time_out_display > Time_check){digitalWrite(4,LOW);state_LCD_Display = 1;_time_out_display=xTaskGetTickCount();}break;
+            case PhanLoai::LANG_OUT : if (xTaskGetTickCount() - _time_out_display > Time_check){digitalWrite(4,LOW);state_LCD_Display = 1;_time_out_display=xTaskGetTickCount();}break;
+      }
       if(xQueueReceive( Queue_display, &Data_TH,  ( TickType_t ) 2 )== pdPASS ){
         state_LCD_Display = 0;
         _time_out_display_LCD = xTaskGetTickCount();

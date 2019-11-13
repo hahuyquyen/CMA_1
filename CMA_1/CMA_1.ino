@@ -86,7 +86,7 @@ void setup()
 
     number_line_save_mqtt=EEPROM.readUInt(800);
     printf("So line %u \n",number_line_save_mqtt);
-
+    loaddata();
     loadWiFiConf();
     if(!SPIFFS.begin(true)){printf("An Error has occurred while mounting SPIFFS\n");}
   //  listDir(SPIFFS, "/", 0);
@@ -108,6 +108,13 @@ void setup()
     server.begin();
     Update.onProgress(printProgress);
     //setting_uart();
+    chonloaica.SL_LoaiCa=5;
+    chonloaica.STT_LoaiCa[1]=1;
+    chonloaica.STT_LoaiCa[2]=3;
+    chonloaica.STT_LoaiCa[3]=5;
+    chonloaica.STT_LoaiCa[4]=7;
+    chonloaica.STT_LoaiCa[5]=8;
+    
     xTaskCreatePinnedToCore(
                         TaskRFID,   /* Function to implement the task */
                         "TaskRFID", /* Name of the task */

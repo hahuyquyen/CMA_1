@@ -64,6 +64,8 @@ void TaskRFID( void * pvParameters ){
                         if(xSemaphoreTake(xreset_id_nv, 10)){
                         strncpy( Data_rfid_nv.id_RFID,"", sizeof(""));
                         strncpy( Data_rfid_nv.id_RFID_Old,"", sizeof(""));
+                         strncpy( Data_rfid.id_RFID,"", sizeof(""));
+                        strncpy( Data_rfid.id_RFID_Old,"", sizeof(""));
                               }
                 vTaskDelay(20);
     }

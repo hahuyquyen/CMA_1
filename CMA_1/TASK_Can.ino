@@ -3,8 +3,6 @@ double can_data=0;
 double can_data_old=0;
 void TaskCAN( void * pvParameters ){    
     const TickType_t xTicksToWait = pdMS_TO_TICKS(5);
-    static data_user Data_task_CAN;
-    Data_task_CAN.id = 1;
     static Data_CAN Data_CAN;
     uint8_t _rfid_data[20];
     int tam=0;
