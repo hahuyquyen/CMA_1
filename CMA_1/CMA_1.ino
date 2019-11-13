@@ -84,8 +84,8 @@ void setup()
      Serial1.begin(9600, SERIAL_8N1, 13, 12); //12 tx 13 lÃ  rx
      Serial.begin(115200);
 
-    number_line_save_mqtt=EEPROM.readUInt(800);
-    printf("So line %u \n",number_line_save_mqtt);
+   // number_line_save_mqtt=EEPROM.readUInt(800);
+    //printf("So line %u \n",number_line_save_mqtt);
     loaddata();
     loadWiFiConf();
     if(!SPIFFS.begin(true)){printf("An Error has occurred while mounting SPIFFS\n");}
@@ -108,13 +108,14 @@ void setup()
     server.begin();
     Update.onProgress(printProgress);
     //setting_uart();
-    chonloaica.SL_LoaiCa=5;
+    chonloaica.PhanLoaiKV = PhanLoai::Not_Choose;
+   /* chonloaica.SL_LoaiCa=5;
     chonloaica.STT_LoaiCa[1]=1;
     chonloaica.STT_LoaiCa[2]=3;
     chonloaica.STT_LoaiCa[3]=5;
     chonloaica.STT_LoaiCa[4]=7;
     chonloaica.STT_LoaiCa[5]=8;
-    
+    savedata();*/
     xTaskCreatePinnedToCore(
                         TaskRFID,   /* Function to implement the task */
                         "TaskRFID", /* Name of the task */
@@ -164,7 +165,7 @@ void setup()
   mqttClient.onPublish(onMqttPublish);
   mqttClient.setServer(WiFiConf.mqtt_server, atoi(WiFiConf.mqtt_port));       
   mqttClient.setCredentials(WiFiConf.mqtt_user,WiFiConf.mqtt_pass);      
-  printf("END set \n");     
+//  printf("END set \n");     
 }
 /*
  * Main Loop luÃ´n cháº¡y Core 1
