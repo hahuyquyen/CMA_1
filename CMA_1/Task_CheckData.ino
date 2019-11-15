@@ -11,7 +11,7 @@ void http_re( void * pvParameters ){
     unsigned long _time_timeout_data=10000;
     unsigned long _time_timeout_data_VAO=10000;
     unsigned long _time_counting_task_check=0;
-    while(true){
+    for (;;){
     if(xQueueReceive( Queue_can, &Data_CAN_TH,  ( TickType_t ) 2 )== pdPASS ){
       _time_get_data_can=xTaskGetTickCount();
     }
@@ -27,6 +27,9 @@ void http_re( void * pvParameters ){
       }
       else _time_get_data_rfid_nv=xTaskGetTickCount();
     }
+    /*
+     * 
+     */
     if ((_time_get_data_can > _time_get_data_rfid + 1000)&&(_time_get_data_rfid > 0)){
          _time_timeout_data = _time_get_data_can - _time_get_data_rfid;
         if (_time_timeout_data < time_2_lan_nhan_data){

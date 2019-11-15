@@ -5,11 +5,11 @@
 #define button_vitri_pin 36
 #define button_du_phong_pin 39
 
-EasyButton button_mode_ca(button_mode_ca_pin);
-EasyButton button_khuvuc(button_khuvuc_pin,50,true);
-EasyButton button_error(button_error_pin);
-EasyButton button_vitri(button_vitri_pin);
-EasyButton button_du_phong(button_du_phong_pin);
+EasyButton button_mode_ca(button_mode_ca_pin,1000,true);
+EasyButton button_khuvuc(button_khuvuc_pin,1000,true);
+EasyButton button_error(button_error_pin,1000,true);
+EasyButton button_vitri(button_vitri_pin,1000,true);
+EasyButton button_du_phong(button_du_phong_pin,1000,true);
 void onPressed_mode_ca() {
   chonloaica.STT_user_choose ++ ;
   if (chonloaica.STT_user_choose > chonloaica.SL_LoaiCa) {chonloaica.STT_user_choose = 0;}
@@ -46,7 +46,7 @@ void Check_button( void * pvParameters ){
         button_khuvuc.read();
         button_error.read();
         button_vitri.read();
-      vTaskDelay(25);   
+        vTaskDelay(25);   
     }
     vTaskDelete(NULL) ;
 }

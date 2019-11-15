@@ -7,7 +7,7 @@ void TaskCAN( void * pvParameters ){
     uint8_t _rfid_data[20];
     int tam=0;
     unsigned long time_send_para_can=0;
-    while(true){
+    for (;;){
       if (Serial1.available()){ 
        uint8_t incomingData = Serial1.read();
        if ( incomingData == 0x3D){tam=0;}

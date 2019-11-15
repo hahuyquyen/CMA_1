@@ -49,7 +49,7 @@ void LCD_thong_tin(uint8_t chedo_HT,Data_TH* Data_TH , uint8_t daucham = 0){
           for (int i=0;i<daucham;i++){
             u8g2.print(".");
           }
-          u8g2.setCursor(2, 64); 
+          u8g2.setCursor(2, 60); 
           /*      Not_Choose=0, 
       CaTra, 
       caLoc, 
@@ -100,7 +100,7 @@ void Display( void * pvParameters ){
     LCD_thong_tin(1,&Data_TH);
     uint8_t state_LCD_Display = 1;
     uint8_t daucham_lcd = 0;
-    while(true){
+   for (;;){
 
       if(xSemaphoreTake(xSignal_Display_check, 10)){
         digitalWrite(Pin_Coi,HIGH);

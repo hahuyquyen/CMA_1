@@ -35,7 +35,7 @@ void TaskRFID( void * pvParameters ){
     nano.set_out_mode(1,5000);
     nano.set_time_ner(0x05,5000);
     nano.set_reset_reader(2000);
-    while(true){
+    for (;;){
                 if (xTaskGetTickCount()-_time_counting_task_rfid > 2000){
                     _time_counting_task_rfid = xTaskGetTickCount();
                     i=i+1; 
