@@ -78,7 +78,7 @@ void setup()
       status_IN_or_OUT = false;
     }
   //  Serial.begin(115200);
-    EEPROM.begin(1024);
+    EEPROM.begin(5120);
     WiFi.disconnect(true);
 
      Serial1.begin(9600, SERIAL_8N1, 13, 12); //12 tx 13 lÃ  rx
@@ -204,4 +204,3 @@ void read_data_mqtt_to_local(){
 
 
  
-

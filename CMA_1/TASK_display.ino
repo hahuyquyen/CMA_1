@@ -50,29 +50,8 @@ void LCD_thong_tin(uint8_t chedo_HT,Data_TH* Data_TH , uint8_t daucham = 0){
             u8g2.print(".");
           }
           u8g2.setCursor(2, 60); 
-          /*      Not_Choose=0, 
-      CaTra, 
-      caLoc, 
-      Caro, 
-      CAAA,
-      CA1,
-      CA2,
-      CA3,
-      CA4,
-      */
-          switch (chonloaica.STT_LoaiCa[chonloaica.STT_user_choose]){
-            case LoaiCa::Not_Choose : u8g2.print("Chưa Chọn Cá");break;
-            case LoaiCa::CaTra : u8g2.print("CaTra");break;
-            case LoaiCa::caLoc : u8g2.print("caLoc");break;
-            case LoaiCa::Caro : u8g2.print("Caro");break;
-            case LoaiCa::CA1 : u8g2.print("ca1");break;
-            case LoaiCa::CA2 : u8g2.print("ca2");break;
-            case LoaiCa::CA3 : u8g2.print("ca3");break;
-            case LoaiCa::CA4 : u8g2.print("ca4");break;
-            case LoaiCa::CAAA : u8g2.print("CAAA");break;
-          }
-           /* if (status_wifi_connect_AP) u8g2.print(WiFi.localIP().toString().c_str());
-            else u8g2.print("Not connect");*/
+      u8g2.print(Nha_SX.Loai_ca[chonloaica.STT_LoaiCa[chonloaica.STT_user_choose]]);
+          
    }
     u8g2.sendBuffer();  
 }
@@ -110,12 +89,13 @@ void Display( void * pvParameters ){
         state_LCD_Display = 1;
         digitalWrite(Pin_Coi,LOW);
       }
-      switch (chonloaica.PhanLoaiKV){
+      switch (chonloaica.PhanLoaiKV){ //chonloaica.PhanLoaiKV == PhanLoai::LANG_OUT
             case PhanLoai::Not_Choose : 
                 if (xTaskGetTickCount() - _time_out_display > Time_check){digitalWrite(4,LOW);state_LCD_Display = 1;_time_out_display=xTaskGetTickCount();}
                 break;
             case PhanLoai::Fil_OUT : if (xTaskGetTickCount() - _time_out_display > Time_check){digitalWrite(4,LOW);state_LCD_Display = 1;_time_out_display=xTaskGetTickCount();}break;
             case PhanLoai::LANG_OUT : if (xTaskGetTickCount() - _time_out_display > Time_check){digitalWrite(4,LOW);state_LCD_Display = 1;_time_out_display=xTaskGetTickCount();}break;
+            default: break;
       }
       if(xQueueReceive( Queue_display, &Data_TH,  ( TickType_t ) 2 )== pdPASS ){
         state_LCD_Display = 0;
@@ -131,7 +111,6 @@ void Display( void * pvParameters ){
         _time_counting_task_display = xTaskGetTickCount();
         status_led=!status_led;
         digitalWrite(2,status_led);
-
       }
       if (xTaskGetTickCount()- _time_counting_task_send_heap > 15000){
         _time_counting_task_send_heap = xTaskGetTickCount();

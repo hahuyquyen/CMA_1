@@ -37,7 +37,7 @@ namespace PhanLoai {
 /*
  * 
  */
-namespace LoaiCa {
+/*namespace LoaiCa {
 enum LoaiCa: uint8_t { 
       Not_Choose=0, 
       CaTra, 
@@ -53,20 +53,29 @@ enum LoaiCa: uint8_t {
       CA7,
       CA8 
     };
-}
+}*/
 struct chonloaicaStruct{
   PhanLoai::PhanLoai PhanLoaiKV;
-  LoaiCa::LoaiCa TSL;
   uint8_t SL_LoaiCa;
   uint8_t STT_LoaiCa[15];
   uint8_t STT_user_choose;
+  uint8_t SL_NhaCC;
+  uint8_t STT_NhaCC[15];
+  uint8_t STT_user_choose_NhaCC;
 }chonloaica={
   PhanLoai::Not_Choose,
-  LoaiCa::Not_Choose,
+  0,
+  0,
+  0,
   0,
   0,
   0
 };
+
+static struct choose_nha_sx {
+  char Loai_ca[30][50];
+  char So_Lo[30][50];
+} Nha_SX;
 /*
  * 
  */
@@ -167,4 +176,3 @@ static IPAddress gateway(192, 168, 1, 1);
 static IPAddress subnet(255, 255, 255, 0);
 static IPAddress primaryDNS(8, 8, 8, 8); //optional
 static IPAddress secondaryDNS(8, 8, 4, 4); //optional
-

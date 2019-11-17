@@ -45,7 +45,15 @@ void TaskRFID( void * pvParameters ){
                     if (nano.parseResponse(myEPC,myEPClength)){
                               if (myEPC[0] == MaRo_RFID){ //NHAN VIEN
                                 array_to_string(&myEPC[5], 7, Data_rfid.id_RFID); //0->12 5->7
-                                 if (strcmp(Data_rfid.id_RFID,Data_rfid.id_RFID_Old) != 0){
+                                /*
+                                 * nếu là khu vực cân 2 lần thì sẽ lúc nào cũng gửi về
+                                 */
+                                  if (chonloaica.PhanLoaiKV == PhanLoai::LANG_OUT){
+                                    strncpy( Data_rfid.id_RFID_Old,Data_rfid.id_RFID, sizeof(Data_rfid.id_RFID));
+                                    printf("So TAB: %s\n",Data_rfid.id_RFID);
+                                    xQueueSend( Queue_RFID, &Data_rfid, xTicksToWait );
+                                  }
+                                 else if (strcmp(Data_rfid.id_RFID,Data_rfid.id_RFID_Old) != 0){
                                     strncpy( Data_rfid.id_RFID_Old,Data_rfid.id_RFID, sizeof(Data_rfid.id_RFID));
                                     printf("So TAB: %s\n",Data_rfid.id_RFID);
                                    // xSemaphoreGive(xSignal_FromRFID);
@@ -71,4 +79,3 @@ void TaskRFID( void * pvParameters ){
     }
     vTaskDelete(NULL) ;
 }
-

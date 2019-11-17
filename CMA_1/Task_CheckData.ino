@@ -12,9 +12,15 @@ void http_re( void * pvParameters ){
     unsigned long _time_timeout_data_VAO=10000;
     unsigned long _time_counting_task_check=0;
     for (;;){
+      /*
+       * Nhận Cân
+       */
     if(xQueueReceive( Queue_can, &Data_CAN_TH,  ( TickType_t ) 2 )== pdPASS ){
       _time_get_data_can=xTaskGetTickCount();
     }
+    /*
+     * Nhận mã RFID mã Rổ
+     */
     if(xQueueReceive( Queue_RFID, &Data_RFID_TH,  ( TickType_t ) 2 )== pdPASS ){
       _time_get_data_rfid=xTaskGetTickCount();
     }
@@ -30,7 +36,12 @@ void http_re( void * pvParameters ){
     /*
      * 
      */
-    if ((_time_get_data_can > _time_get_data_rfid + 1000)&&(_time_get_data_rfid > 0)){
+    if (chonloaica.PhanLoaiKV == PhanLoai::LANG_OUT){
+      /*
+       * Cân 2 lần
+       */
+    }
+    else if ((_time_get_data_can > _time_get_data_rfid + 1000)&&(_time_get_data_rfid > 0)){
          _time_timeout_data = _time_get_data_can - _time_get_data_rfid;
         if (_time_timeout_data < time_2_lan_nhan_data){
           strncpy( Data_TH.id_RFID,Data_RFID_TH.id_RFID, sizeof(Data_RFID_TH.id_RFID));

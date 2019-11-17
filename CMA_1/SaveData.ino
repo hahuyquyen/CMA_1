@@ -47,22 +47,18 @@ void savedata(void) {
   }
   EEPROM.commit();
 }
+bool loaddata_SX() {
+    for (unsigned int t = 0; t < sizeof(Nha_SX); t++) {
+      *((char*)&Nha_SX + t) = EEPROM.read(1000 + t); //& lÃ  Ä‘á»‹a chá»‰  cá»§a biáº¿n Struc, *lÃ  data tá»©c lÃ  gÃ¡n data trong Ã´ nhá»› struc báº±ng eprom Ä‘á»�c dc (char*) lÃ  Ã©p kiá»ƒu dá»¯ liá»‡u
+    }
+   return true;
+}
 /*
-
-void EEPROM_writeDouble(int ee, uint32_t value)
-{
-   byte* p = (byte*)(void*)&value;
-   for (int i = 0; i < sizeof(value); i++)
-       EEPROM.write(ee++, *p++);
-   
+ * LÆ°u Eprom thÃ´ng tin wifi
+ */
+void savedata_SX(void) {
+  for (unsigned int t = 0; t < sizeof(Nha_SX); t++) {
+    EEPROM.write(1000 + t, *((char*)&Nha_SX + t));
+  }
+  EEPROM.commit();
 }
-
-uint32_t EEPROM_readDouble(int ee)
-{
-   uint32_t value = 0.0;
-   byte* p = (byte*)(void*)&value;
-   for (int i = 0; i < sizeof(value); i++)
-       *p++ = EEPROM.read(ee++);
-   return value;
-}
-*/
