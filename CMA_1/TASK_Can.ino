@@ -3,13 +3,11 @@ double can_data=0;
 double can_data_old=0;
 void TaskCAN( void * pvParameters ){    
     const TickType_t xTicksToWait = pdMS_TO_TICKS(5);
-    static data_user Data_task_CAN;
-    Data_task_CAN.id = 1;
     static Data_CAN Data_CAN;
     uint8_t _rfid_data[20];
     int tam=0;
     unsigned long time_send_para_can=0;
-    while(true){
+    for (;;){
       if (Serial1.available()){ 
        uint8_t incomingData = Serial1.read();
        if ( incomingData == 0x3D){tam=0;}

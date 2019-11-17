@@ -30,11 +30,18 @@ void LCD_thong_tin(uint8_t chedo_HT,Data_TH* Data_TH , uint8_t daucham = 0){
    else if (chedo_HT == 1) {
           u8g2.setCursor(2, 16);
           u8g2.setFont(u8g2_font_unifont_t_vietnamese1);
-          if (status_IN_or_OUT) u8g2.print("Đầu ra");
-          else u8g2.print("Đầu Vào");
+          switch (chonloaica.PhanLoaiKV){
+            case PhanLoai::Not_Choose : u8g2.print("Chưa Chọn");break;
+            case PhanLoai::Fil_IN : u8g2.print("FILLER-Đầu Vào");break;
+            case PhanLoai::Fil_OUT : u8g2.print("FILLER-Đầu Ra");break;
+            case PhanLoai::LANG_IN : u8g2.print("LẠNG Da-Đầu Vào");break;
+            case PhanLoai::LANG_OUT : u8g2.print("LẠNG Da-Đầu Ra");break;
+          }
+         // if (status_IN_or_OUT) 
+         // else u8g2.print("Đầu Vào");
           u8g2.setCursor(2, 32);
           u8g2.print("Chờ Thẻ");
-          u8g2.setCursor(68, 16);  
+          u8g2.setCursor(68, 32);  
           u8g2.print("Kg:"); 
         //  u8g2.setCursor(72, 32);  
           u8g2.print(can_data);     
@@ -42,9 +49,9 @@ void LCD_thong_tin(uint8_t chedo_HT,Data_TH* Data_TH , uint8_t daucham = 0){
           for (int i=0;i<daucham;i++){
             u8g2.print(".");
           }
-          u8g2.setCursor(2, 64); 
-            if (status_wifi_connect_AP) u8g2.print(WiFi.localIP().toString().c_str());
-            else u8g2.print("Not connect");
+          u8g2.setCursor(2, 60); 
+      u8g2.print(Nha_SX.Loai_ca[chonloaica.STT_LoaiCa[chonloaica.STT_user_choose]]);
+          
    }
     u8g2.sendBuffer();  
 }
@@ -58,7 +65,6 @@ void Display( void * pvParameters ){
     pinMode(Pin_Coi, OUTPUT);
     uint8_t mode_ht = 0;
     unsigned long _time_counting_task_display=0;
-
     unsigned long _time_counting_task_send_heap=0;
     unsigned long _time_out_display =0;
     unsigned long _time_out_display_LCD=0;
@@ -73,26 +79,28 @@ void Display( void * pvParameters ){
     LCD_thong_tin(1,&Data_TH);
     uint8_t state_LCD_Display = 1;
     uint8_t daucham_lcd = 0;
-    while(true){
+   for (;;){
 
       if(xSemaphoreTake(xSignal_Display_check, 10)){
         digitalWrite(Pin_Coi,HIGH);
         _time_out_display = xTaskGetTickCount();
       }
       if(xSemaphoreTake(xSignal_Display_checkdone, 10)){ //Che do IN qua timeout se tat 
-        
         state_LCD_Display = 1;
         digitalWrite(Pin_Coi,LOW);
       }
-    if (status_IN_or_OUT){  // Neu che do OUT thi tu tat sau 3s
-        if (xTaskGetTickCount() - _time_out_display > Time_check){digitalWrite(4,LOW);state_LCD_Display = 0;_time_out_display=xTaskGetTickCount();}
-    }
+      switch (chonloaica.PhanLoaiKV){ //chonloaica.PhanLoaiKV == PhanLoai::LANG_OUT
+            case PhanLoai::Not_Choose : 
+                if (xTaskGetTickCount() - _time_out_display > Time_check){digitalWrite(4,LOW);state_LCD_Display = 1;_time_out_display=xTaskGetTickCount();}
+                break;
+            case PhanLoai::Fil_OUT : if (xTaskGetTickCount() - _time_out_display > Time_check){digitalWrite(4,LOW);state_LCD_Display = 1;_time_out_display=xTaskGetTickCount();}break;
+            case PhanLoai::LANG_OUT : if (xTaskGetTickCount() - _time_out_display > Time_check){digitalWrite(4,LOW);state_LCD_Display = 1;_time_out_display=xTaskGetTickCount();}break;
+            default: break;
+      }
       if(xQueueReceive( Queue_display, &Data_TH,  ( TickType_t ) 2 )== pdPASS ){
         state_LCD_Display = 0;
         _time_out_display_LCD = xTaskGetTickCount();
       }
-
-     xQueueReceive( Queue_Time_blink, &Time_blink,  ( TickType_t ) 2 );
 
       xQueueReceive( Queue_Time_blink, &Time_blink,  ( TickType_t ) 2 );
       /*
@@ -103,7 +111,6 @@ void Display( void * pvParameters ){
         _time_counting_task_display = xTaskGetTickCount();
         status_led=!status_led;
         digitalWrite(2,status_led);
-
       }
       if (xTaskGetTickCount()- _time_counting_task_send_heap > 15000){
         _time_counting_task_send_heap = xTaskGetTickCount();

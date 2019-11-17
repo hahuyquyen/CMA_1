@@ -1,9 +1,9 @@
 void check_file_exit(){
-  if (SPIFFS.exists("/save_mqtt.txt")){
+/*  if (SPIFFS.exists("/save_mqtt.txt")){
     printf("file mqtt trong spiffs da co\n");
-  }
+  }*/
 }
-
+/*
 void readFile(fs::FS &fs, const char * path, char* dataout){
     printf("Reading file: %s\n", path);
 
@@ -18,10 +18,6 @@ void readFile(fs::FS &fs, const char * path, char* dataout){
     giatritam = file.readStringUntil('\n');
     dataout=giatritam.c_str();
     printf("%s \n",giatritam.c_str());
-    /*while(file.available()){
-        printf("%c",file.read());
-    }
-    printf("\n");*/
     file.close();
 }
 
@@ -89,4 +85,4 @@ void listDir(fs::FS &fs, const char * dirname, uint8_t levels){
         }
         file = root.openNextFile();
     }
-}
+}*/

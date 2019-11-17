@@ -20,9 +20,65 @@ static boolean status_wifi_connect_AP = true ;
 static boolean status_IN_or_OUT = true ; 
 static boolean status_mqtt_connect = false ; 
 static uint32_t number_line_save_mqtt =0;
+/*
+ * 
+ */
+namespace PhanLoai {
+    enum PhanLoai: uint8_t { 
+      Not_Choose=0, 
+      Fil_IN, 
+      Fil_OUT, 
+      LANG_IN, 
+      LANG_OUT 
+    };
+}
 
 
+/*
+ * 
+ */
+/*namespace LoaiCa {
+enum LoaiCa: uint8_t { 
+      Not_Choose=0, 
+      CaTra, 
+      caLoc, 
+      Caro, 
+      CAAA,
+      CA1,
+      CA2,
+      CA3,
+      CA4,
+      CA5,
+      CA6,
+      CA7,
+      CA8 
+    };
+}*/
+struct chonloaicaStruct{
+  PhanLoai::PhanLoai PhanLoaiKV;
+  uint8_t SL_LoaiCa;
+  uint8_t STT_LoaiCa[15];
+  uint8_t STT_user_choose;
+  uint8_t SL_NhaCC;
+  uint8_t STT_NhaCC[15];
+  uint8_t STT_user_choose_NhaCC;
+}chonloaica={
+  PhanLoai::Not_Choose,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0
+};
 
+static struct choose_nha_sx {
+  char Loai_ca[30][50];
+  char So_Lo[30][50];
+} Nha_SX;
+/*
+ * 
+ */
 static struct WiFiConfStruct {
   uint8_t format[4];
   char sta_ssid[32];
@@ -75,13 +131,13 @@ QueueHandle_t Queue_Time_blink;
 /**************************** 
  *  Struct Data 
  ***************************/
-typedef struct Data_user{
+/*typedef struct Data_user{
   uint8_t id;
   char id_RFID[25];
   char id_RFID_Ro[25];
   double data_weight;
   double data_tare;
-} data_user;
+} data_user;*/
 typedef struct Data_TH{
   char id_RFID[25];
   char id_RFID_NV[25];
@@ -120,4 +176,3 @@ static IPAddress gateway(192, 168, 1, 1);
 static IPAddress subnet(255, 255, 255, 0);
 static IPAddress primaryDNS(8, 8, 8, 8); //optional
 static IPAddress secondaryDNS(8, 8, 4, 4); //optional
-
