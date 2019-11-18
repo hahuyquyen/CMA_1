@@ -6,7 +6,6 @@
  * 
  * 
  */
-
 void LCD_thong_tin(uint8_t chedo_HT,Data_TH* Data_TH , uint8_t daucham = 0){
     u8g2.clearBuffer();
   if (chedo_HT == 0){
@@ -50,8 +49,29 @@ void LCD_thong_tin(uint8_t chedo_HT,Data_TH* Data_TH , uint8_t daucham = 0){
             u8g2.print(".");
           }
           u8g2.setCursor(2, 60); 
-      u8g2.print(Nha_SX.Loai_ca[chonloaica.STT_LoaiCa[chonloaica.STT_user_choose]]);
+          u8g2.print(Nha_SX.Loai_ca[chonloaica.STT_LoaiCa[chonloaica.STT_user_choose]]);
           
+   }
+      else if (chedo_HT == 2) {
+          u8g2.setCursor(2, 16);
+          u8g2.setFont(u8g2_font_unifont_t_vietnamese1);
+          u8g2.setCursor(2, 16);
+          u8g2.print("Cài Đặt");
+                    u8g2.setCursor(2, 32);
+          u8g2.print("KV:");
+          switch (chonloaica.PhanLoaiKV){
+            case PhanLoai::Not_Choose : u8g2.print("Chưa Chọn");break;
+            case PhanLoai::Fil_IN : u8g2.print("FILLER-Vào");break;
+            case PhanLoai::Fil_OUT : u8g2.print("FILLER-Ra");break;
+            case PhanLoai::LANG_IN : u8g2.print("LẠNG Da-Vào");break;
+            case PhanLoai::LANG_OUT : u8g2.print("LẠNG Da-Ra");break;
+          }
+          u8g2.setCursor(2, 48);
+          u8g2.print("Cá:");
+          u8g2.print(Nha_SX.Loai_ca[chonloaica.STT_LoaiCa[chonloaica.STT_user_choose]]);
+          u8g2.setCursor(2, 60); 
+          u8g2.print("CC:");
+          u8g2.print(Nha_SX.Loai_ca[chonloaica.STT_LoaiCa[chonloaica.STT_user_choose]]);       
    }
     u8g2.sendBuffer();  
 }
@@ -69,81 +89,87 @@ void Display( void * pvParameters ){
     unsigned long _time_out_display =0;
     unsigned long _time_out_display_LCD=0;
     unsigned long _time_blink_LCD=0;
-
     unsigned long _time_counting_send_heap=0;
-
     uint16_t Time_blink= 1000;
     uint16_t Time_check= 3000;  
+ //   spi.setup(1, spi.MASTER, spi.CPOL_LOW, spi.CPHA_LOW, U8X8_PIN_NONE, 80);
+    //u8g2.st7920_s_128x64(bus, cs, dc, res);
     u8g2.begin();
     u8g2.enableUTF8Print();
     LCD_thong_tin(1,&Data_TH);
     uint8_t state_LCD_Display = 1;
     uint8_t daucham_lcd = 0;
    for (;;){
-
-      if(xSemaphoreTake(xSignal_Display_check, 10)){
-        digitalWrite(Pin_Coi,HIGH);
-        _time_out_display = xTaskGetTickCount();
+      if (state_Running_conf::state_Running == state_Running_conf::Running){
+                if(xSemaphoreTake(xSignal_Display_check, 10)){
+                  digitalWrite(Pin_Coi,HIGH);
+                  _time_out_display = xTaskGetTickCount();
+                }
+                if(xSemaphoreTake(xSignal_Display_checkdone, 10)){ //Che do IN qua timeout se tat 
+                  state_LCD_Display = 1;
+                  digitalWrite(Pin_Coi,LOW);
+                }
+                switch (chonloaica.PhanLoaiKV){ //chonloaica.PhanLoaiKV == PhanLoai::LANG_OUT
+                      case PhanLoai::Not_Choose : if (xTaskGetTickCount() - _time_out_display > Time_check){digitalWrite(4,LOW);state_LCD_Display = 1;_time_out_display=xTaskGetTickCount();}break;
+                      case PhanLoai::Fil_OUT : if (xTaskGetTickCount() - _time_out_display > Time_check){digitalWrite(4,LOW);state_LCD_Display = 1;_time_out_display=xTaskGetTickCount();}break;
+                      case PhanLoai::LANG_OUT : if (xTaskGetTickCount() - _time_out_display > Time_check){digitalWrite(4,LOW);state_LCD_Display = 1;_time_out_display=xTaskGetTickCount();}break;
+                      default: break;
+                }
+                if(xQueueReceive( Queue_display, &Data_TH,  ( TickType_t ) 2 )== pdPASS ){
+                  state_LCD_Display = 0;
+                  _time_out_display_LCD = xTaskGetTickCount();
+                }
+          
+                xQueueReceive( Queue_Time_blink, &Time_blink,  ( TickType_t ) 2 );
+                /*
+                 * Time blink led
+                 */
+          
+                if (xTaskGetTickCount()- _time_counting_task_display > Time_blink){
+                  _time_counting_task_display = xTaskGetTickCount();
+                  status_led=!status_led;
+                  digitalWrite(2,status_led);
+                }
+                if (xTaskGetTickCount()- _time_counting_task_send_heap > 15000){
+                  _time_counting_task_send_heap = xTaskGetTickCount();
+                  printf("Free Heap %d\n",ESP.getFreeHeap());
+          
+                // printf("Free Heap %d\n",ESP.getFreeHeap());
+                }
+                /*
+                 * time send heap free
+                 */
+                if (xTaskGetTickCount()- _time_counting_send_heap > 5000){
+                  _time_counting_send_heap = xTaskGetTickCount();
+                   printf("Free Heap %d\n",ESP.getFreeHeap());
+          
+                }
+                
+                switch (state_LCD_Display){
+                  case 0:
+                        
+                        LCD_thong_tin(0,&Data_TH,daucham_lcd);
+                        state_LCD_Display=4;
+                        break;
+                  case 1:
+                        if (xTaskGetTickCount()- _time_blink_LCD > 1000){
+                           daucham_lcd ++ ;
+                          if (daucham_lcd > 8)daucham_lcd=0;
+                          _time_blink_LCD = xTaskGetTickCount();
+                           LCD_thong_tin(1,&Data_TH,daucham_lcd);
+                        }
+                        break;
+                  case 2:
+                        state_LCD_Display=4;
+                        break;
+                  default: break;
+                }
       }
-      if(xSemaphoreTake(xSignal_Display_checkdone, 10)){ //Che do IN qua timeout se tat 
-        state_LCD_Display = 1;
-        digitalWrite(Pin_Coi,LOW);
-      }
-      switch (chonloaica.PhanLoaiKV){ //chonloaica.PhanLoaiKV == PhanLoai::LANG_OUT
-            case PhanLoai::Not_Choose : 
-                if (xTaskGetTickCount() - _time_out_display > Time_check){digitalWrite(4,LOW);state_LCD_Display = 1;_time_out_display=xTaskGetTickCount();}
-                break;
-            case PhanLoai::Fil_OUT : if (xTaskGetTickCount() - _time_out_display > Time_check){digitalWrite(4,LOW);state_LCD_Display = 1;_time_out_display=xTaskGetTickCount();}break;
-            case PhanLoai::LANG_OUT : if (xTaskGetTickCount() - _time_out_display > Time_check){digitalWrite(4,LOW);state_LCD_Display = 1;_time_out_display=xTaskGetTickCount();}break;
-            default: break;
-      }
-      if(xQueueReceive( Queue_display, &Data_TH,  ( TickType_t ) 2 )== pdPASS ){
-        state_LCD_Display = 0;
-        _time_out_display_LCD = xTaskGetTickCount();
-      }
-
-      xQueueReceive( Queue_Time_blink, &Time_blink,  ( TickType_t ) 2 );
-      /*
-       * Time blink led
-       */
-
-      if (xTaskGetTickCount()- _time_counting_task_display > Time_blink){
-        _time_counting_task_display = xTaskGetTickCount();
-        status_led=!status_led;
-        digitalWrite(2,status_led);
-      }
-      if (xTaskGetTickCount()- _time_counting_task_send_heap > 15000){
-        _time_counting_task_send_heap = xTaskGetTickCount();
-        printf("Free Heap %d\n",ESP.getFreeHeap());
-
-      // printf("Free Heap %d\n",ESP.getFreeHeap());
-      }
-      /*
-       * time send heap free
-       */
-      if (xTaskGetTickCount()- _time_counting_send_heap > 5000){
-        _time_counting_send_heap = xTaskGetTickCount();
-         printf("Free Heap %d\n",ESP.getFreeHeap());
-
-      }
-      switch (state_LCD_Display){
-        case 0:
-              
-              LCD_thong_tin(0,&Data_TH,daucham_lcd);
-              state_LCD_Display=4;
-              break;
-        case 1:
-              if (xTaskGetTickCount()- _time_blink_LCD > 1000){
-                 daucham_lcd ++ ;
-                if (daucham_lcd > 8)daucham_lcd=0;
-                _time_blink_LCD = xTaskGetTickCount();
-                 LCD_thong_tin(1,&Data_TH,daucham_lcd);
-              }
-              break;
-        case 2:
-              state_LCD_Display=4;
-              break;
-        default: break;
+      else if (xTaskGetTickCount()- _time_blink_LCD > 1000){
+                           daucham_lcd ++ ;
+                          if (daucham_lcd > 8)daucham_lcd=0;
+                          _time_blink_LCD = xTaskGetTickCount();
+                           LCD_thong_tin(2,&Data_TH,daucham_lcd);
       }
       vTaskDelay(30);
     }

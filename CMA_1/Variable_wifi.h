@@ -32,7 +32,12 @@ namespace PhanLoai {
       LANG_OUT 
     };
 }
-
+namespace state_Running_conf {
+    enum state_Running: uint8_t { 
+      Setting=0, 
+      Running
+    }state_Running;
+}
 
 /*
  * 
