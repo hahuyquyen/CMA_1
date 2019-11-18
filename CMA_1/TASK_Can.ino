@@ -22,7 +22,7 @@ void TaskCAN( void * pvParameters ){
                   time_send_para_can=xTaskGetTickCount();
                   xQueueSend( Queue_can, &Data_CAN, xTicksToWait );
                   }
-                }
+         }
        }
        else {uart_bien[tam++]=incomingData;if(tam>10)tam=0;}  
      }

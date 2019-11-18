@@ -27,16 +27,16 @@ void truyen_mqtt(){
       free(msg1);
 }
 void onMqttConnect(bool sessionPresent) {
-  status_mqtt_connect = true;
-        if (WiFiConf.mqtt_subto1[0] != 'x'){mqttClient.subscribe( WiFiConf.mqtt_subto1,2 );}  //0,1,2 laf qos
-        if (WiFiConf.mqtt_subto2[0] != 'x'){mqttClient.subscribe(WiFiConf.mqtt_subto2,2);}
-        if (WiFiConf.mqtt_subto3[0] != 'x'){mqttClient.subscribe(WiFiConf.mqtt_subto3,2);}  
+        status_mqtt_connect = true;
+        if (WiFiConf.mqtt_subto1[0] != 'x'){mqttClient.subscribe( WiFiConf.mqtt_subto1,1 );}  //0,1,2 laf qos
+        if (WiFiConf.mqtt_subto2[0] != 'x'){mqttClient.subscribe(WiFiConf.mqtt_subto2,1);}
+        if (WiFiConf.mqtt_subto3[0] != 'x'){mqttClient.subscribe(WiFiConf.mqtt_subto3,1);}  
   
 }
 
 void onMqttDisconnect(AsyncMqttClientDisconnectReason reason) {
  // printf("Disconnected to MQTT.\n");
- status_mqtt_connect = false;
+  status_mqtt_connect = false;
   if (WiFi.isConnected()) {xTimerStart(mqttReconnectTimer, 0);}
 }
 
@@ -46,13 +46,52 @@ void onMqttSubscribe(uint16_t packetId, uint8_t qos) {//printf("Subscribe acknow
 void onMqttUnsubscribe(uint16_t packetId) {// printf("Unsubscribe acknowledged: %f\n",packetId);
 }
 
+
+/*{"type":"0","data":[5,1,3,6,8,9]}  
+ * 
+ * 
+ * 
+ */
 void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties properties, size_t len, size_t index, size_t total) {
   
   printf("Publish received: %s \n",topic);
   printf("QOS: %c \n", properties.qos);
   printf("noi dung: %s \n", payload);
-  if (strcmp(WiFiConf.mqtt_subto1,topic) == 0){printf("vung 1 \n");
-  xQueueSend( Queue_display, &Display_NV, ( TickType_t ) 2  );
+  if (strcmp(WiFiConf.mqtt_subto1,topic) == 0){
+        StaticJsonDocument<1500> jsonBuffer;
+        DeserializationError error = deserializeJson(jsonBuffer,payload);
+        if (error) Serial.println("error json");
+        if (jsonBuffer["type"].as<uint8_t>() == 0){
+          chonloaica.SL_LoaiCa=jsonBuffer["data"][0].as<uint8_t>();
+          for (int i=1;i<jsonBuffer["data"][0].as<uint8_t>() +1;i++)chonloaica.STT_LoaiCa[i]=jsonBuffer["data"][i].as<uint8_t>();
+        }
+        else if (jsonBuffer["type"].as<uint8_t>() == 1){
+          Serial.print("Nhan loai HD : ");
+          Serial.println(jsonBuffer["data"][0].as<uint8_t>());
+          chonloaica.SL_NhaCC=jsonBuffer["data"][0].as<uint8_t>();
+          for (int i=1;i<jsonBuffer["data"][0].as<uint8_t>()+1;i++){
+            chonloaica.STT_NhaCC[i]=jsonBuffer["data"][i].as<uint8_t>();
+          }          
+        }
+        else if (jsonBuffer["type"].as<uint8_t>() == 2){
+          Serial.print("Nhan Ten tong Loai Ca ");
+          Serial.println(jsonBuffer["data"][0].as<uint8_t>());
+          strlcpy(Nha_SX.Loai_ca[0], "Chưa Chọn", sizeof(Nha_SX.Loai_ca[0])); 
+          for (int i=1;i<jsonBuffer["data"][0].as<uint8_t>()+1;i++){
+            strlcpy(Nha_SX.Loai_ca[i], jsonBuffer["data"][i], sizeof(Nha_SX.Loai_ca[i-1]));  
+          }
+          savedata_SX();           
+          Serial.println("");
+        }
+        else if (jsonBuffer["type"].as<uint8_t>() == 3){
+          Serial.print("Nhan Ten tong HD ");
+          Serial.println(jsonBuffer["data"][0].as<uint8_t>());
+          strlcpy(Nha_SX.So_Lo[0], "Chưa Chọn", sizeof(Nha_SX.So_Lo[0])); 
+          for (int i=1;i<jsonBuffer["data"][0].as<uint8_t>()+1;i++){
+              strlcpy(Nha_SX.So_Lo[i], jsonBuffer["data"][i], sizeof(Nha_SX.So_Lo[i-1]));  
+          }
+          savedata_SX();          
+        }   
   }
   if (strcmp(WiFiConf.mqtt_subto2,topic) == 0){printf("vung 2 \n");}
   if (strcmp(WiFiConf.mqtt_subto3,topic) == 0){printf("vung 3 \n");}

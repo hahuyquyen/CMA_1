@@ -22,8 +22,9 @@ extern "C" {
 #ifdef U8X8_HAVE_HW_I2C
 #include <Wire.h>
 #endif
-
-U8G2_ST7920_128X64_F_SW_SPI u8g2(U8G2_R0, /* clock=*/ 27, /* data=*/ 26, /* CS=*/ U8X8_PIN_NONE);
+//SPIClass SPI1(HSPI);
+//U8G2_ST7920_128X64_F_HW_SPI u8g2(SPI1,/*CS=*/ U8X8_PIN_NONE,/*CS=*/ U8X8_PIN_NONE);// 
+U8G2_ST7920_128X64_F_SW_SPI u8g2(U8G2_R0,/* clock=*/ 27, /* data=*/ 26, /* CS=*/ U8X8_PIN_NONE);// /* clock=*/ 27, /* data=*/ 26, /* CS=*/ U8X8_PIN_NONE
 
 
 
@@ -88,6 +89,8 @@ void setup()
     //printf("So line %u \n",number_line_save_mqtt);
     loaddata();
     loadWiFiConf();
+    loaddata_SX();
+    state_Running_conf::state_Running = state_Running_conf::Setting;
     if(!SPIFFS.begin(true)){printf("An Error has occurred while mounting SPIFFS\n");}
   //  listDir(SPIFFS, "/", 0);
     check_file_exit();
@@ -109,6 +112,9 @@ void setup()
     Update.onProgress(printProgress);
     //setting_uart();
     chonloaica.PhanLoaiKV = PhanLoai::Not_Choose;
+    chonloaica.STT_user_choose = 0;
+    chonloaica.STT_LoaiCa[0]=0;
+    chonloaica.STT_NhaCC[0]=0;
    /* chonloaica.SL_LoaiCa=5;
     chonloaica.STT_LoaiCa[1]=1;
     chonloaica.STT_LoaiCa[2]=3;
