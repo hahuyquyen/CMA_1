@@ -2,15 +2,14 @@
  * Connect the SD card to the following pins:
  *
  * SD Card | ESP32
- *    D2       -
- *    D3       SS
- *    CMD      MOSI
- *    VSS      GND
- *    VDD      3.3V
- *    CLK      SCK
- *    VSS      GND
- *    D0       MISO
- *    D1       -
+USIng HSPI cho Thẻ Nhớ
+15-cs
+14-sck
+12-miso
+13-mosi
+
+
+
  *    
  *    
  *    Đây là mã chưa được kiểm tra để thêm vào tệp SD.h ở khoảng dòng 50 trong lớp Tệp.
@@ -21,6 +20,7 @@ Mã: [Chọn]
 #include "FS.h"
 #include "SD.h"
 #include "SPI.h"
+SPIClass SDSPI(HSPI);
 #define SD_CS 5
 
 uint32_t FindLinesAndPositions(char* filename)
@@ -73,7 +73,8 @@ uint32_t bien=0;
 void setup(){
     Serial.begin(115200);
     pinMode(23,INPUT_PULLUP);
-    if(!SD.begin()){
+    SDSPI.begin();
+    if(!SD.begin(15,SDSPI)){
         Serial.println("Card Mount Failed");
         return;
     }
