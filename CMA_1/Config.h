@@ -1,3 +1,6 @@
+
+#define idDevice 1
+
 #define using_sta true
 #define USING_IN true
 #define BUF_SIZE_UART (125)
@@ -21,7 +24,6 @@
 
 #define time_out_display_data 5000
 
-#define Pin_choose_IN_OUT 14
 #define Pin_Coi 4
 
 #define MaRo_RFID 0xE2

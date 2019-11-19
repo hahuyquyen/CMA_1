@@ -46,13 +46,49 @@ void onMqttSubscribe(uint16_t packetId, uint8_t qos) {//printf("Subscribe acknow
 void onMqttUnsubscribe(uint16_t packetId) {// printf("Unsubscribe acknowledged: %f\n",packetId);
 }
 
+
+/*{"type":"0","data":[5,1,3,6,8,9]}  
+ * {"type":"3","l":"3","data":[{"i":"5455","N":"pham an nhàn há há 7"},{"i":"68","N":"nhàn 8"},{"i":"98","N":"nhàn 9"}]}
+ * 
+ * {"type":"3","l":"3","data":[{"i":"5455","N":"nhàn 1"},{"i":"68","N":"nhàn 2"},{"i":"98","N":"nhàn 3"}]}
+ */
+
 void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties properties, size_t len, size_t index, size_t total) {
   
   printf("Publish received: %s \n",topic);
   printf("QOS: %c \n", properties.qos);
   printf("noi dung: %s \n", payload);
-  if (strcmp(WiFiConf.mqtt_subto1,topic) == 0){printf("vung 1 \n");
-  xQueueSend( Queue_display, &Display_NV, ( TickType_t ) 2  );
+
+  
+  if (strcmp(WiFiConf.mqtt_subto1,topic) == 0){
+        StaticJsonDocument<1500> jsonBuffer;
+        DeserializationError error = deserializeJson(jsonBuffer,payload);
+        if (error) Serial.println("error json");
+        if (jsonBuffer["type"].as<uint8_t>() == 1){
+          chonloaica.SL_LoaiCa=jsonBuffer["l"].as<uint8_t>();
+          strlcpy(chonloaica.nameLoaiCa[0], "Chưa Chọn", sizeof(chonloaica.nameLoaiCa[0]));
+          for (int i=0;i<chonloaica.SL_LoaiCa;i++){
+            chonloaica.STT_LoaiCa[i+1]=jsonBuffer["data"][i]["i"].as<uint32_t>();
+            strlcpy(chonloaica.nameLoaiCa[i+1], jsonBuffer["data"][i]["N"], sizeof(chonloaica.nameLoaiCa[i]));
+          }          
+        }
+        else if (jsonBuffer["type"].as<uint8_t>() == 2){
+           strlcpy(chonloaica.nameSoLo[0], "Chưa Chọn", sizeof(chonloaica.nameSoLo[0]));
+          chonloaica.SL_NhaCC=jsonBuffer["l"].as<uint8_t>();
+          for (int i=0;i<chonloaica.SL_NhaCC;i++){
+            chonloaica.STT_NhaCC[i+1]=jsonBuffer["data"][i].as<uint32_t>();
+            strlcpy(chonloaica.nameSoLo[i+1], jsonBuffer["data"][i]["N"], sizeof(chonloaica.nameSoLo[i]));
+          }   
+        }
+        else if (jsonBuffer["type"].as<uint8_t>() == 3){
+           strlcpy(chonloaica.nameThanhPham[0], "Chưa Chọn", sizeof(chonloaica.nameThanhPham[0]));
+          chonloaica.SL_ThanhPham=jsonBuffer["l"].as<uint8_t>();
+          for (int i=0;i<chonloaica.SL_ThanhPham;i++){
+            chonloaica.STT_ThanhPham[i+1]=jsonBuffer["data"][i]["i"].as<uint32_t>();
+            strlcpy(chonloaica.nameThanhPham[i+1], jsonBuffer["data"][i]["N"], sizeof(chonloaica.nameThanhPham[i+1]));
+          }
+        }  
+
   }
   if (strcmp(WiFiConf.mqtt_subto2,topic) == 0){printf("vung 2 \n");}
   if (strcmp(WiFiConf.mqtt_subto3,topic) == 0){printf("vung 3 \n");}
@@ -61,4 +97,3 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
 void onMqttPublish(uint16_t packetId) {
  printf("Publish acknowledged: %d \n",packetId);
 }
-
