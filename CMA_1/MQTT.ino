@@ -48,9 +48,9 @@ void onMqttUnsubscribe(uint16_t packetId) {// printf("Unsubscribe acknowledged: 
 
 
 /*{"type":"0","data":[5,1,3,6,8,9]}  
+ * {"type":"3","l":"3","data":[{"i":"5455","N":"pham an nhàn há há 7"},{"i":"68","N":"nhàn 8"},{"i":"98","N":"nhàn 9"}]}
  * 
- * 
- * 
+ * {"type":"3","l":"3","data":[{"i":"5455","N":"nhàn 1"},{"i":"68","N":"nhàn 2"},{"i":"98","N":"nhàn 3"}]}
  */
 void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties properties, size_t len, size_t index, size_t total) {
   
@@ -61,37 +61,35 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
         StaticJsonDocument<1500> jsonBuffer;
         DeserializationError error = deserializeJson(jsonBuffer,payload);
         if (error) Serial.println("error json");
-        if (jsonBuffer["type"].as<uint8_t>() == 0){
-          chonloaica.SL_LoaiCa=jsonBuffer["data"][0].as<uint8_t>();
-          for (int i=1;i<jsonBuffer["data"][0].as<uint8_t>() +1;i++)chonloaica.STT_LoaiCa[i]=jsonBuffer["data"][i].as<uint8_t>();
-        }
-        else if (jsonBuffer["type"].as<uint8_t>() == 1){
-          Serial.print("Nhan loai HD : ");
-          Serial.println(jsonBuffer["data"][0].as<uint8_t>());
-          chonloaica.SL_NhaCC=jsonBuffer["data"][0].as<uint8_t>();
-          for (int i=1;i<jsonBuffer["data"][0].as<uint8_t>()+1;i++){
-            chonloaica.STT_NhaCC[i]=jsonBuffer["data"][i].as<uint8_t>();
+        if (jsonBuffer["type"].as<uint8_t>() == 1){
+          Serial.print("Nhan loai Loai Ca : ");
+          chonloaica.SL_LoaiCa=jsonBuffer["l"].as<uint8_t>();
+          strlcpy(Nha_SX.Loai_ca[0], "Chưa Chọn", sizeof(Nha_SX.Loai_ca[0]));
+          for (int i=0;i<jsonBuffer["l"].as<uint8_t>();i++){
+            chonloaica.STT_LoaiCa[i+1]=jsonBuffer["data"][i]["i"].as<uint32_t>();
+            strlcpy(Nha_SX.Loai_ca[i+1], jsonBuffer["data"][i]["N"], sizeof(Nha_SX.Loai_ca[i]));
           }          
         }
         else if (jsonBuffer["type"].as<uint8_t>() == 2){
-          Serial.print("Nhan Ten tong Loai Ca ");
-          Serial.println(jsonBuffer["data"][0].as<uint8_t>());
-          strlcpy(Nha_SX.Loai_ca[0], "Chưa Chọn", sizeof(Nha_SX.Loai_ca[0])); 
-          for (int i=1;i<jsonBuffer["data"][0].as<uint8_t>()+1;i++){
-            strlcpy(Nha_SX.Loai_ca[i], jsonBuffer["data"][i], sizeof(Nha_SX.Loai_ca[i-1]));  
-          }
-          savedata_SX();           
-          Serial.println("");
+           strlcpy(Nha_SX.So_Lo[0], "Chưa Chọn", sizeof(Nha_SX.So_Lo[0]));
+          Serial.print("Nhan loai HD : ");
+          Serial.println(jsonBuffer["data"][1].as<uint8_t>());
+          chonloaica.SL_NhaCC=jsonBuffer["l"].as<uint8_t>();
+          for (int i=0;i<chonloaica.SL_NhaCC;i++){
+            chonloaica.STT_NhaCC[i+1]=jsonBuffer["data"][i].as<uint32_t>();
+            strlcpy(Nha_SX.So_Lo[i+1], jsonBuffer["data"][i]["N"], sizeof(Nha_SX.So_Lo[i]));
+          }   
         }
         else if (jsonBuffer["type"].as<uint8_t>() == 3){
-          Serial.print("Nhan Ten tong HD ");
-          Serial.println(jsonBuffer["data"][0].as<uint8_t>());
-          strlcpy(Nha_SX.So_Lo[0], "Chưa Chọn", sizeof(Nha_SX.So_Lo[0])); 
-          for (int i=1;i<jsonBuffer["data"][0].as<uint8_t>()+1;i++){
-              strlcpy(Nha_SX.So_Lo[i], jsonBuffer["data"][i], sizeof(Nha_SX.So_Lo[i-1]));  
+           strlcpy(Nha_SX.Thanh_Pham[0], "Chưa Chọn", sizeof(Nha_SX.Thanh_Pham[0]));
+          Serial.print("Nhan loai Loai Ca : ");
+          Serial.println(jsonBuffer["l"].as<uint8_t>());
+          chonloaica.SL_ThanhPham=jsonBuffer["l"].as<uint8_t>();
+          for (int i=0;i<jsonBuffer["l"].as<uint8_t>();i++){
+            chonloaica.STT_ThanhPham[i+1]=jsonBuffer["data"][i]["i"].as<uint32_t>();
+            strlcpy(Nha_SX.Thanh_Pham[i+1], jsonBuffer["data"][i]["N"], sizeof(Nha_SX.Thanh_Pham[i+1]));
           }
-          savedata_SX();          
-        }   
+        }  
   }
   if (strcmp(WiFiConf.mqtt_subto2,topic) == 0){printf("vung 2 \n");}
   if (strcmp(WiFiConf.mqtt_subto3,topic) == 0){printf("vung 3 \n");}

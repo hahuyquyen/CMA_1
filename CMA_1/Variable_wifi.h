@@ -38,7 +38,9 @@ namespace state_Running_conf {
       Running
     }state_Running;
 }
-
+struct setting_button{
+  uint8_t state_select;
+}Status_setting;
 /*
  * 
  */
@@ -62,13 +64,19 @@ enum LoaiCa: uint8_t {
 struct chonloaicaStruct{
   PhanLoai::PhanLoai PhanLoaiKV;
   uint8_t SL_LoaiCa;
-  uint8_t STT_LoaiCa[15];
+  uint32_t STT_LoaiCa[30];
   uint8_t STT_user_choose;
   uint8_t SL_NhaCC;
-  uint8_t STT_NhaCC[15];
+  uint32_t STT_NhaCC[30];
   uint8_t STT_user_choose_NhaCC;
+  uint8_t SL_ThanhPham;
+  uint32_t STT_ThanhPham[30];
+  uint8_t STT_user_choose_ThanhPham;
 }chonloaica={
   PhanLoai::Not_Choose,
+  0,
+  0,
+  0,
   0,
   0,
   0,
@@ -80,6 +88,7 @@ struct chonloaicaStruct{
 static struct choose_nha_sx {
   char Loai_ca[30][50];
   char So_Lo[30][50];
+  char Thanh_Pham[30][50];
 } Nha_SX;
 /*
  * 
