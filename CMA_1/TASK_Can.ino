@@ -13,11 +13,12 @@ void TaskCAN( void * pvParameters ){
        if ( incomingData == 0x3D){tam=0;}
        else if ( incomingData == 0x0D) {
         if(tach(&can_data)){
+          printf("CAN Nang : %f \n",can_data);
                 if(can_data!=Data_CAN.data_can){
                   Data_CAN.data_can=can_data;
                   Data_CAN.time_get=xTaskGetTickCount();
                   if(can_data > 0.1){xQueueSend( Queue_can, &Data_CAN, xTicksToWait );}
-                  }//printf("CAN Nang : %f \n",can_data);
+                  }//
                 else if (xTaskGetTickCount() - time_send_para_can > 2000){
                   time_send_para_can=xTaskGetTickCount();
                   xQueueSend( Queue_can, &Data_CAN, xTicksToWait );

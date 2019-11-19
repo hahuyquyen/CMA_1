@@ -15,15 +15,25 @@ extern "C" {
 #include <Update.h>
 #include <Arduino.h>
 #include <U8g2lib.h>
+#include "SD.h"
+#include "RTClib.h"
 
+RTC_DS3231 rtc;
 #ifdef U8X8_HAVE_HW_SPI
 #include <SPI.h>
 #endif
 #ifdef U8X8_HAVE_HW_I2C
 #include <Wire.h>
 #endif
+<<<<<<< HEAD
 
 U8G2_ST7920_128X64_F_HW_SPI u8g2(U8G2_R0, /* clock=*/ U8X8_PIN_NONE, /* data=*/ U8X8_PIN_NONE);
+=======
+SPIClass SDSPI(HSPI);
+//SPIClass SPI1(HSPI);
+U8G2_ST7920_128X64_F_HW_SPI u8g2(U8G2_R0,/*CS=*/ U8X8_PIN_NONE,/*CS=*/ U8X8_PIN_NONE);// 
+//U8G2_ST7920_128X64_F_HW_SPI u8g2(U8G2_R0,/* clock=*/ 27, /* data=*/ 26, /* CS=*/ U8X8_PIN_NONE);// /* clock=*/ 27, /* data=*/ 26, /* CS=*/ U8X8_PIN_NONE
+>>>>>>> 1da45cf975ec47940cf18224b4068f2bba99fb0a
 
 
 
@@ -73,21 +83,30 @@ void setup()
     xSignal_Display_check = xSemaphoreCreateCounting( 10, 0 );
     xSignal_Display_checkdone = xSemaphoreCreateCounting( 2, 0 );
     xreset_id_nv = xSemaphoreCreateCounting( 2, 0 );
-    pinMode(Pin_choose_IN_OUT, INPUT);
-    if (digitalRead(Pin_choose_IN_OUT)==HIGH){
-      status_IN_or_OUT = false;
-    }
   //  Serial.begin(115200);
     EEPROM.begin(5120);
     WiFi.disconnect(true);
 
-     Serial1.begin(9600, SERIAL_8N1, 13, 12); //12 tx 13 lÃ  rx
+     Serial1.begin(9600, SERIAL_8N1, 26, 12); //12 tx 13 lÃ  rx(bau,se,rx,tx)
      Serial.begin(115200);
-
+    SDSPI.begin(14,27,13,15); ///SCK,MISO,MOSI,ss
+    if(!SD.begin(15,SDSPI)){
+        Serial.println("Card Mount Failed");
+    }
+    listDir(SD, "/", 0);
+    Status_setting.state_select = 0;
    // number_line_save_mqtt=EEPROM.readUInt(800);
     //printf("So line %u \n",number_line_save_mqtt);
-    loaddata();
+    //loaddata();
     loadWiFiConf();
+<<<<<<< HEAD
+=======
+    //loaddata_SX();
+    strlcpy(Nha_SX.Thanh_Pham[0], "Chờ Dữ Liệu", sizeof(Nha_SX.Thanh_Pham[0]));
+    strlcpy(Nha_SX.So_Lo[0], "Chờ Dữ Liệu", sizeof(Nha_SX.So_Lo[0]));
+    strlcpy(Nha_SX.Loai_ca[0], "Chờ Dữ Liệu", sizeof(Nha_SX.Loai_ca[0]));
+    state_Running_conf::state_Running = state_Running_conf::Setting;
+>>>>>>> 1da45cf975ec47940cf18224b4068f2bba99fb0a
     if(!SPIFFS.begin(true)){printf("An Error has occurred while mounting SPIFFS\n");}
   //  listDir(SPIFFS, "/", 0);
     check_file_exit();
@@ -109,6 +128,15 @@ void setup()
     Update.onProgress(printProgress);
     //setting_uart();
     chonloaica.PhanLoaiKV = PhanLoai::Not_Choose;
+<<<<<<< HEAD
+=======
+    chonloaica.STT_user_choose = 0;
+    chonloaica.STT_user_choose_NhaCC = 0;
+    chonloaica.STT_user_choose_ThanhPham = 0;
+    chonloaica.STT_LoaiCa[0]=0;
+    chonloaica.STT_NhaCC[0]=0;
+    chonloaica.STT_ThanhPham[0]=0;
+>>>>>>> 1da45cf975ec47940cf18224b4068f2bba99fb0a
    /* chonloaica.SL_LoaiCa=5;
     chonloaica.STT_LoaiCa[1]=1;
     chonloaica.STT_LoaiCa[2]=3;
@@ -173,6 +201,7 @@ void setup()
 
 void loop()
 {  
+  
   vTaskDelay(50);
   if (status_wifi_connect_AP == false){
     if (counter_wifi_disconnect == 30){
@@ -202,5 +231,34 @@ void Save_data_mqtt_to_local(){
 void read_data_mqtt_to_local(){
 }
 
+void listDir(fs::FS &fs, const char * dirname, uint8_t levels){
+    Serial.printf("Listing directory: %s\n", dirname);
 
+    File root = fs.open(dirname);
+    if(!root){
+        Serial.println("Failed to open directory");
+        return;
+    }
+    if(!root.isDirectory()){
+        Serial.println("Not a directory");
+        return;
+    }
+
+    File file = root.openNextFile();
+    while(file){
+        if(file.isDirectory()){
+            Serial.print("  DIR : ");
+            Serial.println(file.name());
+            if(levels){
+                listDir(fs, file.name(), levels -1);
+            }
+        } else {
+            Serial.print("  FILE: ");
+            Serial.print(file.name());
+            Serial.print("  SIZE: ");
+            Serial.println(file.size());
+        }
+        file = root.openNextFile();
+    }
+}
  
