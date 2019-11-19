@@ -24,7 +24,7 @@ void saveWiFiConf(void) {
   EEPROM.commit();
 }
 
-
+/*
 bool loaddata() {
     uint8_t bien=0;
     for (unsigned int t = 0; t < sizeof(chonloaica); t++) {
@@ -33,9 +33,6 @@ bool loaddata() {
     }
     return true;
 }
-/*
- * LÆ°u Eprom thÃ´ng tin wifi
- */
 void savedata(void) {
   for (unsigned int t = 0; t < sizeof(chonloaica); t++) {
     EEPROM.write(700 + t, *((uint8_t*)&chonloaica + t));
@@ -48,12 +45,9 @@ bool loaddata_SX() {
     }
    return true;
 }
-/*
- * LÆ°u Eprom thÃ´ng tin wifi
- */
 void savedata_SX(void) {
   for (unsigned int t = 0; t < sizeof(Nha_SX); t++) {
     EEPROM.write(1000 + t, *((char*)&Nha_SX + t));
   }
   EEPROM.commit();
-}
+}*/

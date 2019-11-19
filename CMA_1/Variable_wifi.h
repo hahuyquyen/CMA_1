@@ -14,7 +14,6 @@ uint8_t rfid_data[20];
 static byte myEPC[12]; //Most EPCs are 12 bytes
 static byte myEPClength;
 unsigned long _time_lastconnect_mqtt=0;
-
 static uint8_t counter_wifi_disconnect= 0;
 static boolean status_wifi_connect_AP = true ; 
 static boolean status_IN_or_OUT = true ; 
@@ -72,6 +71,9 @@ struct chonloaicaStruct{
   uint8_t SL_ThanhPham;
   uint32_t STT_ThanhPham[30];
   uint8_t STT_user_choose_ThanhPham;
+  char nameLoaiCa[30][50];
+  char nameSoLo[30][50];
+  char nameThanhPham[30][50];
 }chonloaica={
   PhanLoai::Not_Choose,
   0,
@@ -85,11 +87,9 @@ struct chonloaicaStruct{
   0
 };
 
-static struct choose_nha_sx {
-  char Loai_ca[30][50];
-  char So_Lo[30][50];
-  char Thanh_Pham[30][50];
-} Nha_SX;
+/*static struct choose_nha_sx {
+
+} Nha_SX;*/
 /*
  * 
  */
@@ -156,6 +156,7 @@ typedef struct Data_TH{
   char id_RFID[25];
   char id_RFID_NV[25];
   double data_weight;
+  uint16_t idControl;
 } Data_TH;
 
 typedef struct Data_CAN{
