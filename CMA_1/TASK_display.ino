@@ -58,48 +58,48 @@ Serial.println("onPressed_vitri");
 void onPressed() {
 Serial.println("onPressed");
 }
-
+void LCD_print_KV(){
+          switch (inforServer.PhanLoaiKV){
+            case PhanLoai::Not_Choose : u8g2.print(ramChuaChon);break;
+            case PhanLoai::Fil_IN : u8g2.print(F("FILLER-Đầu Vào"));break;
+            case PhanLoai::Fil_OUT : u8g2.print(F("FILLER-Đầu Ra"));break;
+            case PhanLoai::LANG_IN : u8g2.print(F("LẠNG Da-Đầu Vào"));break;
+            case PhanLoai::LANG_OUT : u8g2.print(F("LẠNG Da-Đầu Ra"));break;
+          }
+}
 void LCD_thong_tin(uint8_t chedo_HT,Data_TH* Data_TH  , uint8_t daucham = 0){
     u8g2.clearBuffer();
     u8g2.setFont(u8g2_font_unifont_t_vietnamese1);
   if (chedo_HT == 0){
          
           u8g2.setCursor(0, 12);
-          u8g2.print("NV:");
+          u8g2.print(F("NV:"));
           u8g2.setFont(u8g2_font_6x12_tf); 
           u8g2.print(Data_TH->id_RFID_NV);
           u8g2.setCursor(0, 28);
           u8g2.setFont(u8g2_font_unifont_t_vietnamese1);
-          u8g2.print("Rổ:");
+          u8g2.print(F("Rổ:"));
           u8g2.setFont(u8g2_font_6x12_tf); 
           u8g2.print(Data_TH->id_RFID);
           u8g2.setFont(u8g2_font_unifont_t_vietnamese1);
           u8g2.setCursor(0, 44);
-          u8g2.print("Kg:");
+          u8g2.print(F("Kg:"));
           u8g2.print(Data_TH->data_weight);
-          //u8g2.setCursor(0, 60);
-          //u8g2.print("Loại: cá tra");
   }
    else if (chedo_HT == 1) {
           u8g2.setCursor(2, 16);
-          switch (inforServer.PhanLoaiKV){
-            case PhanLoai::Not_Choose : u8g2.print("Chưa Chọn");break;
-            case PhanLoai::Fil_IN : u8g2.print("FILLER-Đầu Vào");break;
-            case PhanLoai::Fil_OUT : u8g2.print("FILLER-Đầu Ra");break;
-            case PhanLoai::LANG_IN : u8g2.print("LẠNG Da-Đầu Vào");break;
-            case PhanLoai::LANG_OUT : u8g2.print("LẠNG Da-Đầu Ra");break;
-          }
+          LCD_print_KV();
           u8g2.setCursor(2, 32);
-          u8g2.print("Chờ NV");
+          u8g2.print(F("Chờ NV"));
           switch (daucham){
-            case 0:u8g2.print('|');break;
-            case 1:u8g2.print('/');break;
-            case 2:u8g2.print('-');break;
-            case 3:u8g2.print('\\');break;
+            case 0:u8g2.print(F('|'));break;
+            case 1:u8g2.print(F('/'));break;
+            case 2:u8g2.print(F('-'));break;
+            case 3:u8g2.print(F('\\'));break;
             default: break;
           }
           u8g2.setCursor(68, 32);  
-          u8g2.print("Kg:");   
+          u8g2.print(F("Kg:"));   
           u8g2.print(can_data);   
            if ((inforServer.PhanLoaiKV == PhanLoai::Fil_IN ) || (inforServer.PhanLoaiKV == PhanLoai::LANG_IN )){
              u8g2.setCursor(2, 48); 
@@ -117,40 +117,43 @@ void LCD_thong_tin(uint8_t chedo_HT,Data_TH* Data_TH  , uint8_t daucham = 0){
     
           u8g2.setCursor(((128 - (u8g2.getUTF8Width(LCD_setting))) / 2), 16);
           u8g2.print(LCD_setting);
-          u8g2.setCursor(2, 32);
-          u8g2.print("KHU VỰC CÂN");
+          char stringdem[] = "KHU VỰC CÂN";
+          u8g2.setCursor(((128 - (u8g2.getUTF8Width(stringdem))) / 2), 32);
+          u8g2.print(stringdem);
           u8g2.setCursor(2, 48);
-          switch (inforServer.PhanLoaiKV){
-            case PhanLoai::Not_Choose : u8g2.print("Chưa Chọn");break;
-            case PhanLoai::Fil_IN : u8g2.print("FILLER-Vào");break;
-            case PhanLoai::Fil_OUT : u8g2.print("FILLER-Ra");break;
-            case PhanLoai::LANG_IN : u8g2.print("LẠNG Da-Vào");break;
-            case PhanLoai::LANG_OUT : u8g2.print("LẠNG Da-Ra");break;
-          }
+          LCD_print_KV();
      
    }
    else if (chedo_HT == 3) {
           u8g2.setCursor(((128 - (u8g2.getUTF8Width(LCD_setting))) / 2), 16);
           u8g2.print(LCD_setting);
-          u8g2.setCursor(2, 32);
-          u8g2.print("Loại Cá");
+          char stringdem[] = "Loại Cá";
+          u8g2.setCursor(((128 - (u8g2.getUTF8Width(stringdem))) / 2), 32);
+          u8g2.print(stringdem);
+          //u8g2.setCursor(2, 32);
+         // u8g2.print("Loại Cá");
           u8g2.setCursor(2, 48);
           u8g2.print(inforServer.nameLoaiCa[inforServer.userSelectLoaiCa]);     
    }
     else if (chedo_HT == 4) {
           u8g2.setCursor(((128 - (u8g2.getUTF8Width(LCD_setting))) / 2), 16);
           u8g2.print(LCD_setting);
-          u8g2.setCursor(2, 32);
-          u8g2.print("Nhà Cup Cấp");
+           char stringdem[] = "Nhà Cup Cấp";
+          u8g2.setCursor(((128 - (u8g2.getUTF8Width(stringdem))) / 2), 32);
+          u8g2.print(stringdem);
+          //u8g2.setCursor(2, 32);
+         // u8g2.print("Nhà Cup Cấp");
           u8g2.setCursor(2, 48);          
           u8g2.print(inforServer.nameSoLo[inforServer.userSelectNhaCC]);       
    }
     else if (chedo_HT == 5) {
           u8g2.setCursor(((128 - (u8g2.getUTF8Width(LCD_setting))) / 2), 16);
           u8g2.print(LCD_setting);
-          u8g2.setCursor(2, 32);
-          u8g2.print("Loại Thành Phẩm");
-
+          //u8g2.setCursor(2, 32);
+          //u8g2.print("Loại Thành Phẩm");
+          char stringdem[] = "Loại Thành Phẩm";
+          u8g2.setCursor(((128 - (u8g2.getUTF8Width(stringdem))) / 2), 32);
+          u8g2.print(stringdem);
           if (strlen(inforServer.nameThanhPham[inforServer.userSelectThanhPham])>15){
                 u8g2.drawUTF8(Scrolling_lcd, 48, inforServer.nameThanhPham[inforServer.userSelectThanhPham]);
                 Scrolling_lcd = Scrolling_lcd - 10 ;
@@ -159,16 +162,11 @@ void LCD_thong_tin(uint8_t chedo_HT,Data_TH* Data_TH  , uint8_t daucham = 0){
           else u8g2.drawUTF8(2, 48, inforServer.nameThanhPham[inforServer.userSelectThanhPham]);      
    }
    else if (chedo_HT == 6) {
-          u8g2.setCursor(50, 16);
-          u8g2.print("Xác Nhận");  
+          char xacnhan[]="Xác Nhận";
+          u8g2.setCursor(((128 - (u8g2.getUTF8Width(xacnhan))) / 2), 16);
+          u8g2.print(xacnhan);
           u8g2.setCursor(2, 32);
-          switch (inforServer.PhanLoaiKV){
-            case PhanLoai::Not_Choose : u8g2.print("Chưa Chọn");break;
-            case PhanLoai::Fil_IN : u8g2.print("FILLER-Đầu Vào");break;
-            case PhanLoai::Fil_OUT : u8g2.print("FILLER-Đầu Ra");break;
-            case PhanLoai::LANG_IN : u8g2.print("LẠNG Da-Đầu Vào");break;
-            case PhanLoai::LANG_OUT : u8g2.print("LẠNG Da-Đầu Ra");break;
-          }
+          LCD_print_KV();
            if ((inforServer.PhanLoaiKV == PhanLoai::Fil_IN ) || (inforServer.PhanLoaiKV == PhanLoai::LANG_IN )){
              u8g2.setCursor(2, 48); 
              u8g2.print(inforServer.nameSoLo[inforServer.userSelectNhaCC]);  

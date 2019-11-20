@@ -83,7 +83,7 @@ void setupWiFiConf(void) {
     });
     server.on("/set_mqtt_conf", HTTP_POST, [](AsyncWebServerRequest *request){
         if (request->hasParam(F("ServerMQTT"), true)) {request->getParam("ServerMQTT", true)->value().toCharArray(WiFiConf.mqtt_server, sizeof(WiFiConf.mqtt_server));} 
-        if (request->hasParam("PortMQTT", true)) {request->getParam("PortMQTT", true)->value().toCharArray(WiFiConf.mqtt_port, sizeof(WiFiConf.mqtt_port));} 
+        if (request->hasParam(FPSTR(htmlPortMQTT), true)) {request->getParam(FPSTR(htmlPortMQTT), true)->value().toCharArray(WiFiConf.mqtt_port, sizeof(WiFiConf.mqtt_port));} 
         if (request->hasParam("USERMQTT", true)) {request->getParam("USERMQTT", true)->value().toCharArray(WiFiConf.mqtt_user, sizeof(WiFiConf.mqtt_user)); } 
         if (request->hasParam("PASSMQTT", true)) {request->getParam("PASSMQTT", true)->value().toCharArray(WiFiConf.mqtt_pass, sizeof(WiFiConf.mqtt_pass));} 
         if (request->hasParam("SUBTopic1", true)) {request->getParam("SUBTopic1", true)->value().toCharArray(WiFiConf.mqtt_subto1, sizeof(WiFiConf.mqtt_subto1));} 

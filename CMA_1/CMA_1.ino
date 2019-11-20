@@ -86,9 +86,9 @@ void setup()
     sprintf(MQTT_TOPIC.dataAck, "/data/ack/%lu", ( unsigned long )datatruyen_mqtt.idControl) ;
     sprintf(MQTT_TOPIC.configGetId, "/config/%lu", ( unsigned long )datatruyen_mqtt.idControl) ;
     loadWiFiConf();
-    strlcpy(inforServer.nameThanhPham[0], "Chờ Dữ Liệu", sizeof(inforServer.nameThanhPham[0]));
-    strlcpy(inforServer.nameSoLo[0], "Chờ Dữ Liệu", sizeof(inforServer.nameSoLo[0]));
-    strlcpy(inforServer.nameLoaiCa[0], "Chờ Dữ Liệu", sizeof(inforServer.nameLoaiCa[0]));
+    strlcpy(inforServer.nameThanhPham[0], ramChoDuLieu, sizeof(inforServer.nameThanhPham[0]));
+    strlcpy(inforServer.nameSoLo[0], ramChoDuLieu, sizeof(inforServer.nameSoLo[0]));
+    strlcpy(inforServer.nameLoaiCa[0], ramChoDuLieu, sizeof(inforServer.nameLoaiCa[0]));
     state_Running_conf::state_Running = state_Running_conf::Setting;
     Status_setting.state_select = 0;
     inforServer.PhanLoaiKV = PhanLoai::Not_Choose;

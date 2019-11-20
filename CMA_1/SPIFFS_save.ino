@@ -5,22 +5,15 @@ void readFile(fs::FS &fs, const char * path,uint32_t len){
     if(!file){return;}
     char* msg1 = (char*)malloc(len + 1);
     uint32_t num_=0;
-    while(file.available()){
-        msg1[num_ ++]=file.read();
-    }
-     msg1[num_]='\0';
+    while(file.available())msg1[num_ ++]=file.read();
+    msg1[num_]='\0';
     file.close();
-    if (status_mqtt_connect){ uint16_t packetIdPub1 = mqttClient.publish("/data", 0, true, msg1);}
+    if (status_mqtt_connect){mqttClient.publish("/data", 0, true, msg1);}
     free(msg1);
 }
 void writeFile(fs::FS &fs, const char * path, const char * message){
-   // Serial.printf("Writing file: %s\n", path);
-
     File file = fs.open(path, FILE_WRITE);
-    if(!file){
-      //  Serial.println("Failed to open file for writing");
-        return;
-    }
+    if(!file){return;}
     file.print(message);
     file.close();
 }
