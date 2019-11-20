@@ -14,52 +14,34 @@
 #define button_du_phong_pin 39
 boolean update_lcd_setting = false;
 int Scrolling_lcd = 0;
+const char* LCD_setting = "Cài Đặt";
 EasyButton button_left(button_left_pin,200,true);
 EasyButton button_right(button_right_pin,200,true);
 EasyButton button_ok(button_ok_pin,200,true);
 EasyButton button_error(button_error_pin,200,true);
 EasyButton button_du_phong(button_du_phong_pin,1000,true);
 void onPressed_left() {
-  if (Status_setting.state_select == 0){
-    if (chonloaica.PhanLoaiKV > 0){
-    chonloaica.PhanLoaiKV = static_cast<PhanLoai::PhanLoai>((chonloaica.PhanLoaiKV - 1) % (PhanLoai::LANG_OUT+1));
-    }
-  }
-  else  if (Status_setting.state_select == 1){
-    if (chonloaica.STT_user_choose > 0){
-    chonloaica.STT_user_choose -- ;
-    if (chonloaica.STT_user_choose > chonloaica.SL_LoaiCa) {chonloaica.STT_user_choose = 0;}
-    }
-  }
-   else if (Status_setting.state_select == 2){
-    
-  }
-   else if (Status_setting.state_select == 3){
-    
-  }
-  Serial.println("onPressed_left");
+  if ((Status_setting.state_select == 0)&&(chonloaica.PhanLoaiKV > 0)){ chonloaica.PhanLoaiKV = static_cast<PhanLoai::PhanLoai>((chonloaica.PhanLoaiKV - 1) % (PhanLoai::LANG_OUT+1));}
+  else  if ((Status_setting.state_select == 1)&&(chonloaica.STT_user_choose > 0)){ chonloaica.STT_user_choose -- ;}
+   else if ((Status_setting.state_select == 2)&&(chonloaica.STT_user_choose_NhaCC > 0)){chonloaica.STT_user_choose_NhaCC -- ;}
+   else if ((Status_setting.state_select == 3)&&(chonloaica.STT_user_choose_ThanhPham > 0)){chonloaica.STT_user_choose_ThanhPham -- ; }
   Scrolling_lcd = 0;
   update_lcd_setting = true;
 }
 void onPressed_right() {
-  if (Status_setting.state_select == 0){
-    chonloaica.PhanLoaiKV = static_cast<PhanLoai::PhanLoai>((chonloaica.PhanLoaiKV + 1) % (PhanLoai::LANG_OUT+1));
-  }
-  else  if (Status_setting.state_select == 1){
-    chonloaica.STT_user_choose ++ ;
-    if (chonloaica.STT_user_choose > chonloaica.SL_LoaiCa) {chonloaica.STT_user_choose = 0;}
-  }
-   else if (Status_setting.state_select == 2){
-    chonloaica.STT_user_choose_NhaCC ++ ;
-    if (chonloaica.STT_user_choose_NhaCC > chonloaica.SL_NhaCC) {chonloaica.STT_user_choose_NhaCC = 0;}
-  }
-   else if (Status_setting.state_select == 3){
-    chonloaica.STT_user_choose_ThanhPham ++ ;
-    if (chonloaica.STT_user_choose_ThanhPham > chonloaica.SL_ThanhPham) {chonloaica.STT_user_choose_ThanhPham = 0;}
-  }
+  if (Status_setting.state_select == 0){chonloaica.PhanLoaiKV = static_cast<PhanLoai::PhanLoai>((chonloaica.PhanLoaiKV + 1) % (PhanLoai::LANG_OUT+1));}
+  else  if (Status_setting.state_select == 1){chonloaica.STT_user_choose = chonloaica.STT_user_choose > chonloaica.SL_LoaiCa?0:chonloaica.STT_user_choose ++; }
+  else if (Status_setting.state_select == 2){chonloaica.STT_user_choose_NhaCC = chonloaica.STT_user_choose_NhaCC > chonloaica.SL_NhaCC?0:chonloaica.STT_user_choose_NhaCC ++;}
+  else if (Status_setting.state_select == 3){chonloaica.STT_user_choose_ThanhPham = chonloaica.STT_user_choose_ThanhPham > chonloaica.SL_ThanhPham ? 0:chonloaica.STT_user_choose_ThanhPham ++;}
   Scrolling_lcd = 0;
   update_lcd_setting = true;
 }
+/*
+ *  chonloaica.STT_user_choose_NhaCC ++ ;
+    if (chonloaica.STT_user_choose_NhaCC > chonloaica.SL_NhaCC) {chonloaica.STT_user_choose_NhaCC = 0;}
+      chonloaica.STT_user_choose_ThanhPham ++ ;
+    if (chonloaica.STT_user_choose_ThanhPham > chonloaica.SL_ThanhPham) {chonloaica.STT_user_choose_ThanhPham = 0;}
+ */
 void onPressed_ok() {
   if ((Status_setting.state_select == 0)&& (chonloaica.PhanLoaiKV == 0)) return;
   if ((Status_setting.state_select == 1)&& (chonloaica.STT_user_choose == 0)) return;
@@ -110,8 +92,6 @@ void LCD_thong_tin(uint8_t chedo_HT,Data_TH* Data_TH  , uint8_t daucham = 0){
           //u8g2.print("Loại: cá tra");
   }
    else if (chedo_HT == 1) {
-          
-          
           u8g2.setCursor(2, 16);
           switch (chonloaica.PhanLoaiKV){
             case PhanLoai::Not_Choose : u8g2.print("Chưa Chọn");break;
@@ -144,9 +124,9 @@ void LCD_thong_tin(uint8_t chedo_HT,Data_TH* Data_TH  , uint8_t daucham = 0){
            }     
           
    }
-      else if (chedo_HT == 2) {
-          
-          u8g2.setCursor(2, 16);
+   else if (chedo_HT == 2) {
+    
+          u8g2.setCursor(((128 - (u8g2.getUTF8Width(LCD_setting))) / 2), 16);
           u8g2.print("Cài Đặt");
           u8g2.setCursor(2, 32);
           u8g2.print("KHU VỰC CÂN");
@@ -162,7 +142,7 @@ void LCD_thong_tin(uint8_t chedo_HT,Data_TH* Data_TH  , uint8_t daucham = 0){
    }
    else if (chedo_HT == 3) {
           
-          u8g2.setCursor(2, 16);
+          u8g2.setCursor(50, 16);
           u8g2.print("Cài Đặt");
           u8g2.setCursor(2, 32);
           u8g2.print("Loại Cá");
@@ -170,16 +150,16 @@ void LCD_thong_tin(uint8_t chedo_HT,Data_TH* Data_TH  , uint8_t daucham = 0){
           u8g2.print(chonloaica.nameLoaiCa[chonloaica.STT_user_choose]);     
    }
     else if (chedo_HT == 4) {
-          u8g2.setCursor(2, 16);
+          u8g2.setCursor(50, 16);
           u8g2.print("Cài Đặt");
           u8g2.setCursor(2, 32);
           u8g2.print("Nhà Cup Cấp");
           u8g2.setCursor(2, 48);          
           u8g2.print(chonloaica.nameSoLo[chonloaica.STT_user_choose_NhaCC]);       
    }
-       else if (chedo_HT == 5) {
+    else if (chedo_HT == 5) {
 
-          u8g2.setCursor(2, 16);
+          u8g2.setCursor(50, 16);
           u8g2.print("Cài Đặt");
           u8g2.setCursor(2, 32);
           u8g2.print("Loại Thành Phẩm");
@@ -192,8 +172,26 @@ void LCD_thong_tin(uint8_t chedo_HT,Data_TH* Data_TH  , uint8_t daucham = 0){
           else u8g2.drawUTF8(Scrolling_lcd, 48, chonloaica.nameThanhPham[chonloaica.STT_user_choose_ThanhPham]);      
    }
    else if (chedo_HT == 6) {
-          u8g2.setCursor(2, 16);
-          u8g2.print("Tong Hop");    
+          u8g2.setCursor(50, 16);
+          u8g2.print("Xác Nhận");  
+          u8g2.setCursor(2, 32);
+          switch (chonloaica.PhanLoaiKV){
+            case PhanLoai::Not_Choose : u8g2.print("Chưa Chọn");break;
+            case PhanLoai::Fil_IN : u8g2.print("FILLER-Đầu Vào");break;
+            case PhanLoai::Fil_OUT : u8g2.print("FILLER-Đầu Ra");break;
+            case PhanLoai::LANG_IN : u8g2.print("LẠNG Da-Đầu Vào");break;
+            case PhanLoai::LANG_OUT : u8g2.print("LẠNG Da-Đầu Ra");break;
+          }
+           if ((chonloaica.PhanLoaiKV == PhanLoai::Fil_IN ) || (chonloaica.PhanLoaiKV == PhanLoai::LANG_IN )){
+             u8g2.setCursor(2, 48); 
+             u8g2.print(chonloaica.nameSoLo[chonloaica.STT_user_choose_NhaCC]);  
+             u8g2.setCursor(2, 60);
+             u8g2.print(chonloaica.nameLoaiCa[chonloaica.STT_user_choose]);  
+           }
+           else {
+            u8g2.setCursor(2, 48); 
+             u8g2.print(chonloaica.nameThanhPham[chonloaica.STT_user_choose_ThanhPham]);      
+           }    
    }
     u8g2.sendBuffer();  
 }
@@ -221,16 +219,7 @@ void Display( void * pvParameters ){
     LCD_thong_tin(2,&Data_TH);
     uint8_t state_LCD_Display = 1;
     uint8_t daucham_lcd = 0;
-          if (! rtc.begin()) {
-    Serial.println("Couldn't find RTC");
-  
-  }
-  
-    if (rtc.lostPower()) {
-    Serial.println("RTC lost power, lets set the time!");
-    //nam,thang,ngay,gio,phut,giay
-     rtc.adjust(DateTime(2019, 11, 21,11, 20, 0));
-  }
+
     button_left.begin();
     button_right.begin();
     button_error.begin();
@@ -275,6 +264,7 @@ void Display( void * pvParameters ){
                 if (xTaskGetTickCount()- _time_counting_task_send_heap > 15000){
                   _time_counting_task_send_heap = xTaskGetTickCount();
                   printf("Free Heap %d\n",ESP.getFreeHeap());
+                  
                 }
                 switch (state_LCD_Display){
                   case 0:
@@ -297,7 +287,7 @@ void Display( void * pvParameters ){
                 }
       }
       else if ((xTaskGetTickCount()- _time_blink_LCD > 800)|| update_lcd_setting ){
-        update_lcd_setting = false;
+                update_lcd_setting = false;
                _time_blink_LCD = xTaskGetTickCount();
                LCD_thong_tin(Status_setting.state_select + 2,&Data_TH,daucham_lcd);
       }
@@ -307,6 +297,7 @@ void Display( void * pvParameters ){
                   Serial.println(now.unixtime());
                   _time_counting_send_heap = xTaskGetTickCount();
                    printf("Free Heap %d\n",ESP.getFreeHeap());
+                  
           
       }
       if (state_Running_conf::state_Running == state_Running_conf::Setting){

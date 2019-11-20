@@ -11,6 +11,7 @@ void http_re( void * pvParameters ){
     unsigned long _time_timeout_data=10000;
     unsigned long _time_timeout_data_VAO=10000;
     unsigned long _time_counting_task_check=0;
+    double canDataOutOld = 0;
     for (;;){
       /*
        * Nhận Cân
@@ -38,27 +39,33 @@ void http_re( void * pvParameters ){
           /*
            * 
            */
-          if (chonloaica.PhanLoaiKV == PhanLoai::LANG_OUT){
-            /*
-             * Cân 2 lần
-             */
-          }
-          else if ((_time_get_data_can > _time_get_data_rfid + 1000)&&(_time_get_data_rfid > 0)){
+          if ((_time_get_data_can > _time_get_data_rfid + 1000)&&(_time_get_data_rfid > 0)){
                _time_timeout_data = _time_get_data_can - _time_get_data_rfid;
               if (_time_timeout_data < time_2_lan_nhan_data){
+
                 strncpy( Data_TH.id_RFID,Data_RFID_TH.id_RFID, sizeof(Data_RFID_TH.id_RFID));
                 Data_TH.data_weight=Data_CAN_TH.data_can;
                 strncpy( Data_TH.id_RFID_NV,"x", sizeof("x"));
-                xQueueSend( Queue_display, &Data_TH, xTicksToWait );
-                /*
-                 * Nếu là Phi le và lạng da ngõ ra thì ko cần mã NV nên sẽ truyền MQTT
-                 */
-                if ((chonloaica.PhanLoaiKV == PhanLoai::LANG_OUT)||(chonloaica.PhanLoaiKV == PhanLoai::Fil_IN)||(chonloaica.PhanLoaiKV == PhanLoai::Fil_OUT)){          
-                printf("CHECK OUT: Time: %ld - Kg: %f - RFID: %s \n",_time_timeout_data,Data_TH.data_weight,Data_TH.id_RFID);
-                xQueueSend( Queue_mqtt, &Data_TH, xTicksToWait );
+                boolean tt = true;
+                if (chonloaica.PhanLoaiKV == PhanLoai::LANG_OUT){tt = false;
+                  double tam = Data_CAN_TH.data_can > canDataOutOld ?Data_CAN_TH.data_can - canDataOutOld :canDataOutOld - Data_CAN_TH.data_can ;
+                  if (tam > 0.5){
+                    tt = true;
+                  }
+                  canDataOutOld=Data_CAN_TH.data_can;
                 }
-                else {
-                  xSemaphoreGive(xreset_id_nv);            
+                if(tt){
+                    xQueueSend( Queue_display, &Data_TH, xTicksToWait );
+                    /*
+                     * Nếu là Phi le và lạng da ngõ ra thì ko cần mã NV nên sẽ truyền MQTT
+                     */
+                    if ((chonloaica.PhanLoaiKV == PhanLoai::Fil_IN)||(chonloaica.PhanLoaiKV == PhanLoai::Fil_OUT)){          
+                    printf("CHECK OUT: Time: %ld - Kg: %f - RFID: %s \n",_time_timeout_data,Data_TH.data_weight,Data_TH.id_RFID);
+                    xQueueSend( Queue_mqtt, &Data_TH, xTicksToWait );
+                    }
+                    else {
+                      xSemaphoreGive(xreset_id_nv);            
+                    }
                 }
                 xSemaphoreGive(xSignal_Display_check);     
                 _time_timeout_data = 10000;
