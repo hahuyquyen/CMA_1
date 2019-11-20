@@ -30,9 +30,9 @@ void onPressed_left() {
 }
 void onPressed_right() {
   if (Status_setting.state_select == 0){chonloaica.PhanLoaiKV = static_cast<PhanLoai::PhanLoai>((chonloaica.PhanLoaiKV + 1) % (PhanLoai::LANG_OUT+1));}
-  else  if (Status_setting.state_select == 1){chonloaica.STT_user_choose = chonloaica.STT_user_choose > chonloaica.SL_LoaiCa?0:chonloaica.STT_user_choose ++; }
-  else if (Status_setting.state_select == 2){chonloaica.STT_user_choose_NhaCC = chonloaica.STT_user_choose_NhaCC > chonloaica.SL_NhaCC?0:chonloaica.STT_user_choose_NhaCC ++;}
-  else if (Status_setting.state_select == 3){chonloaica.STT_user_choose_ThanhPham = chonloaica.STT_user_choose_ThanhPham > chonloaica.SL_ThanhPham ? 0:chonloaica.STT_user_choose_ThanhPham ++;}
+  else  if (Status_setting.state_select == 1){chonloaica.STT_user_choose = chonloaica.STT_user_choose > chonloaica.SL_LoaiCa ? 0 : chonloaica.STT_user_choose ++; }
+  else if (Status_setting.state_select == 2){chonloaica.STT_user_choose_NhaCC = chonloaica.STT_user_choose_NhaCC > chonloaica.SL_NhaCC ? 0 : chonloaica.STT_user_choose_NhaCC ++;}
+  else if (Status_setting.state_select == 3){chonloaica.STT_user_choose_ThanhPham = chonloaica.STT_user_choose_ThanhPham > chonloaica.SL_ThanhPham ? 0 : chonloaica.STT_user_choose_ThanhPham ++;}
   Scrolling_lcd = 0;
   update_lcd_setting = true;
 }
@@ -127,7 +127,7 @@ void LCD_thong_tin(uint8_t chedo_HT,Data_TH* Data_TH  , uint8_t daucham = 0){
    else if (chedo_HT == 2) {
     
           u8g2.setCursor(((128 - (u8g2.getUTF8Width(LCD_setting))) / 2), 16);
-          u8g2.print("Cài Đặt");
+          u8g2.print(LCD_setting);
           u8g2.setCursor(2, 32);
           u8g2.print("KHU VỰC CÂN");
           u8g2.setCursor(2, 48);
@@ -141,26 +141,24 @@ void LCD_thong_tin(uint8_t chedo_HT,Data_TH* Data_TH  , uint8_t daucham = 0){
      
    }
    else if (chedo_HT == 3) {
-          
-          u8g2.setCursor(50, 16);
-          u8g2.print("Cài Đặt");
+          u8g2.setCursor(((128 - (u8g2.getUTF8Width(LCD_setting))) / 2), 16);
+          u8g2.print(LCD_setting);
           u8g2.setCursor(2, 32);
           u8g2.print("Loại Cá");
           u8g2.setCursor(2, 48);
           u8g2.print(chonloaica.nameLoaiCa[chonloaica.STT_user_choose]);     
    }
     else if (chedo_HT == 4) {
-          u8g2.setCursor(50, 16);
-          u8g2.print("Cài Đặt");
+          u8g2.setCursor(((128 - (u8g2.getUTF8Width(LCD_setting))) / 2), 16);
+          u8g2.print(LCD_setting);
           u8g2.setCursor(2, 32);
           u8g2.print("Nhà Cup Cấp");
           u8g2.setCursor(2, 48);          
           u8g2.print(chonloaica.nameSoLo[chonloaica.STT_user_choose_NhaCC]);       
    }
     else if (chedo_HT == 5) {
-
-          u8g2.setCursor(50, 16);
-          u8g2.print("Cài Đặt");
+          u8g2.setCursor(((128 - (u8g2.getUTF8Width(LCD_setting))) / 2), 16);
+          u8g2.print(LCD_setting);
           u8g2.setCursor(2, 32);
           u8g2.print("Loại Thành Phẩm");
 
@@ -169,7 +167,7 @@ void LCD_thong_tin(uint8_t chedo_HT,Data_TH* Data_TH  , uint8_t daucham = 0){
                 Scrolling_lcd = Scrolling_lcd - 10 ;
                 if (Scrolling_lcd>128)Scrolling_lcd=0;
           }
-          else u8g2.drawUTF8(Scrolling_lcd, 48, chonloaica.nameThanhPham[chonloaica.STT_user_choose_ThanhPham]);      
+          else u8g2.drawUTF8(2, 48, chonloaica.nameThanhPham[chonloaica.STT_user_choose_ThanhPham]);      
    }
    else if (chedo_HT == 6) {
           u8g2.setCursor(50, 16);

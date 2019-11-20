@@ -44,26 +44,7 @@ namespace state_Running_conf {
 struct setting_button{
   uint8_t state_select;
 }Status_setting;
-/*
- * 
- */
-/*namespace LoaiCa {
-enum LoaiCa: uint8_t { 
-      Not_Choose=0, 
-      CaTra, 
-      caLoc, 
-      Caro, 
-      CAAA,
-      CA1,
-      CA2,
-      CA3,
-      CA4,
-      CA5,
-      CA6,
-      CA7,
-      CA8 
-    };
-}*/
+
 struct chonloaicaStruct{
   PhanLoai::PhanLoai PhanLoaiKV;
   uint8_t SL_LoaiCa; 
