@@ -1,6 +1,6 @@
 void deleteFile(fs::FS &fs, const char * path){fs.remove(path);}
 void readFile(fs::FS &fs, const char * path,uint32_t len){
-    Serial.printf("Reading : %s , L %lu \n", path,len);
+    Serial.printf("Reading : %s , L %lu \n", path,( unsigned long )len);
     File file = fs.open(path);
     if(!file){return;}
     char* msg1 = (char*)malloc(len + 1);
@@ -24,4 +24,3 @@ void writeFile(fs::FS &fs, const char * path, const char * message){
     file.print(message);
     file.close();
 }
-

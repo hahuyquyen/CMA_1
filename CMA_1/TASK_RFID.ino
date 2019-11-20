@@ -48,7 +48,7 @@ void TaskRFID( void * pvParameters ){
                                 /*
                                  * nếu là khu vực cân 2 lần thì sẽ lúc nào cũng gửi về
                                  */
-                                if (chonloaica.PhanLoaiKV == PhanLoai::LANG_OUT){
+                                if (inforServer.PhanLoaiKV == PhanLoai::LANG_OUT){
                                     strncpy( Data_rfid.id_RFID_Old,Data_rfid.id_RFID, sizeof(Data_rfid.id_RFID));
                                     printf("So TAB: %s\n",Data_rfid.id_RFID);
                                     xQueueSend( Queue_RFID, &Data_rfid, xTicksToWait );

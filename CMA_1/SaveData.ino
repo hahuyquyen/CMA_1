@@ -27,15 +27,15 @@ void saveWiFiConf(void) {
 /*
 bool loaddata() {
     uint8_t bien=0;
-    for (unsigned int t = 0; t < sizeof(chonloaica); t++) {
+    for (unsigned int t = 0; t < sizeof(inforServer); t++) {
       bien ++ ;
-      *((uint8_t*)&chonloaica + t) = EEPROM.read(700 + t); //& lÃ  Ä‘á»‹a chá»‰  cá»§a biáº¿n Struc, *lÃ  data tá»©c lÃ  gÃ¡n data trong Ã´ nhá»› struc báº±ng eprom Ä‘á»�c dc (char*) lÃ  Ã©p kiá»ƒu dá»¯ liá»‡u
+      *((uint8_t*)&inforServer + t) = EEPROM.read(700 + t); //& lÃ  Ä‘á»‹a chá»‰  cá»§a biáº¿n Struc, *lÃ  data tá»©c lÃ  gÃ¡n data trong Ã´ nhá»› struc báº±ng eprom Ä‘á»�c dc (char*) lÃ  Ã©p kiá»ƒu dá»¯ liá»‡u
     }
     return true;
 }
 void savedata(void) {
-  for (unsigned int t = 0; t < sizeof(chonloaica); t++) {
-    EEPROM.write(700 + t, *((uint8_t*)&chonloaica + t));
+  for (unsigned int t = 0; t < sizeof(inforServer); t++) {
+    EEPROM.write(700 + t, *((uint8_t*)&inforServer + t));
   }
   EEPROM.commit();
 }

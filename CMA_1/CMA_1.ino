@@ -30,8 +30,8 @@ WiFiClient espClient;
 
 display_NV Display_NV;
 Data_TH datatruyen_mqtt; 
-static intr_handle_t handle_console_uart1;
-static void IRAM_ATTR uart1_intr_handle(void *arg);
+//static intr_handle_t handle_console_uart1;
+//static void IRAM_ATTR uart1_intr_handle(void *arg);
 void TaskRFID( void * pvParameters );
 void TaskCAN( void * pvParameters );
 void Display( void * pvParameters );
@@ -83,21 +83,21 @@ void setup()
     datatruyen_mqtt.idControl=EEPROM.readUInt(800);
     Serial.print("ID Device : ");
     Serial.println( datatruyen_mqtt.idControl);
-    sprintf(MQTT_TOPIC.dataAck, "/data/ack/%lu", datatruyen_mqtt.idControl) ;
-    sprintf(MQTT_TOPIC.configGetId, "/config/%lu", datatruyen_mqtt.idControl) ;
+    sprintf(MQTT_TOPIC.dataAck, "/data/ack/%lu", ( unsigned long )datatruyen_mqtt.idControl) ;
+    sprintf(MQTT_TOPIC.configGetId, "/config/%lu", ( unsigned long )datatruyen_mqtt.idControl) ;
     loadWiFiConf();
-    strlcpy(chonloaica.nameThanhPham[0], "Chờ Dữ Liệu", sizeof(chonloaica.nameThanhPham[0]));
-    strlcpy(chonloaica.nameSoLo[0], "Chờ Dữ Liệu", sizeof(chonloaica.nameSoLo[0]));
-    strlcpy(chonloaica.nameLoaiCa[0], "Chờ Dữ Liệu", sizeof(chonloaica.nameLoaiCa[0]));
+    strlcpy(inforServer.nameThanhPham[0], "Chờ Dữ Liệu", sizeof(inforServer.nameThanhPham[0]));
+    strlcpy(inforServer.nameSoLo[0], "Chờ Dữ Liệu", sizeof(inforServer.nameSoLo[0]));
+    strlcpy(inforServer.nameLoaiCa[0], "Chờ Dữ Liệu", sizeof(inforServer.nameLoaiCa[0]));
     state_Running_conf::state_Running = state_Running_conf::Setting;
     Status_setting.state_select = 0;
-    chonloaica.PhanLoaiKV = PhanLoai::Not_Choose;
-    chonloaica.STT_user_choose = 0;
-    chonloaica.STT_user_choose_NhaCC = 0;
-    chonloaica.STT_user_choose_ThanhPham = 0;
-    strlcpy(chonloaica.STT_LoaiCa[0], "x", sizeof(chonloaica.STT_LoaiCa[0]));
-    strlcpy(chonloaica.STT_NhaCC[0],"x", sizeof(chonloaica.STT_NhaCC[0]));
-    strlcpy(chonloaica.STT_ThanhPham[0], "x", sizeof(chonloaica.STT_ThanhPham[0]));
+    inforServer.PhanLoaiKV = PhanLoai::Not_Choose;
+    inforServer.userSelectLoaiCa = 0;
+    inforServer.userSelectNhaCC = 0;
+    inforServer.userSelectThanhPham = 0;
+    strlcpy(inforServer.maLoaica[0], "x", sizeof(inforServer.maLoaica[0]));
+    strlcpy(inforServer.maNhaCC[0],"x", sizeof(inforServer.maNhaCC[0]));
+    strlcpy(inforServer.maThanhPham[0], "x", sizeof(inforServer.maThanhPham[0]));
     if (! rtc.begin()) {Serial.println("Couldn't find RTC");} 
     if (rtc.lostPower()) {
     Serial.println("RTC lost power, lets set the time!");

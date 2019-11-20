@@ -1,12 +1,12 @@
 uint8_t uart_bien[11];
 double can_data=0;
-double can_data_old=0;
+//double can_data_old=0;
 void TaskCAN( void * pvParameters ){    
     const TickType_t xTicksToWait = pdMS_TO_TICKS(5);
     static Data_CAN Data_CAN;
-    uint8_t _rfid_data[20];
+   // uint8_t _rfid_data[20];
     int tam=0;
-    unsigned long time_send_para_can=0;
+    unsigned long timeScheduSendCan=0;
     for (;;){
       if (Serial1.available()){ 
        uint8_t incomingData = Serial1.read();
@@ -19,8 +19,8 @@ void TaskCAN( void * pvParameters ){
                   Data_CAN.time_get=xTaskGetTickCount();
                   if(can_data > 0.1){xQueueSend( Queue_can, &Data_CAN, xTicksToWait );}
                   }//
-                else if (xTaskGetTickCount() - time_send_para_can > 2000){
-                  time_send_para_can=xTaskGetTickCount();
+                else if (xTaskGetTickCount() - timeScheduSendCan > 2000){
+                  timeScheduSendCan=xTaskGetTickCount();
                   xQueueSend( Queue_can, &Data_CAN, xTicksToWait );
                   }
          }
