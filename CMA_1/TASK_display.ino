@@ -23,16 +23,16 @@ EasyButton button_du_phong(button_du_phong_pin,1000,true);
 void onPressed_left() {
   if ((Status_setting.state_select == 0)&&(chonloaica.PhanLoaiKV > 0)){ chonloaica.PhanLoaiKV = static_cast<PhanLoai::PhanLoai>((chonloaica.PhanLoaiKV - 1) % (PhanLoai::LANG_OUT+1));}
   else  if ((Status_setting.state_select == 1)&&(chonloaica.STT_user_choose > 0)){ chonloaica.STT_user_choose -- ;}
-   else if ((Status_setting.state_select == 2)&&(chonloaica.STT_user_choose_NhaCC > 0)){chonloaica.STT_user_choose_NhaCC -- ;}
-   else if ((Status_setting.state_select == 3)&&(chonloaica.STT_user_choose_ThanhPham > 0)){chonloaica.STT_user_choose_ThanhPham -- ; }
+  else if ((Status_setting.state_select == 2)&&(chonloaica.STT_user_choose_NhaCC > 0)){chonloaica.STT_user_choose_NhaCC -- ;}
+  else if ((Status_setting.state_select == 3)&&(chonloaica.STT_user_choose_ThanhPham > 0)){chonloaica.STT_user_choose_ThanhPham -- ; }
   Scrolling_lcd = 0;
   update_lcd_setting = true;
 }
 void onPressed_right() {
   if (Status_setting.state_select == 0){chonloaica.PhanLoaiKV = static_cast<PhanLoai::PhanLoai>((chonloaica.PhanLoaiKV + 1) % (PhanLoai::LANG_OUT+1));}
-  else  if (Status_setting.state_select == 1){chonloaica.STT_user_choose = chonloaica.STT_user_choose > chonloaica.SL_LoaiCa ? 0 : chonloaica.STT_user_choose ++; }
-  else if (Status_setting.state_select == 2){chonloaica.STT_user_choose_NhaCC = chonloaica.STT_user_choose_NhaCC > chonloaica.SL_NhaCC ? 0 : chonloaica.STT_user_choose_NhaCC ++;}
-  else if (Status_setting.state_select == 3){chonloaica.STT_user_choose_ThanhPham = chonloaica.STT_user_choose_ThanhPham > chonloaica.SL_ThanhPham ? 0 : chonloaica.STT_user_choose_ThanhPham ++;}
+  else if (Status_setting.state_select == 1){chonloaica.STT_user_choose = (chonloaica.STT_user_choose > chonloaica.SL_LoaiCa )? 0 : chonloaica.STT_user_choose ++; }
+  else if (Status_setting.state_select == 2){chonloaica.STT_user_choose_NhaCC = (chonloaica.STT_user_choose_NhaCC > chonloaica.SL_NhaCC) ? 0 : chonloaica.STT_user_choose_NhaCC ++;}
+  else if (Status_setting.state_select == 3){chonloaica.STT_user_choose_ThanhPham = (chonloaica.STT_user_choose_ThanhPham > chonloaica.SL_ThanhPham) ? 0 : chonloaica.STT_user_choose_ThanhPham ++;}
   Scrolling_lcd = 0;
   update_lcd_setting = true;
 }
