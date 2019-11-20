@@ -50,5 +50,3 @@ boolean tach(double* soky){
    }
    return false;
 }
-
-

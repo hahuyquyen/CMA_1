@@ -12,8 +12,8 @@
 #define button_ok_pin 35
 #define button_error_pin 36
 #define button_du_phong_pin 39
- boolean update_lcd_setting = false;
- int Scrolling_lcd = 0;
+boolean update_lcd_setting = false;
+int Scrolling_lcd = 0;
 EasyButton button_left(button_left_pin,200,true);
 EasyButton button_right(button_right_pin,200,true);
 EasyButton button_ok(button_ok_pin,200,true);
@@ -39,7 +39,7 @@ void onPressed_left() {
   }
   Serial.println("onPressed_left");
   Scrolling_lcd = 0;
- update_lcd_setting = true;
+  update_lcd_setting = true;
 }
 void onPressed_right() {
   if (Status_setting.state_select == 0){
@@ -61,7 +61,6 @@ void onPressed_right() {
   update_lcd_setting = true;
 }
 void onPressed_ok() {
-Serial.println("onPressed_OK");
   if ((Status_setting.state_select == 0)&& (chonloaica.PhanLoaiKV == 0)) return;
   if ((Status_setting.state_select == 1)&& (chonloaica.STT_user_choose == 0)) return;
   if ((Status_setting.state_select == 2)&& (chonloaica.STT_user_choose_NhaCC == 0)) return;
@@ -91,8 +90,9 @@ Serial.println("onPressed");
 
 void LCD_thong_tin(uint8_t chedo_HT,Data_TH* Data_TH  , uint8_t daucham = 0){
     u8g2.clearBuffer();
+    u8g2.setFont(u8g2_font_unifont_t_vietnamese1);
   if (chedo_HT == 0){
-          u8g2.setFont(u8g2_font_unifont_t_vietnamese1);
+         
           u8g2.setCursor(0, 12);
           u8g2.print("NV:");
           u8g2.setFont(u8g2_font_6x12_tf); 
@@ -106,12 +106,13 @@ void LCD_thong_tin(uint8_t chedo_HT,Data_TH* Data_TH  , uint8_t daucham = 0){
           u8g2.setCursor(0, 44);
           u8g2.print("Kg:");
           u8g2.print(Data_TH->data_weight);
-          u8g2.setCursor(0, 60);
-          u8g2.print("Loại: cá tra");
+          //u8g2.setCursor(0, 60);
+          //u8g2.print("Loại: cá tra");
   }
    else if (chedo_HT == 1) {
+          
+          
           u8g2.setCursor(2, 16);
-          u8g2.setFont(u8g2_font_unifont_t_vietnamese1);
           switch (chonloaica.PhanLoaiKV){
             case PhanLoai::Not_Choose : u8g2.print("Chưa Chọn");break;
             case PhanLoai::Fil_IN : u8g2.print("FILLER-Đầu Vào");break;
@@ -119,10 +120,8 @@ void LCD_thong_tin(uint8_t chedo_HT,Data_TH* Data_TH  , uint8_t daucham = 0){
             case PhanLoai::LANG_IN : u8g2.print("LẠNG Da-Đầu Vào");break;
             case PhanLoai::LANG_OUT : u8g2.print("LẠNG Da-Đầu Ra");break;
           }
-         // if (status_IN_or_OUT) 
-         // else u8g2.print("Đầu Vào");
           u8g2.setCursor(2, 32);
-          u8g2.print("Chờ Thẻ");
+          u8g2.print("Chờ NV");
           switch (daucham){
             case 0:u8g2.print('|');break;
             case 1:u8g2.print('/');break;
@@ -131,25 +130,22 @@ void LCD_thong_tin(uint8_t chedo_HT,Data_TH* Data_TH  , uint8_t daucham = 0){
             default: break;
           }
           u8g2.setCursor(68, 32);  
-          u8g2.print("Kg:"); 
-        //  u8g2.setCursor(72, 32);  
+          u8g2.print("Kg:");   
           u8g2.print(can_data);   
            if ((chonloaica.PhanLoaiKV == PhanLoai::Fil_IN ) || (chonloaica.PhanLoaiKV == PhanLoai::LANG_IN )){
              u8g2.setCursor(2, 48); 
-             u8g2.print(Nha_SX.So_Lo[chonloaica.STT_user_choose_NhaCC]);  
+             u8g2.print(chonloaica.nameSoLo[chonloaica.STT_user_choose_NhaCC]);  
              u8g2.setCursor(2, 60);
-             u8g2.print(Nha_SX.Loai_ca[chonloaica.STT_user_choose]);  
+             u8g2.print(chonloaica.nameLoaiCa[chonloaica.STT_user_choose]);  
            }
            else {
             u8g2.setCursor(2, 48); 
-             u8g2.print(Nha_SX.Thanh_Pham[chonloaica.STT_user_choose_ThanhPham]);      
-           }
-          
-          
+             u8g2.print(chonloaica.nameThanhPham[chonloaica.STT_user_choose_ThanhPham]);      
+           }     
           
    }
       else if (chedo_HT == 2) {
-          u8g2.setFont(u8g2_font_unifont_t_vietnamese1);
+          
           u8g2.setCursor(2, 16);
           u8g2.print("Cài Đặt");
           u8g2.setCursor(2, 32);
@@ -165,47 +161,37 @@ void LCD_thong_tin(uint8_t chedo_HT,Data_TH* Data_TH  , uint8_t daucham = 0){
      
    }
    else if (chedo_HT == 3) {
-          u8g2.setCursor(2, 16);
-          u8g2.setFont(u8g2_font_unifont_t_vietnamese1);
+          
           u8g2.setCursor(2, 16);
           u8g2.print("Cài Đặt");
           u8g2.setCursor(2, 32);
           u8g2.print("Loại Cá");
           u8g2.setCursor(2, 48);
-          u8g2.print(Nha_SX.Loai_ca[chonloaica.STT_user_choose]);     
+          u8g2.print(chonloaica.nameLoaiCa[chonloaica.STT_user_choose]);     
    }
     else if (chedo_HT == 4) {
-          u8g2.setCursor(2, 16);
-          u8g2.setFont(u8g2_font_unifont_t_vietnamese1);
           u8g2.setCursor(2, 16);
           u8g2.print("Cài Đặt");
           u8g2.setCursor(2, 32);
           u8g2.print("Nhà Cup Cấp");
-          
-          u8g2.setCursor(2, 48);
-          
-          u8g2.print(Nha_SX.So_Lo[chonloaica.STT_user_choose_NhaCC]);       
+          u8g2.setCursor(2, 48);          
+          u8g2.print(chonloaica.nameSoLo[chonloaica.STT_user_choose_NhaCC]);       
    }
        else if (chedo_HT == 5) {
-          u8g2.setCursor(2, 16);
-          u8g2.setFont(u8g2_font_unifont_t_vietnamese1);
+
           u8g2.setCursor(2, 16);
           u8g2.print("Cài Đặt");
           u8g2.setCursor(2, 32);
           u8g2.print("Loại Thành Phẩm");
-          if (strlen(Nha_SX.Thanh_Pham[chonloaica.STT_user_choose_ThanhPham])>20){
-                u8g2.drawUTF8(Scrolling_lcd, 48, Nha_SX.Thanh_Pham[chonloaica.STT_user_choose_ThanhPham]);
+
+          if (strlen(chonloaica.nameThanhPham[chonloaica.STT_user_choose_ThanhPham])>15){
+                u8g2.drawUTF8(Scrolling_lcd, 48, chonloaica.nameThanhPham[chonloaica.STT_user_choose_ThanhPham]);
                 Scrolling_lcd = Scrolling_lcd - 10 ;
                 if (Scrolling_lcd>128)Scrolling_lcd=0;
           }
-          else u8g2.drawUTF8(Scrolling_lcd, 48, Nha_SX.Thanh_Pham[chonloaica.STT_user_choose_ThanhPham]);
-          
-          //u8g2.setCursor(Scrolling_lcd, 48);
-          //u8g2.print(Nha_SX.Thanh_Pham[chonloaica.STT_user_choose_ThanhPham]);       
+          else u8g2.drawUTF8(Scrolling_lcd, 48, chonloaica.nameThanhPham[chonloaica.STT_user_choose_ThanhPham]);      
    }
-          else if (chedo_HT == 6) {
-          u8g2.setCursor(2, 16);
-          u8g2.setFont(u8g2_font_unifont_t_vietnamese1);
+   else if (chedo_HT == 6) {
           u8g2.setCursor(2, 16);
           u8g2.print("Tong Hop");    
    }
@@ -219,7 +205,7 @@ void Display( void * pvParameters ){
     Data_TH Data_TH;
     pinMode(2, OUTPUT);
     pinMode(Pin_Coi, OUTPUT);
-    uint8_t mode_ht = 0;
+    //uint8_t mode_ht = 0;
    
     unsigned long _time_counting_task_display=0;
     unsigned long _time_counting_task_send_heap=0;
@@ -229,9 +215,6 @@ void Display( void * pvParameters ){
     unsigned long _time_counting_send_heap=0;
     uint16_t Time_blink= 1000;
     uint16_t Time_check= 3000;  
- //   spi.setup(1, spi.MASTER, spi.CPOL_LOW, spi.CPHA_LOW, U8X8_PIN_NONE, 80);
-    //u8g2.st7920_s_128x64(bus, cs, dc, res);
-   // SPI.setFrequency(1000000);
    SPI.setClockDivider( SPI_CLOCK_DIV32 );
     u8g2.begin();
     u8g2.enableUTF8Print();
@@ -248,7 +231,7 @@ void Display( void * pvParameters ){
     //nam,thang,ngay,gio,phut,giay
      rtc.adjust(DateTime(2019, 11, 21,11, 20, 0));
   }
-      button_left.begin();
+    button_left.begin();
     button_right.begin();
     button_error.begin();
     button_ok.begin();

@@ -1,3 +1,6 @@
+
+#define idDevice 1
+
 #define using_sta true
 #define USING_IN true
 #define BUF_SIZE_UART (125)

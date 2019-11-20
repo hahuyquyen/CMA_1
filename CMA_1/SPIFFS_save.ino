@@ -1,7 +1,5 @@
 void check_file_exit(){
-/*  if (SPIFFS.exists("/save_mqtt.txt")){
-    printf("file mqtt trong spiffs da co\n");
-  }*/
+
 }
 /*
 void readFile(fs::FS &fs, const char * path, char* dataout){

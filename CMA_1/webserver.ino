@@ -72,6 +72,10 @@ void setupWiFiConf(void) {
         saveWiFiConf();
         request->send(200, F("text/plain"), F("OK BABY"));
     });
+    server.on("/set_id", HTTP_GET, [](AsyncWebServerRequest *request){
+        if (request->hasParam("id", true)) { datatruyen_mqtt.idControl = strtoul(request->getParam("id", true)->value().c_str(), NULL, 10);EEPROM.writeUInt(800, datatruyen_mqtt.idControl);EEPROM.commit();} 
+        request->send(200, F("text/plain"), F("OK BABY"));
+    });
     server.on("/set_mqtt_conf", HTTP_POST, [](AsyncWebServerRequest *request){
         if (request->hasParam(F("ServerMQTT"), true)) {request->getParam("ServerMQTT", true)->value().toCharArray(WiFiConf.mqtt_server, sizeof(WiFiConf.mqtt_server));} 
         if (request->hasParam("PortMQTT", true)) {request->getParam("PortMQTT", true)->value().toCharArray(WiFiConf.mqtt_port, sizeof(WiFiConf.mqtt_port));} 
@@ -94,4 +98,3 @@ void setupWiFiConf(void) {
     request->send(SPIFFS, F("/favicon.ico"), F("image/png"));
 });
 }
-

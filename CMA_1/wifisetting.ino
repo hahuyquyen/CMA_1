@@ -66,4 +66,3 @@ void wifi_staticip(char *ip_in, char* gateway_in, char* subnet_in){
    // if (!WiFi.config(local_IP, gateway, subnet, primaryDNS, secondaryDNS)) { printf("STA Failed to configure");}
   //}
 }
-

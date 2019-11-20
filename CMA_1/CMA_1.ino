@@ -25,11 +25,9 @@ RTC_DS3231 rtc;
 #ifdef U8X8_HAVE_HW_I2C
 #include <Wire.h>
 #endif
-SPIClass SDSPI(HSPI);
-//SPIClass SPI1(HSPI);
-U8G2_ST7920_128X64_F_HW_SPI u8g2(U8G2_R0,/*CS=*/ U8X8_PIN_NONE,/*CS=*/ U8X8_PIN_NONE);// 
-//U8G2_ST7920_128X64_F_HW_SPI u8g2(U8G2_R0,/* clock=*/ 27, /* data=*/ 26, /* CS=*/ U8X8_PIN_NONE);// /* clock=*/ 27, /* data=*/ 26, /* CS=*/ U8X8_PIN_NONE
 
+SPIClass SDSPI(HSPI);
+U8G2_ST7920_128X64_F_HW_SPI u8g2(U8G2_R0,/*CS=*/ U8X8_PIN_NONE,/*CS=*/ U8X8_PIN_NONE);// 
 
 
 AsyncMqttClient mqttClient;
@@ -79,7 +77,7 @@ void setup()
     xSignal_Display_checkdone = xSemaphoreCreateCounting( 2, 0 );
     xreset_id_nv = xSemaphoreCreateCounting( 2, 0 );
   //  Serial.begin(115200);
-    EEPROM.begin(5120);
+    EEPROM.begin(1024);
     WiFi.disconnect(true);
 
      Serial1.begin(9600, SERIAL_8N1, 26, 12); //12 tx 13 lÃ  rx(bau,se,rx,tx)
@@ -89,19 +87,20 @@ void setup()
         Serial.println("Card Mount Failed");
     }
     listDir(SD, "/", 0);
-    Status_setting.state_select = 0;
+    datatruyen_mqtt.idControl=EEPROM.readUInt(800);
+    //EEPROM.writeUInt(800, datatruyen_mqtt.idControl);EEPROM.commit();
    // number_line_save_mqtt=EEPROM.readUInt(800);
     //printf("So line %u \n",number_line_save_mqtt);
     //loaddata();
     loadWiFiConf();
+
     //loaddata_SX();
-    strlcpy(Nha_SX.Thanh_Pham[0], "Chờ Dữ Liệu", sizeof(Nha_SX.Thanh_Pham[0]));
-    strlcpy(Nha_SX.So_Lo[0], "Chờ Dữ Liệu", sizeof(Nha_SX.So_Lo[0]));
-    strlcpy(Nha_SX.Loai_ca[0], "Chờ Dữ Liệu", sizeof(Nha_SX.Loai_ca[0]));
+    strlcpy(chonloaica.nameThanhPham[0], "Chờ Dữ Liệu", sizeof(chonloaica.nameThanhPham[0]));
+    strlcpy(chonloaica.nameSoLo[0], "Chờ Dữ Liệu", sizeof(chonloaica.nameSoLo[0]));
+    strlcpy(chonloaica.nameLoaiCa[0], "Chờ Dữ Liệu", sizeof(chonloaica.nameLoaiCa[0]));
     state_Running_conf::state_Running = state_Running_conf::Setting;
-    if(!SPIFFS.begin(true)){printf("An Error has occurred while mounting SPIFFS\n");}
-  //  listDir(SPIFFS, "/", 0);
-    check_file_exit();
+    //if(!SPIFFS.begin(true)){printf("An Error has occurred while mounting SPIFFS\n");}
+   // check_file_exit();
 #ifdef using_sta
     wifi_connect(0,WIFI_STA,WiFiConf.sta_ssid,WiFiConf.sta_pwd,WiFiConf.ap_ssid);
 #else
@@ -118,7 +117,7 @@ void setup()
     setupWiFiConf();
     server.begin();
     Update.onProgress(printProgress);
-    //setting_uart();
+    Status_setting.state_select = 0;
     chonloaica.PhanLoaiKV = PhanLoai::Not_Choose;
     chonloaica.STT_user_choose = 0;
     chonloaica.STT_user_choose_NhaCC = 0;
@@ -126,13 +125,6 @@ void setup()
     chonloaica.STT_LoaiCa[0]=0;
     chonloaica.STT_NhaCC[0]=0;
     chonloaica.STT_ThanhPham[0]=0;
-   /* chonloaica.SL_LoaiCa=5;
-    chonloaica.STT_LoaiCa[1]=1;
-    chonloaica.STT_LoaiCa[2]=3;
-    chonloaica.STT_LoaiCa[3]=5;
-    chonloaica.STT_LoaiCa[4]=7;
-    chonloaica.STT_LoaiCa[5]=8;
-    savedata();*/
     xTaskCreatePinnedToCore(
                         TaskRFID,   /* Function to implement the task */
                         "TaskRFID", /* Name of the task */
