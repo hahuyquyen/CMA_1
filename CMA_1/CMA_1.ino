@@ -17,19 +17,12 @@ extern "C" {
 #include <U8g2lib.h>
 #include "SD.h"
 #include "RTClib.h"
-
-RTC_DS3231 rtc;
-#ifdef U8X8_HAVE_HW_SPI
 #include <SPI.h>
-#endif
-#ifdef U8X8_HAVE_HW_I2C
-#include <Wire.h>
-#endif
-
+RTC_DS3231 rtc;
 SPIClass SDSPI(HSPI);
 U8G2_ST7920_128X64_F_HW_SPI u8g2(U8G2_R0,/*CS=*/ U8X8_PIN_NONE,/*CS=*/ U8X8_PIN_NONE);// 
 
-
+File root_CMA ;
 AsyncMqttClient mqttClient;
 TimerHandle_t mqttReconnectTimer;
 AsyncWebServer server(web_port);
@@ -71,36 +64,45 @@ void setup()
     Queue_display = xQueueCreate(3,sizeof(Data_TH));
     Queue_can_interrup= xQueueCreate(3,sizeof(rfid_data));
     Queue_Time_blink= xQueueCreate(3,sizeof(uint16_t));
-     xCountingSemaphore = xSemaphoreCreateCounting( 10, 0 );
+    xCountingSemaphore = xSemaphoreCreateCounting( 10, 0 );
     xSignal_FromRFID = xSemaphoreCreateCounting( 10, 0 );
     xSignal_Display_check = xSemaphoreCreateCounting( 10, 0 );
     xSignal_Display_checkdone = xSemaphoreCreateCounting( 2, 0 );
     xreset_id_nv = xSemaphoreCreateCounting( 2, 0 );
-  //  Serial.begin(115200);
+
     EEPROM.begin(1024);
     WiFi.disconnect(true);
-
-     Serial1.begin(9600, SERIAL_8N1, 26, 12); //12 tx 13 lÃ  rx(bau,se,rx,tx)
-     Serial.begin(115200);
+    if(!SPIFFS.begin(true)){printf("An Error has occurred while mounting SPIFFS\n");}
+    Serial1.begin(9600, SERIAL_8N1, 26, 12); //12 tx 13 lÃ  rx(bau,se,rx,tx)
+    Serial.begin(115200);
     SDSPI.begin(14,27,13,15); ///SCK,MISO,MOSI,ss
     if(!SD.begin(15,SDSPI)){
-        Serial.println("Card Mount Failed");
+      Serial.println("Card Mount Failed");
+      
     }
-    listDir(SD, "/", 0);
     datatruyen_mqtt.idControl=EEPROM.readUInt(800);
-    //EEPROM.writeUInt(800, datatruyen_mqtt.idControl);EEPROM.commit();
-   // number_line_save_mqtt=EEPROM.readUInt(800);
-    //printf("So line %u \n",number_line_save_mqtt);
-    //loaddata();
+    Serial.print("ID Device : ");
+    Serial.println( datatruyen_mqtt.idControl);
+    sprintf(MQTT_TOPIC.dataAck, "/data/ack/%lu", datatruyen_mqtt.idControl) ;
+    sprintf(MQTT_TOPIC.configGetId, "/config/%lu", datatruyen_mqtt.idControl) ;
     loadWiFiConf();
-
-    //loaddata_SX();
     strlcpy(chonloaica.nameThanhPham[0], "Chờ Dữ Liệu", sizeof(chonloaica.nameThanhPham[0]));
     strlcpy(chonloaica.nameSoLo[0], "Chờ Dữ Liệu", sizeof(chonloaica.nameSoLo[0]));
     strlcpy(chonloaica.nameLoaiCa[0], "Chờ Dữ Liệu", sizeof(chonloaica.nameLoaiCa[0]));
     state_Running_conf::state_Running = state_Running_conf::Setting;
-    //if(!SPIFFS.begin(true)){printf("An Error has occurred while mounting SPIFFS\n");}
-   // check_file_exit();
+    Status_setting.state_select = 0;
+    chonloaica.PhanLoaiKV = PhanLoai::Not_Choose;
+    chonloaica.STT_user_choose = 0;
+    chonloaica.STT_user_choose_NhaCC = 0;
+    chonloaica.STT_user_choose_ThanhPham = 0;
+    strlcpy(chonloaica.STT_LoaiCa[0], "x", sizeof(chonloaica.STT_LoaiCa[0]));
+    strlcpy(chonloaica.STT_NhaCC[0],"x", sizeof(chonloaica.STT_NhaCC[0]));
+    strlcpy(chonloaica.STT_ThanhPham[0], "x", sizeof(chonloaica.STT_ThanhPham[0]));
+    if (! rtc.begin()) {Serial.println("Couldn't find RTC");} 
+    if (rtc.lostPower()) {
+    Serial.println("RTC lost power, lets set the time!");
+     rtc.adjust(DateTime(2019, 11, 21,11, 20, 0));
+    }
 #ifdef using_sta
     wifi_connect(0,WIFI_STA,WiFiConf.sta_ssid,WiFiConf.sta_pwd,WiFiConf.ap_ssid);
 #else
@@ -117,14 +119,6 @@ void setup()
     setupWiFiConf();
     server.begin();
     Update.onProgress(printProgress);
-    Status_setting.state_select = 0;
-    chonloaica.PhanLoaiKV = PhanLoai::Not_Choose;
-    chonloaica.STT_user_choose = 0;
-    chonloaica.STT_user_choose_NhaCC = 0;
-    chonloaica.STT_user_choose_ThanhPham = 0;
-    chonloaica.STT_LoaiCa[0]=0;
-    chonloaica.STT_NhaCC[0]=0;
-    chonloaica.STT_ThanhPham[0]=0;
     xTaskCreatePinnedToCore(
                         TaskRFID,   /* Function to implement the task */
                         "TaskRFID", /* Name of the task */
@@ -174,7 +168,8 @@ void setup()
   mqttClient.onPublish(onMqttPublish);
   mqttClient.setServer(WiFiConf.mqtt_server, atoi(WiFiConf.mqtt_port));       
   mqttClient.setCredentials(WiFiConf.mqtt_user,WiFiConf.mqtt_pass);      
-//  printf("END set \n");     
+//  printf("END set \n");
+    root_CMA = SD.open("/CMA");
 }
 /*
  * Main Loop luÃ´n cháº¡y Core 1
@@ -200,46 +195,33 @@ void loop()
     }
   }
   if(xQueueReceive( Queue_mqtt, &datatruyen_mqtt,  ( TickType_t ) 2 )== pdPASS ){
-    if (status_mqtt_connect){truyen_mqtt();}
-    else {}
+    truyen_mqtt();
+    timeCheckMQTT_SD=xTaskGetTickCount();
   }
-  else if (status_mqtt_connect){}   
-}
-
-
-void Save_data_mqtt_to_local(){
-}
-void read_data_mqtt_to_local(){
-}
-
-void listDir(fs::FS &fs, const char * dirname, uint8_t levels){
-    Serial.printf("Listing directory: %s\n", dirname);
-
-    File root = fs.open(dirname);
-    if(!root){
-        Serial.println("Failed to open directory");
-        return;
+  else if ((status_mqtt_connect)&&((xTaskGetTickCount() - timeCheckMQTT_SD >timeTruyenMQTT))){
+      /*
+       * Check nếu có file còn thì đọc và gửi MQTT
+       */
+       timeCheckMQTT_SD=xTaskGetTickCount();
+       File file = root_CMA.openNextFile();
+       if(file){ readFile(SD,file.name(),file.size());}
+       else if (timeEndReadSD==0){
+              timeEndReadSD=xTaskGetTickCount();
+              root_CMA.close();
+       }
+       else if(xTaskGetTickCount() - timeEndReadSD > 60000){
+              root_CMA = SD.open("/CMA");
+              
+       }    
+  }
+  if ((status_mqtt_connect)&&(state_Running_conf::state_Running == state_Running_conf::Setting)){  
+    if(((firstGetDataFromServer < 3)&&(xTaskGetTickCount() - timeFirstGetDataFromServer>30000))|| (timeFirstGetDataFromServer == 0)){
+      timeFirstGetDataFromServer = xTaskGetTickCount();
+      mqttClient.publish("/getconfig", 0, true, "{id:1,ty:1}"); 
+      firstGetDataFromServer = 0;
     }
-    if(!root.isDirectory()){
-        Serial.println("Not a directory");
-        return;
-    }
-
-    File file = root.openNextFile();
-    while(file){
-        if(file.isDirectory()){
-            Serial.print("  DIR : ");
-            Serial.println(file.name());
-            if(levels){
-                listDir(fs, file.name(), levels -1);
-            }
-        } else {
-            Serial.print("  FILE: ");
-            Serial.print(file.name());
-            Serial.print("  SIZE: ");
-            Serial.println(file.size());
-        }
-        file = root.openNextFile();
-    }
+  }
 }
+
+
  

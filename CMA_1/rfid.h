@@ -22,9 +22,9 @@ public:
 	void sendCommand(uint16_t timeOut = COMMAND_TIME_OUT, boolean waitForResponse = true);
 	void set_mode_timming(uint8_t mode,uint16_t timeout);
 	void set_timing_message(uint8_t mode,uint16_t timeout);
- void set_out_mode(uint8_t mode,uint16_t timeout);
- void set_time_ner(uint8_t mode,uint16_t timeout);
- void set_OFFdelaytime(uint8_t mode,uint16_t timeout);
+  void set_out_mode(uint8_t mode,uint16_t timeout);
+  void set_time_ner(uint8_t mode,uint16_t timeout);
+  void set_OFFdelaytime(uint8_t mode,uint16_t timeout);
 	void set_reset_reader(uint16_t timeout);
 	void set_link_selec(uint8_t mode,uint16_t timeout);
   void set_buzzer(uint8_t mode,uint16_t timeout);

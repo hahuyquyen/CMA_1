@@ -20,21 +20,17 @@ Mã: [Chọn]
 #include "FS.h"
 #include "SD.h"
 #include "SPI.h"
-SPIClass SDSPI(HSPI);
-#define SD_CS 5
+#include "RTClib.h"
 
-uint32_t FindLinesAndPositions(char* filename)
-{
-  File myFile;
-  uint32_t i = 0;
-  myFile = SD.open(filename);
-  if (myFile)
-  { while (myFile.available()){
-      if (myFile.read() == '\n') i++;
+RTC_DS3231 rtc;
+SPIClass SDSPI(HSPI);
+void createDir(fs::FS &fs, const char * path){
+    Serial.printf("Creating Dir: %s\n", path);
+    if(fs.mkdir(path)){
+        Serial.println("Dir created");
+    } else {
+        Serial.println("mkdir failed");
     }
-    myFile.close();
-  }
-  return i;
 }
 
 void listDir(fs::FS &fs, const char * dirname, uint8_t levels){
@@ -43,9 +39,12 @@ void listDir(fs::FS &fs, const char * dirname, uint8_t levels){
     File root = fs.open(dirname);
     if(!root){
         Serial.println("Failed to open directory");
+        createDir(SD,dirname);
+        root.close();
         return;
     }
     if(!root.isDirectory()){
+      root.close();
         Serial.println("Not a directory");
         return;
     }
@@ -66,17 +65,56 @@ void listDir(fs::FS &fs, const char * dirname, uint8_t levels){
         }
         file = root.openNextFile();
     }
+    root.close();
+}
+void deleteFile(fs::FS &fs, const char * path){
+    Serial.printf("Deleting file: %s\n", path);
+    if(fs.remove(path)){
+        Serial.println("File deleted");
+    } else {
+        Serial.println("Delete failed");
+    }
+}
+void readFile(fs::FS &fs, const char * path){
+    Serial.printf("Reading file: %s\n", path);
+
+    File file = fs.open(path);
+    if(!file){
+        Serial.println("Failed to open file for reading");
+        return;
+    }
+
+    Serial.print("Read from file: ");
+    while(file.available()){
+        Serial.write(file.read());
+    }
+    file.close();
 }
 
-uint32_t bien=0;
+void writeFile(fs::FS &fs, const char * path, const char * message){
+    Serial.printf("Writing file: %s\n", path);
 
+    File file = fs.open(path, FILE_WRITE);
+    if(!file){
+        Serial.println("Failed to open file for writing");
+        return;
+    }
+    if(file.print(message)){
+        Serial.println("File written");
+    } else {
+        Serial.println("Write failed");
+    }
+    file.close();
+}
+int16_t stt=0;
+File root_CMA ;
 void setup(){
     Serial.begin(115200);
     pinMode(23,INPUT_PULLUP);
-    SDSPI.begin();
+    SDSPI.begin(14,27,13,15); ///SCK,MISO,MOSI,ss
     if(!SD.begin(15,SDSPI)){
         Serial.println("Card Mount Failed");
-        return;
+        ESP.restart();
     }
     uint8_t cardType = SD.cardType();
 
@@ -84,116 +122,70 @@ void setup(){
         Serial.println("No SD card attached");
         return;
     }
-
-    Serial.print("SD Card Type: ");
-    if(cardType == CARD_MMC){
-        Serial.println("MMC");
-    } else if(cardType == CARD_SD){
-        Serial.println("SDSC");
-    } else if(cardType == CARD_SDHC){
-        Serial.println("SDHC");
-    } else {
-        Serial.println("UNKNOWN");
-    }
-    uint64_t cardSize = SD.cardSize() / (1024 * 1024);
-    Serial.printf("SD Card Size: %lluMB\n", cardSize);
-    listDir(SD, "/", 0);
-}
-void readFile(fs::FS &fs, const char * path, uint32_t* bientang){
-  uint32_t tam = 0;
-  File file = fs.open(path);
-      if(!file){
-        printf("Failed to open file for reading\n");
-        return;
-    }
-    String giatritam = "";
-  while (file.available()){
-    giatritam="";
-    giatritam = file.readStringUntil('\n');
-    if (tam >= *bientang) {*bientang=*bientang+1 ; break;}
-    tam=tam + 1;
+              if (! rtc.begin()) {
+    Serial.println("Couldn't find RTC");
+  
   }
-    printf("%s \n",giatritam.c_str());
-    Serial.println(millis());
-    file.close();
-}
-void CopyFiles(char* ToFile, char* FromFile)
-{
-  File myFileOrig;
-  File myFileTemp;
-
-  if (SD.exists(ToFile))
-    SD.remove(ToFile);
-  myFileTemp = SD.open(ToFile, FILE_WRITE);
-  myFileOrig = SD.open(FromFile);
-  if (myFileOrig)
-  {
-    while (myFileOrig.available())
-    {
-      myFileTemp.write( myFileOrig.read() ); // make a complete copy of the original file
-    }
-    myFileOrig.close();
-    myFileTemp.close();
+  
+    if (rtc.lostPower()) {
+    Serial.println("RTC lost power, lets set the time!");
+    //nam,thang,ngay,gio,phut,giay
+     rtc.adjust(DateTime(2019, 11, 21,11, 20, 0));
   }
+    listDir(SD, "/CMA", 0);
+    root_CMA = SD.open("/CMA");
 }
-void DeleteMultipleLinesFromFile(char * filename, uint32_t SLine, uint32_t ELine)
-{
-  File myFileOrig;
-  File myFileTemp;
-  if (SD.exists("/tempFile.txt"))
-    SD.remove("/tempFile.txt");
-  myFileTemp = SD.open("/tempFile.txt", FILE_WRITE);
-  myFileOrig = SD.open(filename);
-  uint32_t position = 0;
-  String giatritam;
-  boolean first_run = true;
-  if (myFileOrig)
-  {
-     
-    while (myFileOrig.available())
-    { if (first_run){
-      giatritam = myFileOrig.readStringUntil('\n');
-      first_run = false;
-      }
-      else {
-      char C = myFileOrig.read();
-      myFileTemp.write(C);
-      }
-    }
-    myFileOrig.close();
-    myFileTemp.close();
-  }
-  Serial.println(giatritam);
-  CopyFiles(filename, "/tempFile.txt");
-  if (SD.exists("/tempFile.txt"))
-    SD.remove("/tempFile.txt");
-}
-void appendFile(const char * path, const char * message){
-   // printf("Appending to file: %s\n", path);
 
-    File file = SD.open(path, FILE_APPEND);
-    if(!file){
-        printf("Failed to open file for appending\n");
-        return;
-    }
-    if(file.print(message)){
-       // printf("Message appended\n");
-    } else {
-      //  printf("Append failed\n");
-    }
-    file.close();
-}
+long _time_counting_send_heap = 0;
+long _time_end_check = 0;
 void loop(){
- DeleteMultipleLinesFromFile("/Nhan.txt",0,0);
- uint32_t numline = FindLinesAndPositions("/Nhan.txt");
- Serial.println(numline);
- if (numline == 0){
-  for (int i =0 ;i<20; i ++){
-    size_t size_needed = snprintf(NULL, 0, "dong %u \n",i); 
-    char* msg1 = (char*)malloc(size_needed);
-    if (msg1 != NULL) { sprintf(msg1, "dong %u \n",i) ;appendFile("/Nhan.txt", msg1);}
-  }
- }
- delay(3000);
+  if (Serial.available()){ 
+       char incomingData = Serial.read();
+       if (incomingData == '1'){
+                DateTime now = rtc.now();
+                  Serial.print(" since midnight 1/1/1970 = ");
+                  Serial.println(now.unixtime());
+       char textToWrite[ 16 ];
+       sprintf(textToWrite,"/CMA/%lu", now.unixtime());
+       writeFile(SD, textToWrite, "123456");
+       stt++;
+       Serial.print("Crea :");
+       Serial.println(textToWrite);
+       }
+       else if (incomingData == '2')
+       {
+        DateTime now = rtc.now();
+                  Serial.print(" since midnight 1/1/1970 = ");
+                  Serial.println(now.unixtime());
+        char textToWrite[ 16 ];
+        if (stt > 0)sprintf(textToWrite,"/CMA/%lu", stt - 1);
+        else sprintf(textToWrite,"/CMA/%lu", stt);
+        deleteFile(SD,textToWrite);
+       }
+        else if (incomingData == '3'){
+            File file = root_CMA.openNextFile();
+            if(file){
+                Serial.print("  FILE: ");
+                Serial.print(file.name());
+                readFile(SD,file.name());
+            }
+            else if (_time_end_check==0){
+              _time_end_check=xTaskGetTickCount();
+              root_CMA.close();
+            }
+            else if(xTaskGetTickCount() - _time_end_check > 60000){
+              root_CMA = SD.open("/CMA");
+            }
+       }
+       else if (incomingData == '4'){
 
+       }
+  }     
+  if (xTaskGetTickCount()- _time_counting_send_heap > 5000){
+                 
+                  _time_counting_send_heap = xTaskGetTickCount();
+                   printf("Free Heap %d\n",ESP.getFreeHeap());
+          
+      }
+ delay(500);
 }

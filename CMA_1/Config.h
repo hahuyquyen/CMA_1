@@ -9,6 +9,8 @@
 #define time_2_lan_nhan_data 5000
 #define time_cho_nhan_RFID_NV 8000
 #define time_out_set_rfid 1000
+#define timeTruyenMQTT 3000
+
 
 #define can_dau_cham 0x2C
 #define can_dau_phay 0x2E
