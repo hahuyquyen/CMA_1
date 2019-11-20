@@ -193,7 +193,7 @@ void LCD_thong_tin(uint8_t chedo_HT,Data_TH* Data_TH  , uint8_t daucham = 0){
           u8g2.print("Cài Đặt");
           u8g2.setCursor(2, 32);
           u8g2.print("Loại Thành Phẩm");
-          if (strlen(Nha_SX.Thanh_Pham[chonloaica.STT_user_choose_ThanhPham])>15){
+          if (strlen(Nha_SX.Thanh_Pham[chonloaica.STT_user_choose_ThanhPham])>20){
                 u8g2.drawUTF8(Scrolling_lcd, 48, Nha_SX.Thanh_Pham[chonloaica.STT_user_choose_ThanhPham]);
                 Scrolling_lcd = Scrolling_lcd - 10 ;
                 if (Scrolling_lcd>128)Scrolling_lcd=0;
