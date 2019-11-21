@@ -144,6 +144,7 @@ QueueHandle_t Queue_Time_blink;
   double data_weight;
   double data_tare;
 } data_user;*/
+uint32_t idDevice;
 typedef struct Data_TH{
   char id_RFID[25];
   char id_RFID_NV[25];

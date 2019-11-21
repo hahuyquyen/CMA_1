@@ -1,3 +1,4 @@
+
 /*
  * CPU cháº¡y 240mhz
  * vTaskDelay (x)  x lÃ  sá»‘ stick muá»‘n trÃ¬ hoÃ£n
@@ -51,7 +52,7 @@ void onPressed_ok() {
 void onPressed_error() {
   Status_setting.state_select = 0 ;
   state_Running_conf::state_Running = state_Running_conf::Setting;
-Serial.println("onPressed_vitri");
+  Serial.println("onPressed_vitri");
 }
 void onPressed() {
 Serial.println("onPressed");
@@ -68,8 +69,6 @@ void LCD_print_KV(uint8_t vitri = 48){
             case PhanLoai::LANG_IN : u8g2.setCursor(((128 - (u8g2.getUTF8Width(stringdem3))) / 2), vitri);u8g2.print(stringdem3);break;
             case PhanLoai::LANG_OUT :u8g2.setCursor(((128 - (u8g2.getUTF8Width(stringdem4))) / 2), vitri); u8g2.print(stringdem4);break;
           }
-        //  u8g2.setCursor(2, 48);
-        //  u8g2.print(hienthiLCD);
 }
 void hienthiSetting(char* dataDisplay,char* dataUserDisplay){
           u8g2.setCursor(((128 - (u8g2.getUTF8Width(LCD_setting))) / 2), 16);
@@ -83,7 +82,6 @@ void hienthiSetting(char* dataDisplay,char* dataUserDisplay){
                 if (Scrolling_lcd>128)Scrolling_lcd=0;
           }
           else u8g2.drawUTF8(((128 - (u8g2.getUTF8Width(dataUserDisplay))) / 2), 48, dataUserDisplay);  
-  
 }
 void LCD_thong_tin(uint8_t chedo_HT,Data_TH* Data_TH  , uint8_t daucham = 0){
     u8g2.clearBuffer();
@@ -202,6 +200,7 @@ void Display( void * pvParameters ){
                 switch (inforServer.PhanLoaiKV){ //inforServer.PhanLoaiKV == PhanLoai::LANG_OUT
                       case PhanLoai::Not_Choose : if (xTaskGetTickCount() - timeoutDisplay > Time_check){digitalWrite(4,LOW);state_LCD_Display = 1;timeoutDisplay=xTaskGetTickCount();}break;
                       case PhanLoai::Fil_OUT : if (xTaskGetTickCount() - timeoutDisplay > Time_check){digitalWrite(4,LOW);state_LCD_Display = 1;timeoutDisplay=xTaskGetTickCount();}break;
+                      case PhanLoai::Fil_IN : if (xTaskGetTickCount() - timeoutDisplay > Time_check){digitalWrite(4,LOW);state_LCD_Display = 1;timeoutDisplay=xTaskGetTickCount();}break;
                       case PhanLoai::LANG_OUT : if (xTaskGetTickCount() - timeoutDisplay > Time_check){digitalWrite(4,LOW);state_LCD_Display = 1;timeoutDisplay=xTaskGetTickCount();}break;
                       default: break;
                 }

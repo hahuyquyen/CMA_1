@@ -75,8 +75,8 @@ void setupWiFiConf(void) {
     server.on("/set_id", HTTP_POST, [](AsyncWebServerRequest *request){
         if (request->hasParam("id", true)) { 
           Serial.println(request->getParam("id", true)->value());
-          datatruyen_mqtt.idControl = strtoul(request->getParam("id", true)->value().c_str(), NULL, 10);
-          EEPROM.writeUInt(800, datatruyen_mqtt.idControl);
+          idDevice = strtoul(request->getParam("id", true)->value().c_str(), NULL, 10);
+          EEPROM.writeUInt(800, idDevice);
           EEPROM.commit();
           } 
         request->send(200, F("text/plain"), F("OK ...."));

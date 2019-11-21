@@ -56,8 +56,8 @@ void printProgress(size_t prg, size_t sz) {
  * Setup
  */
 void khoiTaoGiaTri(){
-    sprintf(MQTT_TOPIC.dataAck, "/data/ack/%lu", ( unsigned long )datatruyen_mqtt.idControl) ;
-    sprintf(MQTT_TOPIC.configGetId, "/config/%lu", ( unsigned long )datatruyen_mqtt.idControl) ;
+    sprintf(MQTT_TOPIC.dataAck, "/data/ack/%lu", ( unsigned long )idDevice) ;
+    sprintf(MQTT_TOPIC.configGetId, "/config/%lu", ( unsigned long )idDevice) ;
     strlcpy(inforServer.nameThanhPham[0], ramChoDuLieu, sizeof(inforServer.nameThanhPham[0]));
     strlcpy(inforServer.nameSoLo[0], ramChoDuLieu, sizeof(inforServer.nameSoLo[0]));
     strlcpy(inforServer.nameLoaiCa[0], ramChoDuLieu, sizeof(inforServer.nameLoaiCa[0]));
@@ -95,9 +95,9 @@ void setup()
     Serial.begin(115200);
     SDSPI.begin(14,27,13,15); ///SCK,MISO,MOSI,ss
     if(!SD.begin(15,SDSPI)){Serial.println("Card Mount Failed");    }
-    datatruyen_mqtt.idControl=EEPROM.readUInt(800);
+    idDevice=EEPROM.readUInt(800);
     Serial.print("ID Device : ");
-    Serial.println( datatruyen_mqtt.idControl);
+    Serial.println( idDevice);
     loadWiFiConf();
     khoiTaoGiaTri();
     if (! rtc.begin()) {Serial.println("Couldn't find RTC");} 
@@ -176,7 +176,7 @@ void setup()
 /*
  * Main Loop luÃ´n cháº¡y Core 1
  */
-
+boolean statusGetAllSD=false;
 void loop()
 {  
   
@@ -205,13 +205,18 @@ void loop()
        * Check nếu có file còn thì đọc và gửi MQTT
        */
        timeCheckMQTT_SD=xTaskGetTickCount();
-       File file = root_CMA.openNextFile();
-       if(file){ readFile(SD,file.name(),file.size());}
-       else if (timeEndReadSD==0){
-              timeEndReadSD=xTaskGetTickCount();
-              root_CMA.close();
-       }
-       else if(xTaskGetTickCount() - timeEndReadSD > 60000){
+       if (statusGetAllSD == false){
+           File file = root_CMA.openNextFile();
+           if(file){ readFile(SD,file.name(),file.size());}
+           else{  statusGetAllSD = true;
+                  timeEndReadSD=xTaskGetTickCount();
+                  root_CMA.close();
+           }
+      }
+      if((xTaskGetTickCount() - timeEndReadSD > 60000)&&(statusGetAllSD)){
+        timeEndReadSD = xTaskGetTickCount();
+        statusGetAllSD = false;
+        Serial.println("reboot SD");
               root_CMA = SD.open("/CMA");             
        }    
   }

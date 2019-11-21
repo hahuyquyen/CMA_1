@@ -31,10 +31,12 @@ void truyen_mqtt(){
       Serial.print(" since midnight 1/1/1970 = ");
       Serial.println(now.unixtime());
       StaticJsonDocument<500> doc;
+      Serial.print("SSSSSSSSSSSS :");
+      Serial.println(idDevice);
       doc["k"] = static_cast<uint8_t>(inforServer.PhanLoaiKV);
       doc["b"] = datatruyen_mqtt.id_RFID;
       doc["e"] = datatruyen_mqtt.id_RFID_NV;
-      doc["s"] = datatruyen_mqtt.idControl;      
+      doc["s"] = (unsigned long) idDevice;      
       doc["w"] = datatruyen_mqtt.data_weight;
       doc["t"] = now.unixtime();
       doc["p"] = inforServer.maLoaica[inforServer.userSelectLoaiCa];
@@ -74,7 +76,9 @@ void onMqttUnsubscribe(uint16_t packetId) {// printf("Unsubscribe acknowledged: 
 /*{"type":"0","data":[5,1,3,6,8,9]}  
  * {"type":"3","l":"3","data":[{"i":"5455","N":"pham an nhàn há há 7"},{"i":"68","N":"nhàn 8"},{"i":"98","N":"nhàn 9"}]}
  * 
- * {"type":"3","l":"3","data":[{"i":"5455","N":"nhàn 1"},{"i":"68","N":"nhàn 2"},{"i":"98","N":"nhàn 3"}]}
+ * 00000003
+ * 00000003
+ * 
  */
 
 void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties properties, size_t len, size_t index, size_t total) {

@@ -10,6 +10,7 @@ void readFile(fs::FS &fs, const char * path,uint32_t len){
     file.close();
     if (status_mqtt_connect){mqttClient.publish("/data", 0, true, msg1);}
     free(msg1);
+    
 }
 void writeFile(fs::FS &fs, const char * path, const char * message){
     File file = fs.open(path, FILE_WRITE);
