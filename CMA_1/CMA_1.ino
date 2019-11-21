@@ -176,7 +176,7 @@ void setup()
  */
 void loop()
 {  
-  vTaskDelay(30);
+  vTaskDelay(10);
   if (status_wifi_connect_AP == false){
     if (counter_wifi_disconnect == 30){
       vTaskDelay(500);
@@ -188,7 +188,6 @@ void loop()
     else if (counter_wifi_disconnect < 30) {
         vTaskDelay(1000);
         counter_wifi_disconnect = counter_wifi_disconnect + 1;
-       // printf("STA Disconnected\n");
         wifi_connect(0, WIFI_STA,WiFiConf.sta_ssid,WiFiConf.sta_pwd,WiFiConf.ap_ssid);
     }
   }
