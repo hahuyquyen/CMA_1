@@ -56,9 +56,9 @@ struct inforServerStruct{
   uint8_t userSelectNhaCC;
   uint8_t userSelectLoaiCa;
   uint8_t userSelectThanhPham;
-  char maLoaica[20][12];
-  char maThanhPham[20][12];
-  char maNhaCC[20][12];
+  uint16_t maLoaica[20];
+  uint16_t maThanhPham[20];
+  uint16_t maNhaCC[20];
   char nameLoaiCa[20][50];
   char nameSoLo[20][50];
   char nameThanhPham[20][50];

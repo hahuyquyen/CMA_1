@@ -119,10 +119,6 @@ void http_re( void * pvParameters ){
                     printf("TIme out check rfid nv \n");
                   } 
               }
-              
-              
-              
-               
               else if ((_time_get_tam >0)&&(xTaskGetTickCount()- _time_get_tam > time_cho_nhan_RFID_NV)){
                 /*     
                  *      cần 

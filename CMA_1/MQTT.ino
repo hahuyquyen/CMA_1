@@ -28,20 +28,16 @@ QoS2 Broker/client Ä‘áº£m báº£m khi gá»Ÿi dá»¯ liá»‡u thÃ¬ 
 }
 void truyen_mqtt(){
       DateTime now = rtc.now();
-      Serial.print(" since midnight 1/1/1970 = ");
-      Serial.println(now.unixtime());
       StaticJsonDocument<500> doc;
-      Serial.print("SSSSSSSSSSSS :");
-      Serial.println(idDevice);
       doc["k"] = static_cast<uint8_t>(inforServer.PhanLoaiKV);
       doc["b"] = datatruyen_mqtt.id_RFID;
       doc["e"] = datatruyen_mqtt.id_RFID_NV;
       doc["s"] = (unsigned long) idDevice;      
       doc["w"] = datatruyen_mqtt.data_weight;
       doc["t"] = now.unixtime();
-      doc["p"] = inforServer.maLoaica[inforServer.userSelectLoaiCa];
-      doc["m"] = inforServer.maNhaCC[inforServer.userSelectNhaCC];
-      doc["y"] = inforServer.maThanhPham[inforServer.userSelectThanhPham];
+      doc["m"] = inforServer.maLoaica[inforServer.userSelectLoaiCa];
+      doc["c"] = inforServer.maNhaCC[inforServer.userSelectNhaCC];
+      doc["p"] = inforServer.maThanhPham[inforServer.userSelectThanhPham];
       char buffer[500];
       serializeJson(doc, buffer);
       if (status_mqtt_connect){ mqttClient.publish("/data", 0, true, buffer);}
@@ -53,15 +49,12 @@ void onMqttConnect(bool sessionPresent) {
         status_mqtt_connect = true;
         mqttClient.subscribe( MQTT_TOPIC.dataAck,0 ); 
         mqttClient.subscribe( MQTT_TOPIC.configGetId,0 ); 
-        mqttClient.subscribe( "/config",0 ); 
         if (WiFiConf.mqtt_subto1[0] != 'x'){mqttClient.subscribe( WiFiConf.mqtt_subto1,0 );}  //0,1,2 laf qos
         if (WiFiConf.mqtt_subto2[0] != 'x'){mqttClient.subscribe(WiFiConf.mqtt_subto2,0);}
         if (WiFiConf.mqtt_subto3[0] != 'x'){mqttClient.subscribe(WiFiConf.mqtt_subto3,0);}  
-  
 }
 
 void onMqttDisconnect(AsyncMqttClientDisconnectReason reason) {
- // printf("Disconnected to MQTT.\n");
  status_mqtt_connect = false;
   if (WiFi.isConnected()) {xTimerStart(mqttReconnectTimer, 0);}
 }
@@ -73,46 +66,42 @@ void onMqttUnsubscribe(uint16_t packetId) {// printf("Unsubscribe acknowledged: 
 }
 
 
-/*{"type":"0","data":[5,1,3,6,8,9]}  
- * {"type":"3","l":"3","data":[{"i":"5455","N":"pham an nhàn há há 7"},{"i":"68","N":"nhàn 8"},{"i":"98","N":"nhàn 9"}]}
- * 
- * 00000003
- * 00000003
- * 
+/*
+ * {"t":"1","l":"3","data":[{"i":5455,"n":"pham an nhàn há há 7"},{"i":68,"n":"nhàn 8"},{"i":98,"n":"nhàn 9"}]}
  */
 
 void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties properties, size_t len, size_t index, size_t total) {
   
-  printf("Publish received: %s \n",topic);
-  printf("QOS: %c \n", properties.qos);
-  printf("noi dung: %s \n", payload);
+  printf("MQTT GET: %s \n",topic);
+  //printf("QOS: %c \n", properties.qos);
+ // printf("noi dung: %s \n", payload);
 
   StaticJsonDocument<1500> jsonBuffer;
   DeserializationError error = deserializeJson(jsonBuffer,payload);
   if (error) Serial.println("error json");
   if ((strcmp(WiFiConf.mqtt_subto1,topic) == 0)||(strcmp(MQTT_TOPIC.configGetId,topic) == 0)){
-        if (jsonBuffer["type"].as<uint8_t>() == 1){
+        if (jsonBuffer["t"].as<uint8_t>() == 1){
           inforServer.tongLoaiCa=jsonBuffer["l"].as<uint8_t>();
           strlcpy(inforServer.nameLoaiCa[0], ramChuaChon, sizeof(inforServer.nameLoaiCa[0]));
           for (int i=0;i<inforServer.tongLoaiCa;i++){
-            strlcpy(inforServer.maLoaica[i+1], jsonBuffer["data"][i]["i"], sizeof(inforServer.maLoaica[i]));
-            strlcpy(inforServer.nameLoaiCa[i+1], jsonBuffer["data"][i]["N"], sizeof(inforServer.nameLoaiCa[i]));
+            inforServer.maLoaica[i+1]= jsonBuffer["data"][i]["i"].as<uint16_t>();
+            strlcpy(inforServer.nameLoaiCa[i+1], jsonBuffer["data"][i]["n"], sizeof(inforServer.nameLoaiCa[i]));
           }      
         }
-        else if (jsonBuffer["type"].as<uint8_t>() == 2){
+        else if (jsonBuffer["t"].as<uint8_t>() == 2){
            strlcpy(inforServer.nameSoLo[0], ramChuaChon, sizeof(inforServer.nameSoLo[0]));
           inforServer.tongNhaCC=jsonBuffer["l"].as<uint8_t>();
           for (int i=0;i<inforServer.tongNhaCC;i++){
-            strlcpy(inforServer.maNhaCC[i+1], jsonBuffer["data"][i]["i"], sizeof(inforServer.maNhaCC[i]));
-            strlcpy(inforServer.nameSoLo[i+1], jsonBuffer["data"][i]["N"], sizeof(inforServer.nameSoLo[i]));
+            inforServer.maNhaCC[i+1]=jsonBuffer["data"][i]["i"].as<uint16_t>();
+            strlcpy(inforServer.nameSoLo[i+1], jsonBuffer["data"][i]["n"], sizeof(inforServer.nameSoLo[i]));
           }  
         }
-        else if (jsonBuffer["type"].as<uint8_t>() == 3){
-           strlcpy(inforServer.nameThanhPham[0], ramChuaChon, sizeof(inforServer.nameThanhPham[0]));
+        else if (jsonBuffer["t"].as<uint8_t>() == 3){
+          strlcpy(inforServer.nameThanhPham[0], ramChuaChon, sizeof(inforServer.nameThanhPham[0]));
           inforServer.tongThanhPham=jsonBuffer["l"].as<uint8_t>();
           for (int i=0;i<inforServer.tongThanhPham;i++){
-            strlcpy(inforServer.maThanhPham[i+1], jsonBuffer["data"][i]["i"], sizeof(inforServer.maThanhPham[i+1]));
-            strlcpy(inforServer.nameThanhPham[i+1], jsonBuffer["data"][i]["N"], sizeof(inforServer.nameThanhPham[i+1]));
+            inforServer.maThanhPham[i+1]=jsonBuffer["data"][i]["i"].as<uint16_t>();
+            strlcpy(inforServer.nameThanhPham[i+1], jsonBuffer["data"][i]["n"], sizeof(inforServer.nameThanhPham[i+1]));
           }
         }  
 

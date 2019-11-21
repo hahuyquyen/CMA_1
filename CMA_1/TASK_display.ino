@@ -1,4 +1,5 @@
 
+
 /*
  * CPU cháº¡y 240mhz
  * vTaskDelay (x)  x lÃ  sá»‘ stick muá»‘n trÃ¬ hoÃ£n
@@ -173,7 +174,7 @@ void Display( void * pvParameters ){
     unsigned long timeoutDisplay =0;
     unsigned long _time_blink_LCD=0;
     uint16_t Time_blink= 1000;
-    uint16_t Time_check= 3000;  
+    uint16_t Time_check= 1500;  
     SPI.setClockDivider( SPI_CLOCK_DIV32 );
     u8g2.begin();
     u8g2.enableUTF8Print();
@@ -202,6 +203,7 @@ void Display( void * pvParameters ){
                       case PhanLoai::Fil_OUT : if (xTaskGetTickCount() - timeoutDisplay > Time_check){digitalWrite(4,LOW);state_LCD_Display = 1;timeoutDisplay=xTaskGetTickCount();}break;
                       case PhanLoai::Fil_IN : if (xTaskGetTickCount() - timeoutDisplay > Time_check){digitalWrite(4,LOW);state_LCD_Display = 1;timeoutDisplay=xTaskGetTickCount();}break;
                       case PhanLoai::LANG_OUT : if (xTaskGetTickCount() - timeoutDisplay > Time_check){digitalWrite(4,LOW);state_LCD_Display = 1;timeoutDisplay=xTaskGetTickCount();}break;
+                      case PhanLoai::LANG_IN : if (strcmp(Data_TH.id_RFID_NV,"x") != 0){if (xTaskGetTickCount() - timeoutDisplay > Time_check){digitalWrite(4,LOW);state_LCD_Display = 1;timeoutDisplay=xTaskGetTickCount();}}break;
                       default: break;
                 }
                 if(xQueueReceive( Queue_display, &Data_TH,  ( TickType_t ) 2 )== pdPASS ){ state_LCD_Display = 0;}          

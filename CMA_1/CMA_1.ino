@@ -70,9 +70,9 @@ void khoiTaoGiaTri(){
     inforServer.tongThanhPham = 0;
     inforServer.tongNhaCC = 0;
     inforServer.tongLoaiCa = 0;
-    strlcpy(inforServer.maLoaica[0], "x", sizeof(inforServer.maLoaica[0]));
-    strlcpy(inforServer.maNhaCC[0],"x", sizeof(inforServer.maNhaCC[0]));
-    strlcpy(inforServer.maThanhPham[0], "x", sizeof(inforServer.maThanhPham[0]));
+    inforServer.maLoaica[0]=0;
+    inforServer.maNhaCC[0]=0;
+    inforServer.maThanhPham[0]=0;
 }
 void setup()
 {   Queue_can = xQueueCreate(5,sizeof(Data_CAN));
@@ -221,13 +221,29 @@ void loop()
        }    
   }
   if ((status_mqtt_connect)&&(state_Running_conf::state_Running == state_Running_conf::Setting)){  
-    if(((inforServer.tongLoaiCa == 0)&& (inforServer.tongThanhPham == 0) && (inforServer.tongNhaCC== 0)&&(xTaskGetTickCount() - timeFirstGetDataFromServer>30000))|| (timeFirstGetDataFromServer == 0)){
+    if((xTaskGetTickCount() - timeFirstGetDataFromServer>30000)|| (timeFirstGetDataFromServer == 0)){
       timeFirstGetDataFromServer = xTaskGetTickCount();
-      mqttClient.publish("/getconfig", 0, true, "{id:1,ty:1}"); 
-      firstGetDataFromServer = 0;
+      StaticJsonDocument<35> doc;
+      char buffer[35];
+      doc["i"]= idDevice;
+      if (inforServer.tongLoaiCa == 0){
+        doc["t"]= 1 ;
+        serializeJson(doc, buffer);
+        mqttClient.publish("/config", 0, true,buffer); 
+      }
+      if (inforServer.tongThanhPham == 0){
+        doc["t"]= 3 ;
+        serializeJson(doc, buffer);
+        mqttClient.publish("/config", 0, true, buffer); 
+      }
+      if(inforServer.tongNhaCC== 0){
+        doc["t"]= 2 ;
+        serializeJson(doc, buffer);
+        mqttClient.publish("/config", 0, true, buffer); 
+      }
     }
   }
 }
-
+//(&& () && ()&&
 
  
