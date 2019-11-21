@@ -66,8 +66,9 @@ void onMqttUnsubscribe(uint16_t packetId) {// printf("Unsubscribe acknowledged: 
 }
 
 
-/*
- * {"t":"1","l":"3","data":[{"i":5455,"n":"pham an nhàn há há 7"},{"i":68,"n":"nhàn 8"},{"i":98,"n":"nhàn 9"}]}
+/*{"t":"3","l":"3","data":[{"i":"5455","n":"nhàn 1"},{"i":"68","n":"nhàn 2"},{"i":"98","n":"nhàn 3"}]}
+
+ * 
  */
 
 void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties properties, size_t len, size_t index, size_t total) {

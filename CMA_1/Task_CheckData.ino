@@ -16,6 +16,8 @@ void http_re( void * pvParameters ){
     unsigned long timeScheduTaskCheck=0;
     double canDataOutOld = 0;
     for (;;){
+      Serial.print("Time Task Check : ");
+      Serial.println(millis());
       /*
        * Nhận Cân
        */
@@ -42,7 +44,7 @@ void http_re( void * pvParameters ){
      * state_Running
      */
     if (state_Running_conf::state_Running == state_Running_conf::Running){
-          if ((timeGetQueueCan > timeGetQueueRfidRo + 1000)&&(timeGetQueueRfidRo > 0)){
+          if ((timeGetQueueCan > timeGetQueueRfidRo + 500)&&(timeGetQueueRfidRo > 0)){
                _time_timeout_data = timeGetQueueCan - timeGetQueueRfidRo;
               if (_time_timeout_data < time_2_lan_nhan_data){
                 if ((inforServer.PhanLoaiKV == PhanLoai::Fil_IN)||(inforServer.PhanLoaiKV == PhanLoai::Fil_OUT)){
@@ -96,7 +98,7 @@ void http_re( void * pvParameters ){
               }
           }
           else if ((timeGetQueueRfidRo >0)&&(xTaskGetTickCount()- timeGetQueueRfidRo > time_2_lan_nhan_data)){
-
+              printf("Over time: Ma Ro va Can \n");     
                 timeGetQueueRfidRo=0;
                 xSemaphoreGive(xreset_id_nv);      
                 xSemaphoreGive(xSignal_Display_checkdone);
@@ -112,6 +114,7 @@ void http_re( void * pvParameters ){
                     xQueueSend( Queue_mqtt, &Data_TH, xTicksToWait );
                     _time_timeout_data_VAO=10000;
                     timeGetQueueRfidNV=0;
+                    _time_get_tam = 0;
                   }
                   else  {
                     xSemaphoreGive(xSignal_Display_checkdone);
@@ -124,6 +127,7 @@ void http_re( void * pvParameters ){
                  *      cần 
                  *      reset ID mã rổ
                  */
+                 xSemaphoreGive(xResetRfidMaRo);
                 _time_get_tam=0;
                 printf("Over time: Ma NV va \n");      
                 xSemaphoreGive(xSignal_Display_checkdone);
@@ -134,7 +138,7 @@ void http_re( void * pvParameters ){
       timeScheduTaskCheck=xTaskGetTickCount();
     }
       
-      vTaskDelay(10);
+    vTaskDelay(10);
     }
     vTaskDelete(NULL) ;
 }

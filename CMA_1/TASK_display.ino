@@ -191,22 +191,30 @@ void Display( void * pvParameters ){
     button_error.onPressed(onPressed_error);
     button_ok.onPressed(onPressed_ok);
     button_du_phong.onPressed(onPressed);
-   for (;;){
+    unsigned long timeoutLcdLangDaIn = 0;
+   for (;;){Serial.print("Time Task Display : ");
+      Serial.println(millis());
+      /*
+       * 30ms
+       */
       if (state_Running_conf::state_Running == state_Running_conf::Running){
-                if(xSemaphoreTake(xSignal_Display_check, 5)){digitalWrite(Pin_Coi,HIGH); timeoutDisplay = xTaskGetTickCount();}
+                if(xQueueReceive( Queue_display, &Data_TH,  ( TickType_t ) 2 )== pdPASS ){ state_LCD_Display = 0;if ((strcmp(Data_TH.id_RFID_NV,"x") != 0)&& (inforServer.PhanLoaiKV ==PhanLoai::LANG_IN )) {timeoutLcdLangDaIn= xTaskGetTickCount();}}     
+                if(xSemaphoreTake(xSignal_Display_check, 5)){
+                  digitalWrite(Pin_Coi,HIGH); timeoutDisplay = xTaskGetTickCount();
+               }
                 if(xSemaphoreTake(xSignal_Display_checkdone, 5)){ //Che do IN qua timeout se tat 
                   state_LCD_Display = 1;
                   digitalWrite(Pin_Coi,LOW);
                 }
                 switch (inforServer.PhanLoaiKV){ //inforServer.PhanLoaiKV == PhanLoai::LANG_OUT
-                      case PhanLoai::Not_Choose : if (xTaskGetTickCount() - timeoutDisplay > Time_check){digitalWrite(4,LOW);state_LCD_Display = 1;timeoutDisplay=xTaskGetTickCount();}break;
-                      case PhanLoai::Fil_OUT : if (xTaskGetTickCount() - timeoutDisplay > Time_check){digitalWrite(4,LOW);state_LCD_Display = 1;timeoutDisplay=xTaskGetTickCount();}break;
-                      case PhanLoai::Fil_IN : if (xTaskGetTickCount() - timeoutDisplay > Time_check){digitalWrite(4,LOW);state_LCD_Display = 1;timeoutDisplay=xTaskGetTickCount();}break;
-                      case PhanLoai::LANG_OUT : if (xTaskGetTickCount() - timeoutDisplay > Time_check){digitalWrite(4,LOW);state_LCD_Display = 1;timeoutDisplay=xTaskGetTickCount();}break;
-                      case PhanLoai::LANG_IN : if (strcmp(Data_TH.id_RFID_NV,"x") != 0){if (xTaskGetTickCount() - timeoutDisplay > Time_check){digitalWrite(4,LOW);state_LCD_Display = 1;timeoutDisplay=xTaskGetTickCount();}}break;
+                      case PhanLoai::Not_Choose : if ((xTaskGetTickCount() - timeoutDisplay > Time_check)&&(timeoutDisplay > 0 )){digitalWrite(4,LOW);state_LCD_Display = 1;timeoutDisplay=0;}break;
+                      case PhanLoai::Fil_OUT : if ((xTaskGetTickCount() - timeoutDisplay > Time_check)&&(timeoutDisplay > 0 )){digitalWrite(4,LOW);state_LCD_Display = 1;timeoutDisplay=0;}break;
+                      case PhanLoai::Fil_IN : if ((xTaskGetTickCount() - timeoutDisplay > Time_check)&&(timeoutDisplay > 0 )){digitalWrite(4,LOW);state_LCD_Display = 1;timeoutDisplay=0;}break;
+                      case PhanLoai::LANG_OUT : if((xTaskGetTickCount() - timeoutDisplay > Time_check)&&(timeoutDisplay > 0 )){digitalWrite(4,LOW);state_LCD_Display = 1;timeoutDisplay=0;}break;
+                      case PhanLoai::LANG_IN : if ((xTaskGetTickCount() - timeoutLcdLangDaIn > Time_check)&&(timeoutLcdLangDaIn > 0 )){digitalWrite(4,LOW);state_LCD_Display = 1;timeoutLcdLangDaIn=0;}break;
                       default: break;
                 }
-                if(xQueueReceive( Queue_display, &Data_TH,  ( TickType_t ) 2 )== pdPASS ){ state_LCD_Display = 0;}          
+                    
                 xQueueReceive( Queue_Time_blink, &Time_blink,  ( TickType_t ) 2 );
                 /*
                  * Time blink led

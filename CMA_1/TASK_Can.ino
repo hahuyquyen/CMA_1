@@ -8,6 +8,8 @@ void TaskCAN( void * pvParameters ){
     int tam=0;
     unsigned long timeScheduSendCan=0;
     for (;;){
+      Serial.print("Time Task CAN : ");
+      Serial.println(millis());
       if (Serial1.available()){ 
        uint8_t incomingData = Serial1.read();
        if ( incomingData == 0x3D){tam=0;}

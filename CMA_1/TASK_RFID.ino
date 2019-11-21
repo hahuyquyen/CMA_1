@@ -35,7 +35,11 @@ void TaskRFID( void * pvParameters ){
     nano.set_out_mode(1,5000);
     nano.set_time_ner(0x05,5000);
     nano.set_reset_reader(2000);
-    for (;;){
+    for (;;){Serial.print("Time Task RFID : ");
+      Serial.println(millis());
+      /*
+       * Chuyển task 24ms
+       */
                 if (xTaskGetTickCount()-_time_counting_task_rfid > 2000){
                     _time_counting_task_rfid = xTaskGetTickCount();
                     i=i+1; 
@@ -70,11 +74,14 @@ void TaskRFID( void * pvParameters ){
                               }
                     }
                   }
-                  if(xSemaphoreTake(xreset_id_nv, 10)){
+                  if(xSemaphoreTake(xreset_id_nv, 2)){
                       //  strncpy( Data_rfid_nv.id_RFID,"", sizeof(""));
                         strncpy( Data_rfid_nv.id_RFID_Old,"", sizeof(""));
                        // strncpy( Data_rfid.id_RFID,"", sizeof(""));
                    //     strncpy( Data_rfid.id_RFID_Old,"", sizeof(""));
+                  }
+                  if(xSemaphoreTake(xResetRfidMaRo, 2)){
+                       strncpy( Data_rfid.id_RFID_Old,"", sizeof(""));
                   }
                 vTaskDelay(20);
     }

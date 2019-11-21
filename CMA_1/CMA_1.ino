@@ -87,7 +87,7 @@ void setup()
     xSignal_Display_check = xSemaphoreCreateCounting( 10, 0 );
     xSignal_Display_checkdone = xSemaphoreCreateCounting( 2, 0 );
     xreset_id_nv = xSemaphoreCreateCounting( 2, 0 );
-
+    xResetRfidMaRo = xSemaphoreCreateCounting( 2, 0 );
     EEPROM.begin(1024);
     WiFi.disconnect(true);
     if(!SPIFFS.begin(true)){printf("An Error has occurred while mounting SPIFFS\n");}
@@ -180,7 +180,7 @@ boolean statusGetAllSD=false;
 void loop()
 {  
   
-  vTaskDelay(50);
+  vTaskDelay(30);
   if (status_wifi_connect_AP == false){
     if (counter_wifi_disconnect == 30){
       vTaskDelay(500);

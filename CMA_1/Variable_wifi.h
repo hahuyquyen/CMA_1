@@ -127,6 +127,7 @@ SemaphoreHandle_t xSignal_FromRFID;
 SemaphoreHandle_t xSignal_Display_check;
 SemaphoreHandle_t xSignal_Display_checkdone;
 SemaphoreHandle_t xreset_id_nv;
+SemaphoreHandle_t xResetRfidMaRo;
 QueueHandle_t Queue_can;
 QueueHandle_t Queue_RFID;
 QueueHandle_t Queue_RFID_NV;
