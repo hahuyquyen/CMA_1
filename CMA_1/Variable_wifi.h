@@ -3,6 +3,12 @@
  * 
  * 
  */
+const char ramChoDuLieu[] ="Chờ Dữ Liệu"; // dung can lây FPSTR(ramChoDuLieu) và strlcpy_P  tiet kiem RAM cho heap memory
+const char ramChuaChon[] ="Chưa Chọn";
+const char htmlPortMQTT[] PROGMEM ="PortMQTT"; // dung can lây FPSTR(htmlPortMQTT) và strlcpy_P  tiet kiem RAM cho heap memory
+const char khuVucFilletRa[] PROGMEM ="FILLET-Đầu Ra"; // FPSTR(khuVucFilletRa)
+
+
 
 #define WIFI_CONF_FORMAT {0, 0, 0, 1}
 const uint8_t wifi_conf_format[] = WIFI_CONF_FORMAT;
@@ -13,15 +19,12 @@ volatile uint8_t canbuff=0;
 uint8_t rfid_data[20];
 static byte myEPC[12]; //Most EPCs are 12 bytes
 static byte myEPClength;
-//unsigned long _time_lastconnect_mqtt=0;
 unsigned long timeEndReadSD=0;
 unsigned long timeCheckMQTT_SD=0;  
 unsigned long timeFirstGetDataFromServer =0;
 static uint8_t counter_wifi_disconnect= 0;
 static boolean status_wifi_connect_AP = true ; 
-static boolean status_IN_or_OUT = true ; 
 static boolean status_mqtt_connect = false ; 
-static uint32_t number_line_save_mqtt =0;
 uint8_t firstGetDataFromServer=0;
 /*
  * 
@@ -44,41 +47,22 @@ namespace state_Running_conf {
 struct setting_button{
   uint8_t state_select;
 }Status_setting;
-/*
- * 
- */
-/*namespace LoaiCa {
-enum LoaiCa: uint8_t { 
-      Not_Choose=0, 
-      CaTra, 
-      caLoc, 
-      Caro, 
-      CAAA,
-      CA1,
-      CA2,
-      CA3,
-      CA4,
-      CA5,
-      CA6,
-      CA7,
-      CA8 
-    };
-}*/
-struct chonloaicaStruct{
+
+struct inforServerStruct{
   PhanLoai::PhanLoai PhanLoaiKV;
-  uint8_t SL_LoaiCa; 
-  uint8_t STT_user_choose;
-  uint8_t SL_NhaCC; 
-  uint8_t STT_user_choose_NhaCC;
-  uint8_t SL_ThanhPham; 
-  uint8_t STT_user_choose_ThanhPham;
-  char STT_LoaiCa[30][12];
-  char STT_ThanhPham[30][12];
-  char STT_NhaCC[30][12];
-  char nameLoaiCa[30][50];
-  char nameSoLo[30][50];
-  char nameThanhPham[30][50];
-}chonloaica={
+  uint8_t tongLoaiCa; 
+  uint8_t tongNhaCC;   
+  uint8_t tongThanhPham; 
+  uint8_t userSelectNhaCC;
+  uint8_t userSelectLoaiCa;
+  uint8_t userSelectThanhPham;
+  uint16_t maLoaica[20];
+  uint16_t maThanhPham[20];
+  uint16_t maNhaCC[20];
+  char nameLoaiCa[20][50];
+  char nameSoLo[20][50];
+  char nameThanhPham[20][50];
+}inforServer={
   PhanLoai::Not_Choose,
   0,
   0,
@@ -143,6 +127,7 @@ SemaphoreHandle_t xSignal_FromRFID;
 SemaphoreHandle_t xSignal_Display_check;
 SemaphoreHandle_t xSignal_Display_checkdone;
 SemaphoreHandle_t xreset_id_nv;
+SemaphoreHandle_t xResetRfidMaRo;
 QueueHandle_t Queue_can;
 QueueHandle_t Queue_RFID;
 QueueHandle_t Queue_RFID_NV;
@@ -160,6 +145,7 @@ QueueHandle_t Queue_Time_blink;
   double data_weight;
   double data_tare;
 } data_user;*/
+uint32_t idDevice;
 typedef struct Data_TH{
   char id_RFID[25];
   char id_RFID_NV[25];

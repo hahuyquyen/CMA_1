@@ -35,7 +35,11 @@ void TaskRFID( void * pvParameters ){
     nano.set_out_mode(1,5000);
     nano.set_time_ner(0x05,5000);
     nano.set_reset_reader(2000);
-    for (;;){
+    for (;;){Serial.print("Time Task RFID : ");
+      Serial.println(millis());
+      /*
+       * Chuyển task 24ms
+       */
                 if (xTaskGetTickCount()-_time_counting_task_rfid > 2000){
                     _time_counting_task_rfid = xTaskGetTickCount();
                     i=i+1; 
@@ -43,23 +47,24 @@ void TaskRFID( void * pvParameters ){
                   if (nano.check() == true){ 
                     myEPClength = sizeof(myEPC);
                     if (nano.parseResponse(myEPC,myEPClength)){
-                              if (myEPC[0] == MaRo_RFID){ //NHAN VIEN
+                              if (myEPC[0] == MaRo_RFID){ 
                                 array_to_string(&myEPC[5], 7, Data_rfid.id_RFID); //0->12 5->7
                                 /*
                                  * nếu là khu vực cân 2 lần thì sẽ lúc nào cũng gửi về
                                  */
-                                if (chonloaica.PhanLoaiKV == PhanLoai::LANG_OUT){
+                                if (inforServer.PhanLoaiKV == PhanLoai::LANG_OUT){
                                     strncpy( Data_rfid.id_RFID_Old,Data_rfid.id_RFID, sizeof(Data_rfid.id_RFID));
-                                    printf("So TAB: %s\n",Data_rfid.id_RFID);
+                                   // printf("So TAB: %s\n",Data_rfid.id_RFID);
                                     xQueueSend( Queue_RFID, &Data_rfid, xTicksToWait );
                                 }
                                  else if (strcmp(Data_rfid.id_RFID,Data_rfid.id_RFID_Old) != 0){
                                     strncpy( Data_rfid.id_RFID_Old,Data_rfid.id_RFID, sizeof(Data_rfid.id_RFID));
-                                    printf("So TAB: %s\n",Data_rfid.id_RFID);
+                                   // printf("So TAB: %s\n",Data_rfid.id_RFID);
                                    // xSemaphoreGive(xSignal_FromRFID);
                                     xQueueSend( Queue_RFID, &Data_rfid, xTicksToWait );
                                  }
                               }
+                              
                               else if (myEPC[0] == MaNV_RFID){ 
                                  array_to_string(&myEPC[5], 7, Data_rfid_nv.id_RFID);
                                  if (strcmp(Data_rfid_nv.id_RFID,Data_rfid_nv.id_RFID_Old) != 0){
@@ -69,11 +74,14 @@ void TaskRFID( void * pvParameters ){
                               }
                     }
                   }
-                  if(xSemaphoreTake(xreset_id_nv, 10)){
-                        strncpy( Data_rfid_nv.id_RFID,"", sizeof(""));
+                  if(xSemaphoreTake(xreset_id_nv, 2)){
+                      //  strncpy( Data_rfid_nv.id_RFID,"", sizeof(""));
                         strncpy( Data_rfid_nv.id_RFID_Old,"", sizeof(""));
-                         strncpy( Data_rfid.id_RFID,"", sizeof(""));
-                        strncpy( Data_rfid.id_RFID_Old,"", sizeof(""));
+                       // strncpy( Data_rfid.id_RFID,"", sizeof(""));
+                   //     strncpy( Data_rfid.id_RFID_Old,"", sizeof(""));
+                  }
+                  if(xSemaphoreTake(xResetRfidMaRo, 2)){
+                       strncpy( Data_rfid.id_RFID_Old,"", sizeof(""));
                   }
                 vTaskDelay(20);
     }

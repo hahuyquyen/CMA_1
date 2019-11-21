@@ -30,8 +30,8 @@ WiFiClient espClient;
 
 display_NV Display_NV;
 Data_TH datatruyen_mqtt; 
-static intr_handle_t handle_console_uart1;
-static void IRAM_ATTR uart1_intr_handle(void *arg);
+//static intr_handle_t handle_console_uart1;
+//static void IRAM_ATTR uart1_intr_handle(void *arg);
 void TaskRFID( void * pvParameters );
 void TaskCAN( void * pvParameters );
 void Display( void * pvParameters );
@@ -55,7 +55,25 @@ void printProgress(size_t prg, size_t sz) {
 /*
  * Setup
  */
-
+void khoiTaoGiaTri(){
+    sprintf(MQTT_TOPIC.dataAck, "/data/ack/%lu", ( unsigned long )idDevice) ;
+    sprintf(MQTT_TOPIC.configGetId, "/config/%lu", ( unsigned long )idDevice) ;
+    strlcpy(inforServer.nameThanhPham[0], ramChoDuLieu, sizeof(inforServer.nameThanhPham[0]));
+    strlcpy(inforServer.nameSoLo[0], ramChoDuLieu, sizeof(inforServer.nameSoLo[0]));
+    strlcpy(inforServer.nameLoaiCa[0], ramChoDuLieu, sizeof(inforServer.nameLoaiCa[0]));
+    state_Running_conf::state_Running = state_Running_conf::Setting;
+    Status_setting.state_select = 0;
+    inforServer.PhanLoaiKV = PhanLoai::Not_Choose;
+    inforServer.userSelectLoaiCa = 0;
+    inforServer.userSelectNhaCC = 0;
+    inforServer.userSelectThanhPham = 0;
+    inforServer.tongThanhPham = 0;
+    inforServer.tongNhaCC = 0;
+    inforServer.tongLoaiCa = 0;
+    inforServer.maLoaica[0]=0;
+    inforServer.maNhaCC[0]=0;
+    inforServer.maThanhPham[0]=0;
+}
 void setup()
 {   Queue_can = xQueueCreate(5,sizeof(Data_CAN));
     Queue_RFID= xQueueCreate(5,sizeof(Data_RFID));
@@ -69,35 +87,19 @@ void setup()
     xSignal_Display_check = xSemaphoreCreateCounting( 10, 0 );
     xSignal_Display_checkdone = xSemaphoreCreateCounting( 2, 0 );
     xreset_id_nv = xSemaphoreCreateCounting( 2, 0 );
-
+    xResetRfidMaRo = xSemaphoreCreateCounting( 2, 0 );
     EEPROM.begin(1024);
     WiFi.disconnect(true);
     if(!SPIFFS.begin(true)){printf("An Error has occurred while mounting SPIFFS\n");}
     Serial1.begin(9600, SERIAL_8N1, 26, 12); //12 tx 13 lÃ  rx(bau,se,rx,tx)
     Serial.begin(115200);
     SDSPI.begin(14,27,13,15); ///SCK,MISO,MOSI,ss
-    if(!SD.begin(15,SDSPI)){
-      Serial.println("Card Mount Failed");
-      
-    }
-    datatruyen_mqtt.idControl=EEPROM.readUInt(800);
+    if(!SD.begin(15,SDSPI)){Serial.println("Card Mount Failed");    }
+    idDevice=EEPROM.readUInt(800);
     Serial.print("ID Device : ");
-    Serial.println( datatruyen_mqtt.idControl);
-    sprintf(MQTT_TOPIC.dataAck, "/data/ack/%lu", datatruyen_mqtt.idControl) ;
-    sprintf(MQTT_TOPIC.configGetId, "/config/%lu", datatruyen_mqtt.idControl) ;
+    Serial.println( idDevice);
     loadWiFiConf();
-    strlcpy(chonloaica.nameThanhPham[0], "Chờ Dữ Liệu", sizeof(chonloaica.nameThanhPham[0]));
-    strlcpy(chonloaica.nameSoLo[0], "Chờ Dữ Liệu", sizeof(chonloaica.nameSoLo[0]));
-    strlcpy(chonloaica.nameLoaiCa[0], "Chờ Dữ Liệu", sizeof(chonloaica.nameLoaiCa[0]));
-    state_Running_conf::state_Running = state_Running_conf::Setting;
-    Status_setting.state_select = 0;
-    chonloaica.PhanLoaiKV = PhanLoai::Not_Choose;
-    chonloaica.STT_user_choose = 0;
-    chonloaica.STT_user_choose_NhaCC = 0;
-    chonloaica.STT_user_choose_ThanhPham = 0;
-    strlcpy(chonloaica.STT_LoaiCa[0], "x", sizeof(chonloaica.STT_LoaiCa[0]));
-    strlcpy(chonloaica.STT_NhaCC[0],"x", sizeof(chonloaica.STT_NhaCC[0]));
-    strlcpy(chonloaica.STT_ThanhPham[0], "x", sizeof(chonloaica.STT_ThanhPham[0]));
+    khoiTaoGiaTri();
     if (! rtc.begin()) {Serial.println("Couldn't find RTC");} 
     if (rtc.lostPower()) {
     Serial.println("RTC lost power, lets set the time!");
@@ -174,11 +176,11 @@ void setup()
 /*
  * Main Loop luÃ´n cháº¡y Core 1
  */
-
+boolean statusGetAllSD=false;
 void loop()
 {  
   
-  vTaskDelay(50);
+  vTaskDelay(30);
   if (status_wifi_connect_AP == false){
     if (counter_wifi_disconnect == 30){
       vTaskDelay(500);
@@ -203,25 +205,45 @@ void loop()
        * Check nếu có file còn thì đọc và gửi MQTT
        */
        timeCheckMQTT_SD=xTaskGetTickCount();
-       File file = root_CMA.openNextFile();
-       if(file){ readFile(SD,file.name(),file.size());}
-       else if (timeEndReadSD==0){
-              timeEndReadSD=xTaskGetTickCount();
-              root_CMA.close();
-       }
-       else if(xTaskGetTickCount() - timeEndReadSD > 60000){
-              root_CMA = SD.open("/CMA");
-              
+       if (statusGetAllSD == false){
+           File file = root_CMA.openNextFile();
+           if(file){ readFile(SD,file.name(),file.size());}
+           else{  statusGetAllSD = true;
+                  timeEndReadSD=xTaskGetTickCount();
+                  root_CMA.close();
+           }
+      }
+      if((xTaskGetTickCount() - timeEndReadSD > 60000)&&(statusGetAllSD)){
+        timeEndReadSD = xTaskGetTickCount();
+        statusGetAllSD = false;
+        Serial.println("reboot SD");
+              root_CMA = SD.open("/CMA");             
        }    
   }
   if ((status_mqtt_connect)&&(state_Running_conf::state_Running == state_Running_conf::Setting)){  
-    if(((firstGetDataFromServer < 3)&&(xTaskGetTickCount() - timeFirstGetDataFromServer>30000))|| (timeFirstGetDataFromServer == 0)){
+    if((xTaskGetTickCount() - timeFirstGetDataFromServer>30000)|| (timeFirstGetDataFromServer == 0)){
       timeFirstGetDataFromServer = xTaskGetTickCount();
-      mqttClient.publish("/getconfig", 0, true, "{id:1,ty:1}"); 
-      firstGetDataFromServer = 0;
+      StaticJsonDocument<35> doc;
+      char buffer[35];
+      doc["i"]= idDevice;
+      if (inforServer.tongLoaiCa == 0){
+        doc["t"]= 1 ;
+        serializeJson(doc, buffer);
+        mqttClient.publish("/config", 0, true,buffer); 
+      }
+      if (inforServer.tongThanhPham == 0){
+        doc["t"]= 3 ;
+        serializeJson(doc, buffer);
+        mqttClient.publish("/config", 0, true, buffer); 
+      }
+      if(inforServer.tongNhaCC== 0){
+        doc["t"]= 2 ;
+        serializeJson(doc, buffer);
+        mqttClient.publish("/config", 0, true, buffer); 
+      }
     }
   }
 }
-
+//(&& () && ()&&
 
  

@@ -1,6 +1,3 @@
-
-#define idDevice 1
-
 #define using_sta true
 #define USING_IN true
 #define BUF_SIZE_UART (125)
@@ -31,3 +28,9 @@
 #define MaRo_RFID 0xE2
 #define MaNV_RFID 0x00
 #define MaLoaiCa_RFID 0x01
+
+#define button_left_pin 32
+#define button_right_pin 34
+#define button_ok_pin 35
+#define button_error_pin 36
+#define button_du_phong_pin 39
