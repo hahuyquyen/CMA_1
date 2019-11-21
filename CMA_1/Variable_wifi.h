@@ -6,6 +6,7 @@
 const char ramChoDuLieu[] ="Chờ Dữ Liệu"; // dung can lây FPSTR(ramChoDuLieu) và strlcpy_P  tiet kiem RAM cho heap memory
 const char ramChuaChon[] ="Chưa Chọn";
 const char htmlPortMQTT[] PROGMEM ="PortMQTT"; // dung can lây FPSTR(htmlPortMQTT) và strlcpy_P  tiet kiem RAM cho heap memory
+const char khuVucFilletRa[] PROGMEM ="FILLET-Đầu Ra"; // FPSTR(khuVucFilletRa)
 
 
 
@@ -18,15 +19,12 @@ volatile uint8_t canbuff=0;
 uint8_t rfid_data[20];
 static byte myEPC[12]; //Most EPCs are 12 bytes
 static byte myEPClength;
-//unsigned long _time_lastconnect_mqtt=0;
 unsigned long timeEndReadSD=0;
 unsigned long timeCheckMQTT_SD=0;  
 unsigned long timeFirstGetDataFromServer =0;
 static uint8_t counter_wifi_disconnect= 0;
 static boolean status_wifi_connect_AP = true ; 
-//static boolean status_IN_or_OUT = true ; 
 static boolean status_mqtt_connect = false ; 
-//static uint32_t number_line_save_mqtt =0;
 uint8_t firstGetDataFromServer=0;
 /*
  * 
@@ -58,12 +56,12 @@ struct inforServerStruct{
   uint8_t userSelectNhaCC;
   uint8_t userSelectLoaiCa;
   uint8_t userSelectThanhPham;
-  char maLoaica[30][12];
-  char maThanhPham[30][12];
-  char maNhaCC[30][12];
-  char nameLoaiCa[30][50];
-  char nameSoLo[30][50];
-  char nameThanhPham[30][50];
+  char maLoaica[20][12];
+  char maThanhPham[20][12];
+  char maNhaCC[20][12];
+  char nameLoaiCa[20][50];
+  char nameSoLo[20][50];
+  char nameThanhPham[20][50];
 }inforServer={
   PhanLoai::Not_Choose,
   0,

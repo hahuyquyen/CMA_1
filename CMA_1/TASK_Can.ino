@@ -13,7 +13,7 @@ void TaskCAN( void * pvParameters ){
        if ( incomingData == 0x3D){tam=0;}
        else if ( incomingData == 0x0D) {
         if(tach(&can_data)){
-          printf("CAN Nang : %f \n",can_data);
+        //  printf("CAN Nang : %f \n",can_data);
                 if(can_data!=Data_CAN.data_can){
                   Data_CAN.data_can=can_data;
                   Data_CAN.time_get=xTaskGetTickCount();

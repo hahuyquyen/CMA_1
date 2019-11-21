@@ -55,7 +55,25 @@ void printProgress(size_t prg, size_t sz) {
 /*
  * Setup
  */
-
+void khoiTaoGiaTri(){
+    sprintf(MQTT_TOPIC.dataAck, "/data/ack/%lu", ( unsigned long )datatruyen_mqtt.idControl) ;
+    sprintf(MQTT_TOPIC.configGetId, "/config/%lu", ( unsigned long )datatruyen_mqtt.idControl) ;
+    strlcpy(inforServer.nameThanhPham[0], ramChoDuLieu, sizeof(inforServer.nameThanhPham[0]));
+    strlcpy(inforServer.nameSoLo[0], ramChoDuLieu, sizeof(inforServer.nameSoLo[0]));
+    strlcpy(inforServer.nameLoaiCa[0], ramChoDuLieu, sizeof(inforServer.nameLoaiCa[0]));
+    state_Running_conf::state_Running = state_Running_conf::Setting;
+    Status_setting.state_select = 0;
+    inforServer.PhanLoaiKV = PhanLoai::Not_Choose;
+    inforServer.userSelectLoaiCa = 0;
+    inforServer.userSelectNhaCC = 0;
+    inforServer.userSelectThanhPham = 0;
+    inforServer.tongThanhPham = 0;
+    inforServer.tongNhaCC = 0;
+    inforServer.tongLoaiCa = 0;
+    strlcpy(inforServer.maLoaica[0], "x", sizeof(inforServer.maLoaica[0]));
+    strlcpy(inforServer.maNhaCC[0],"x", sizeof(inforServer.maNhaCC[0]));
+    strlcpy(inforServer.maThanhPham[0], "x", sizeof(inforServer.maThanhPham[0]));
+}
 void setup()
 {   Queue_can = xQueueCreate(5,sizeof(Data_CAN));
     Queue_RFID= xQueueCreate(5,sizeof(Data_RFID));
@@ -76,28 +94,12 @@ void setup()
     Serial1.begin(9600, SERIAL_8N1, 26, 12); //12 tx 13 lÃ  rx(bau,se,rx,tx)
     Serial.begin(115200);
     SDSPI.begin(14,27,13,15); ///SCK,MISO,MOSI,ss
-    if(!SD.begin(15,SDSPI)){
-      Serial.println("Card Mount Failed");
-      
-    }
+    if(!SD.begin(15,SDSPI)){Serial.println("Card Mount Failed");    }
     datatruyen_mqtt.idControl=EEPROM.readUInt(800);
     Serial.print("ID Device : ");
     Serial.println( datatruyen_mqtt.idControl);
-    sprintf(MQTT_TOPIC.dataAck, "/data/ack/%lu", ( unsigned long )datatruyen_mqtt.idControl) ;
-    sprintf(MQTT_TOPIC.configGetId, "/config/%lu", ( unsigned long )datatruyen_mqtt.idControl) ;
     loadWiFiConf();
-    strlcpy(inforServer.nameThanhPham[0], ramChoDuLieu, sizeof(inforServer.nameThanhPham[0]));
-    strlcpy(inforServer.nameSoLo[0], ramChoDuLieu, sizeof(inforServer.nameSoLo[0]));
-    strlcpy(inforServer.nameLoaiCa[0], ramChoDuLieu, sizeof(inforServer.nameLoaiCa[0]));
-    state_Running_conf::state_Running = state_Running_conf::Setting;
-    Status_setting.state_select = 0;
-    inforServer.PhanLoaiKV = PhanLoai::Not_Choose;
-    inforServer.userSelectLoaiCa = 0;
-    inforServer.userSelectNhaCC = 0;
-    inforServer.userSelectThanhPham = 0;
-    strlcpy(inforServer.maLoaica[0], "x", sizeof(inforServer.maLoaica[0]));
-    strlcpy(inforServer.maNhaCC[0],"x", sizeof(inforServer.maNhaCC[0]));
-    strlcpy(inforServer.maThanhPham[0], "x", sizeof(inforServer.maThanhPham[0]));
+    khoiTaoGiaTri();
     if (! rtc.begin()) {Serial.println("Couldn't find RTC");} 
     if (rtc.lostPower()) {
     Serial.println("RTC lost power, lets set the time!");
@@ -210,12 +212,11 @@ void loop()
               root_CMA.close();
        }
        else if(xTaskGetTickCount() - timeEndReadSD > 60000){
-              root_CMA = SD.open("/CMA");
-              
+              root_CMA = SD.open("/CMA");             
        }    
   }
   if ((status_mqtt_connect)&&(state_Running_conf::state_Running == state_Running_conf::Setting)){  
-    if(((firstGetDataFromServer < 3)&&(xTaskGetTickCount() - timeFirstGetDataFromServer>30000))|| (timeFirstGetDataFromServer == 0)){
+    if(((inforServer.tongLoaiCa == 0)&& (inforServer.tongThanhPham == 0) && (inforServer.tongNhaCC== 0)&&(xTaskGetTickCount() - timeFirstGetDataFromServer>30000))|| (timeFirstGetDataFromServer == 0)){
       timeFirstGetDataFromServer = xTaskGetTickCount();
       mqttClient.publish("/getconfig", 0, true, "{id:1,ty:1}"); 
       firstGetDataFromServer = 0;
