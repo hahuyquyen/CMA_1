@@ -1,4 +1,7 @@
-
+/*
+ * 930926 bytes (47%)
+ * 930418
+ */
 
 String processor( const String& var){
   char __dataFileName[sizeof(var)];
@@ -62,13 +65,13 @@ void setupWiFiConf(void) {
     server.on("/wifi_conf", HTTP_GET, [](AsyncWebServerRequest *request){request->send(SPIFFS, F("/wifi_conf.html"), String(), false, processor);});
     server.on("/mqtt_conf", HTTP_GET, [](AsyncWebServerRequest *request){request->send(SPIFFS, F("/mqtt_conf.html"), String(), false, processor);});
     server.on("/set_wifi_conf", HTTP_POST, [](AsyncWebServerRequest *request){
-        if (request->hasParam("html_ssid", true)) { request->getParam("html_ssid", true)->value().toCharArray(WiFiConf.sta_ssid, sizeof(WiFiConf.sta_ssid));} 
-        if (request->hasParam("html_wpa_password", true)) {request->getParam("html_wpa_password", true)->value().toCharArray(WiFiConf.sta_pwd, sizeof(WiFiConf.sta_pwd));} 
-        if (request->hasParam("html_ip_wifi", true)) { request->getParam("html_ip_wifi", true)->value().toCharArray(WiFiConf.sta_ip, sizeof(WiFiConf.sta_ip));} 
-        if (request->hasParam("html_gateway_wifi", true)) {request->getParam("html_gateway_wifi", true)->value().toCharArray(WiFiConf.sta_gateway, sizeof(WiFiConf.sta_gateway));} 
-        if (request->hasParam("html_sub_wifi", true)) {request->getParam("html_sub_wifi", true)->value().toCharArray(WiFiConf.sta_subnet, sizeof(WiFiConf.sta_subnet));} 
-        if (request->hasParam("button", true)) {request->getParam("button", true)->value().toCharArray(WiFiConf.choose_dhcp, sizeof(WiFiConf.choose_dhcp));} 
-        if (request->hasParam("chooseinout", true)) {request->getParam("chooseinout", true)->value().toCharArray(WiFiConf.mqtt_choose_inout, sizeof(WiFiConf.mqtt_choose_inout));} 
+        if (request->hasParam(F("html_ssid"), true)) { request->getParam(F("html_ssid"), true)->value().toCharArray(WiFiConf.sta_ssid, sizeof(WiFiConf.sta_ssid));} 
+        if (request->hasParam(F("html_wpa_password"), true)) {request->getParam(F("html_wpa_password"), true)->value().toCharArray(WiFiConf.sta_pwd, sizeof(WiFiConf.sta_pwd));} 
+        if (request->hasParam(F("html_ip_wifi"), true)) { request->getParam(F("html_ip_wifi"), true)->value().toCharArray(WiFiConf.sta_ip, sizeof(WiFiConf.sta_ip));} 
+        if (request->hasParam(F("html_gateway_wifi"), true)) {request->getParam(F("html_gateway_wifi"), true)->value().toCharArray(WiFiConf.sta_gateway, sizeof(WiFiConf.sta_gateway));} 
+        if (request->hasParam(F("html_sub_wifi"), true)) {request->getParam(F("html_sub_wifi"), true)->value().toCharArray(WiFiConf.sta_subnet, sizeof(WiFiConf.sta_subnet));} 
+        if (request->hasParam(F("button"), true)) {request->getParam(F("button"), true)->value().toCharArray(WiFiConf.choose_dhcp, sizeof(WiFiConf.choose_dhcp));} 
+        if (request->hasParam(F("chooseinout"), true)) {request->getParam(F("chooseinout"), true)->value().toCharArray(WiFiConf.mqtt_choose_inout, sizeof(WiFiConf.mqtt_choose_inout));} 
         saveWiFiConf();
         request->send(200, F("text/plain"), F("OK BABY"));
     });
@@ -84,11 +87,11 @@ void setupWiFiConf(void) {
     server.on("/set_mqtt_conf", HTTP_POST, [](AsyncWebServerRequest *request){
         if (request->hasParam(F("ServerMQTT"), true)) {request->getParam("ServerMQTT", true)->value().toCharArray(WiFiConf.mqtt_server, sizeof(WiFiConf.mqtt_server));} 
         if (request->hasParam(FPSTR(htmlPortMQTT), true)) {request->getParam(FPSTR(htmlPortMQTT), true)->value().toCharArray(WiFiConf.mqtt_port, sizeof(WiFiConf.mqtt_port));} 
-        if (request->hasParam("USERMQTT", true)) {request->getParam("USERMQTT", true)->value().toCharArray(WiFiConf.mqtt_user, sizeof(WiFiConf.mqtt_user)); } 
-        if (request->hasParam("PASSMQTT", true)) {request->getParam("PASSMQTT", true)->value().toCharArray(WiFiConf.mqtt_pass, sizeof(WiFiConf.mqtt_pass));} 
-        if (request->hasParam("SUBTopic1", true)) {request->getParam("SUBTopic1", true)->value().toCharArray(WiFiConf.mqtt_subto1, sizeof(WiFiConf.mqtt_subto1));} 
-        if (request->hasParam("SUBTopic2", true)) {request->getParam("SUBTopic2", true)->value().toCharArray(WiFiConf.mqtt_subto2, sizeof(WiFiConf.mqtt_subto2));} 
-        if (request->hasParam("SUBTopic3", true)) {request->getParam("SUBTopic3", true)->value().toCharArray(WiFiConf.mqtt_subto3, sizeof(WiFiConf.mqtt_subto3));} 
+        if (request->hasParam(F("USERMQTT"), true)) {request->getParam(F("USERMQTT"), true)->value().toCharArray(WiFiConf.mqtt_user, sizeof(WiFiConf.mqtt_user)); } 
+        if (request->hasParam(F("PASSMQTT"), true)) {request->getParam(F("PASSMQTT"), true)->value().toCharArray(WiFiConf.mqtt_pass, sizeof(WiFiConf.mqtt_pass));} 
+        if (request->hasParam(F("SUBTopic1"), true)) {request->getParam(F("SUBTopic1"), true)->value().toCharArray(WiFiConf.mqtt_subto1, sizeof(WiFiConf.mqtt_subto1));} 
+        if (request->hasParam(F("SUBTopic2"), true)) {request->getParam(F("SUBTopic2"), true)->value().toCharArray(WiFiConf.mqtt_subto2, sizeof(WiFiConf.mqtt_subto2));} 
+        if (request->hasParam(F("SUBTopic3"), true)) {request->getParam(F("SUBTopic3"), true)->value().toCharArray(WiFiConf.mqtt_subto3, sizeof(WiFiConf.mqtt_subto3));} 
         saveWiFiConf();
         request->send(200, F("text/plain"), F("OK"));
     });

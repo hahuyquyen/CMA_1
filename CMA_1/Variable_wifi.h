@@ -6,16 +6,16 @@
 const char ramChoDuLieu[] ="Chờ Dữ Liệu"; // dung can lây FPSTR(ramChoDuLieu) và strlcpy_P  tiet kiem RAM cho heap memory
 const char ramChuaChon[] ="Chưa Chọn";
 const char htmlPortMQTT[] PROGMEM ="PortMQTT"; // dung can lây FPSTR(htmlPortMQTT) và strlcpy_P  tiet kiem RAM cho heap memory
-const char khuVucFilletRa[] PROGMEM ="FILLET-Đầu Ra"; // FPSTR(khuVucFilletRa)
+//const char khuVucFilletRa[] PROGMEM ="FILLET-Đầu Ra"; // FPSTR(khuVucFilletRa)
 
 
 
 #define WIFI_CONF_FORMAT {0, 0, 0, 1}
 const uint8_t wifi_conf_format[] = WIFI_CONF_FORMAT;
 #define WIFI_CONF_START 0
-
-volatile uint8_t can_rxbuf[40];
-volatile uint8_t canbuff=0;
+boolean statusGetAllSD=false;
+//volatile uint8_t can_rxbuf[40];
+//volatile uint8_t canbuff=0;
 uint8_t rfid_data[20];
 static byte myEPC[12]; //Most EPCs are 12 bytes
 static byte myEPClength;
@@ -163,12 +163,12 @@ typedef struct Data_RFID{
   unsigned long time_get;
 } Data_RFID;
 //char id_RFID_old[25];
-typedef struct Display{
+/*typedef struct Display{
   uint8_t id;
   char name_nv[50];
   double cannang;
   double tiencong;
-} display_NV;
+} display_NV;*/
  
 
 /*

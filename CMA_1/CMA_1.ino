@@ -2,22 +2,23 @@ extern "C" {
   #include "freertos/FreeRTOS.h"
   #include "freertos/timers.h"
 }
+#include <Arduino.h>
 #include "FS.h"
 #include <AsyncMqttClient.h>
 #include <EEPROM.h>
 #include "Config.h"
 #include "Variable_wifi.h"
-#include <driver/uart.h>
 #include <ArduinoJson.h>
 #include <SPIFFS.h>
 #include <WiFi.h>
 #include <ESPAsyncWebServer.h>
 #include <Update.h>
-#include <Arduino.h>
 #include <U8g2lib.h>
 #include "SD.h"
 #include "RTClib.h"
 #include <SPI.h>
+
+///#include <driver/uart.h>
 RTC_DS3231 rtc;
 SPIClass SDSPI(HSPI);
 U8G2_ST7920_128X64_F_HW_SPI u8g2(U8G2_R0,/*CS=*/ U8X8_PIN_NONE,/*CS=*/ U8X8_PIN_NONE);// 
@@ -28,7 +29,7 @@ TimerHandle_t mqttReconnectTimer;
 AsyncWebServer server(web_port);
 WiFiClient espClient;
 
-display_NV Display_NV;
+//display_NV Display_NV;
 Data_TH datatruyen_mqtt; 
 //static intr_handle_t handle_console_uart1;
 //static void IRAM_ATTR uart1_intr_handle(void *arg);
@@ -100,11 +101,8 @@ void setup()
     Serial.println( idDevice);
     loadWiFiConf();
     khoiTaoGiaTri();
-    if (! rtc.begin()) {Serial.println("Couldn't find RTC");} 
-    if (rtc.lostPower()) {
-    Serial.println("RTC lost power, lets set the time!");
-     rtc.adjust(DateTime(2019, 11, 21,11, 20, 0));
-    }
+    if (! rtc.begin()) {Serial.println(F("Couldn't find RTC"));} 
+    if (rtc.lostPower()) { rtc.adjust(DateTime(2019, 11, 21,11, 20, 0));}
 #ifdef using_sta
     wifi_connect(0,WIFI_STA,WiFiConf.sta_ssid,WiFiConf.sta_pwd,WiFiConf.ap_ssid);
 #else
@@ -176,10 +174,8 @@ void setup()
 /*
  * Main Loop luÃ´n cháº¡y Core 1
  */
-boolean statusGetAllSD=false;
 void loop()
 {  
-  
   vTaskDelay(30);
   if (status_wifi_connect_AP == false){
     if (counter_wifi_disconnect == 30){
@@ -196,7 +192,10 @@ void loop()
         wifi_connect(0, WIFI_STA,WiFiConf.sta_ssid,WiFiConf.sta_pwd,WiFiConf.ap_ssid);
     }
   }
-  if(xQueueReceive( Queue_mqtt, &datatruyen_mqtt,  ( TickType_t ) 2 )== pdPASS ){
+  /*
+   * truyen mqtt nếu không truyền thì sẽ kiểm tra thẻ nhớ đọc và gửi
+   */
+  if(xQueueReceive( Queue_mqtt, &datatruyen_mqtt,  ( TickType_t ) 1 )== pdPASS ){
     truyen_mqtt();
     timeCheckMQTT_SD=xTaskGetTickCount();
   }
@@ -220,6 +219,9 @@ void loop()
               root_CMA = SD.open("/CMA");             
        }    
   }
+  /*
+   * Lịch gửi server yêu cầu config
+   */
   if ((status_mqtt_connect)&&(state_Running_conf::state_Running == state_Running_conf::Setting)){  
     if((xTaskGetTickCount() - timeFirstGetDataFromServer>30000)|| (timeFirstGetDataFromServer == 0)){
       timeFirstGetDataFromServer = xTaskGetTickCount();
@@ -244,6 +246,5 @@ void loop()
     }
   }
 }
-//(&& () && ()&&
 
  
