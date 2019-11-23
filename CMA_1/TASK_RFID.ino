@@ -24,7 +24,7 @@ void TaskRFID( void * pvParameters ){
     Data_RFID Data_rfid;
     Data_RFID Data_rfid_nv;
     RFID nano; 
-    const TickType_t xTicksToWait = pdMS_TO_TICKS(2);
+    const TickType_t xTicksToWait = pdMS_TO_TICKS(1);
     unsigned long _time_counting_task_rfid = 0;
     int i =0;
     Serial2.begin(uart_rfid_baud_rate);
@@ -74,13 +74,10 @@ void TaskRFID( void * pvParameters ){
                               }
                     }
                   }
-                  if(xSemaphoreTake(xreset_id_nv, 2)){
-                      //  strncpy( Data_rfid_nv.id_RFID,"", sizeof(""));
+                  if(xSemaphoreTake(xreset_id_nv, 1)){
                         strncpy( Data_rfid_nv.id_RFID_Old,"", sizeof(""));
-                       // strncpy( Data_rfid.id_RFID,"", sizeof(""));
-                   //     strncpy( Data_rfid.id_RFID_Old,"", sizeof(""));
                   }
-                  if(xSemaphoreTake(xResetRfidMaRo, 2)){
+                  if(xSemaphoreTake(xResetRfidMaRo, 1)){
                        strncpy( Data_rfid.id_RFID_Old,"", sizeof(""));
                   }
                 vTaskDelay(20);

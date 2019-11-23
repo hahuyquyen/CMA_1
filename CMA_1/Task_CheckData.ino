@@ -2,7 +2,7 @@ char idRFID_OLD[25];
 
 
 void http_re( void * pvParameters ){
-    const TickType_t xTicksToWait = pdMS_TO_TICKS(2);
+    const TickType_t xTicksToWait = pdMS_TO_TICKS(1);
     Data_CAN Data_CAN_TH;
     Data_RFID Data_RFID_TH;
     Data_RFID Data_RFID_NV;
@@ -21,22 +21,24 @@ void http_re( void * pvParameters ){
       /*
        * Nhận Cân
        */
-    if(xQueueReceive( Queue_can, &Data_CAN_TH,  ( TickType_t ) 2 )== pdPASS ){
+    if(xQueueReceive( Queue_can, &Data_CAN_TH,  ( TickType_t ) 1 )== pdPASS ){
       timeGetQueueCan=xTaskGetTickCount();
     }
     /*
      * Nhận mã RFID mã Rổ
+     * Nếu khu fille thì không nhận mã rỗ.
      */
-    if(xQueueReceive( Queue_RFID, &Data_RFID_TH,  ( TickType_t ) 2 )== pdPASS ){
+    if(xQueueReceive( Queue_RFID, &Data_RFID_TH,  ( TickType_t ) 1 )== pdPASS ){
       if ((inforServer.PhanLoaiKV == PhanLoai::LANG_IN)||(inforServer.PhanLoaiKV == PhanLoai::LANG_OUT)){
       timeGetQueueRfidRo=xTaskGetTickCount();
-      }
-      
+      }     
     }
-    if(xQueueReceive( Queue_RFID_NV, &Data_RFID_NV,  ( TickType_t ) 2 )== pdPASS ){
-            if ((inforServer.PhanLoaiKV == PhanLoai::Fil_IN)||(inforServer.PhanLoaiKV == PhanLoai::Fil_OUT)){
-              timeGetQueueRfidRo=xTaskGetTickCount();
-            }
+    /*
+     * Nhận mã RFID
+     * Nếu là khu Filler chỉ nhận mã rỗ thì swap time tới mã rỗ để khỏi viết lại code
+     */
+    if(xQueueReceive( Queue_RFID_NV, &Data_RFID_NV,  ( TickType_t ) 1 )== pdPASS ){
+            if ((inforServer.PhanLoaiKV == PhanLoai::Fil_IN)||(inforServer.PhanLoaiKV == PhanLoai::Fil_OUT)){timeGetQueueRfidRo=xTaskGetTickCount();}
             else timeGetQueueRfidNV=xTaskGetTickCount();
     }
     /*
@@ -44,9 +46,9 @@ void http_re( void * pvParameters ){
      * state_Running
      */
     if (state_Running_conf::state_Running == state_Running_conf::Running){
-          if ((timeGetQueueCan > timeGetQueueRfidRo + 500)&&(timeGetQueueRfidRo > 0)){
+          if ((timeGetQueueCan > timeGetQueueRfidRo + 500)&&(timeGetQueueRfidRo > 0)){ // chỉ nhận khi dữ liệu cân lớn hơn dữ liệu rfid 500 stick
                _time_timeout_data = timeGetQueueCan - timeGetQueueRfidRo;
-              if (_time_timeout_data < time_2_lan_nhan_data){
+              if (_time_timeout_data < time_2_lan_nhan_data){ // 2 dữ liệu phải nhỏ hơn thời gian cài đặt mới là 1 cặp đúng
                 if ((inforServer.PhanLoaiKV == PhanLoai::Fil_IN)||(inforServer.PhanLoaiKV == PhanLoai::Fil_OUT)){
                     strncpy( Data_TH.id_RFID_NV,Data_RFID_NV.id_RFID, sizeof(Data_RFID_NV.id_RFID));
                     Data_TH.data_weight=Data_CAN_TH.data_can;
@@ -67,12 +69,9 @@ void http_re( void * pvParameters ){
                     strncpy( idRFID_OLD,Data_TH.id_RFID, sizeof(Data_TH.id_RFID));
                     if (Data_CAN_TH.data_can >0.5) tt = true;
                   }
-                  else {
-                       
+                  else {  
                         double tam = Data_CAN_TH.data_can > canDataOutOld ?Data_CAN_TH.data_can - canDataOutOld :canDataOutOld - Data_CAN_TH.data_can ;
-                        if ((tam > 0.8)&&(Data_CAN_TH.data_can >0.5)){
-                          tt = true;
-                        }
+                        if ((tam > 0.8)&&(Data_CAN_TH.data_can >0.5))tt = true;
                         canDataOutOld=Data_CAN_TH.data_can;
                   }
                 }
@@ -123,11 +122,7 @@ void http_re( void * pvParameters ){
                   } 
               }
               else if ((_time_get_tam >0)&&(xTaskGetTickCount()- _time_get_tam > time_cho_nhan_RFID_NV)){
-                /*     
-                 *      cần 
-                 *      reset ID mã rổ
-                 */
-                 xSemaphoreGive(xResetRfidMaRo);
+                 xSemaphoreGive(xResetRfidMaRo); // Gửi tín hiệu để reset mã rỗ
                 _time_get_tam=0;
                 printf("Over time: Ma NV va \n");      
                 xSemaphoreGive(xSignal_Display_checkdone);
