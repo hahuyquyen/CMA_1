@@ -5,8 +5,12 @@
   (c)2019 Alexander Emelianov (a.m.emelianov@gmail.com)
   https://github.com/emelianov/modbus-esp8266
 */
+#include "Config.h"
+#include "define.h"
 #include "cutf.h"
 #include <ModbusRTU.h>
+#include <EEPROM.h>
+#include <AsyncMqttClient.h>
 /*#include <string> 
 #include <locale> 
 #include <codecvt> */
@@ -23,6 +27,8 @@ return dest;
 #define SLAVE_ID 1
 
 ModbusRTU mb;
+AsyncMqttClient mqttClient;
+TimerHandle_t mqttReconnectTimer;
 char hienthiutf[200]; 
 wchar_t hienthiascii[150];
 //char16_t output[100];
@@ -34,6 +40,15 @@ void setup() {
   mb.slave(SLAVE_ID);
   mb.addHreg(REGN,0x0000,305);
   mb.Hreg(300, 10);
+  mqttReconnectTimer = xTimerCreate("mqttTimer", pdMS_TO_TICKS(2000), pdFALSE, (void*)0, reinterpret_cast<TimerCallbackFunction_t>(connectToMqtt));
+  mqttClient.onConnect(onMqttConnect);
+  mqttClient.onDisconnect(onMqttDisconnect);
+  mqttClient.onSubscribe(onMqttSubscribe);
+  mqttClient.onUnsubscribe(onMqttUnsubscribe);
+  mqttClient.onMessage(onMqttMessage);
+  mqttClient.onPublish(onMqttPublish);
+  mqttClient.setServer(WiFiConf.mqtt_server, atoi(WiFiConf.mqtt_port));       
+  mqttClient.setCredentials(WiFiConf.mqtt_user,WiFiConf.mqtt_pass);      
 }
 int i = 0;
 int scenes = 10;
