@@ -84,7 +84,7 @@ void RFID::set_link_selec(uint8_t mode,uint16_t timeout){
 	sendMessage(0x60,data,sizeof(data),timeout,true);
 }
 /*
- * power tá»« 0 - 150 Transmit power 0 - 150 Power analog
+ * power tÃ¡Â»Â« 0 - 150 Transmit power 0 - 150 Power analog
  */
 void RFID::set_power(uint8_t mode,uint16_t timeout){
   uint8_t data[4]={0x00,0x00,0x65,0x02}; 
@@ -225,16 +225,16 @@ byte 3-10:   E2 00 10 71 00 00 52 6F ID
 
 17 byte
 00 00 E3 00 60 19 D2 6D 1C E9 AA BB CC DD 01 51 FF
-byte2-13 E3 00 60 19 D2 6D 1C E9 AA BB CC DD lÃ  ID
-01 lÃ  anten
+byte2-13 E3 00 60 19 D2 6D 1C E9 AA BB CC DD lÃƒÂ  ID
+01 lÃƒÂ  anten
 
 20 byte
 00 00 12 1F 15 05 8D 48 29 4E D9 00 D9 00 00 00 00 05 01 8A FF
 
 12  datalenght
 1F RSSI
-15 nhiá»‡t Ä‘á»™ giÃ¡ trá»‹, giÃ¡ trá»‹ lÃ  hex chuyá»ƒn qua dec
-05  nhiá»‡t Ä‘á»™ label
+15 nhiÃ¡Â»â€¡t Ã„â€˜Ã¡Â»â„¢ giÃƒÂ¡ trÃ¡Â»â€¹, giÃƒÂ¡ trÃ¡Â»â€¹ lÃƒÂ  hex chuyÃ¡Â»Æ’n qua dec
+05  nhiÃ¡Â»â€¡t Ã„â€˜Ã¡Â»â„¢ label
 byte 6-17 8D 48 29 4E D9 00 D9 00 00 00 00 05 ID
 */
 	uint8_t crc = calculateCRC(&msg[0], _head_par-1);

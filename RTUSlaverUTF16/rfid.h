@@ -40,3 +40,4 @@ private:
 	uint8_t _head = 0;
   uint8_t _head_par = 0;
 };
+
