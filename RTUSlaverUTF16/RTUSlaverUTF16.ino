@@ -37,10 +37,6 @@ AsyncWebServer server(4999);
 WiFiClient espClient;
 AsyncMqttClient mqttClient;
 TimerHandle_t mqttReconnectTimer;
-char hienthiutf[200];
-char begini[] = "Phạn Am nhàn ố ồ ô á à ạ ê ế ề ệ í ì ị ấ ầ ư ự ụ ú ù";
-wchar_t hienthiascii[150];
-//char16_t output[100];
 uint32_t sogui = 0;
 int i = 0;
 int scenes = 10;
@@ -69,6 +65,9 @@ void setup() {
   mb.slave(SLAVE_ID);
   mb.addHreg(REGN, 0x0000, 450);
   scenes = 10;
+  mb.Hreg(399, 0);
+  mb.Hreg(301, 0);
+  mb.Hreg(302, 0);
   mb.Hreg(300, scenes);
   for (int j = 0 ; j < sizeof(WiFiConf.sta_ssid) ; j = j+2) {
     mb.Hreg(400 + j/2, (((uint16_t)WiFiConf.sta_ssid[j+1]<< 8 )|((uint16_t)WiFiConf.sta_ssid[j])));
@@ -95,6 +94,7 @@ void setup() {
   mqttClient.setCredentials(WiFiConf.mqtt_user,WiFiConf.mqtt_pass);  
 }
 long timeTaskDelay = 0;
+long timeoutDataMqtt = 0;
 void loop() {
   vTaskDelay(10);
   if (statusWifiConnect == false){
@@ -120,16 +120,29 @@ void loop() {
     mb.Hreg(300, scenes);
   }
   if(xQueueReceive( Queue_RFID, &idRfidmain,  ( TickType_t ) 1 )== pdPASS ){
+    timeoutDataMqtt = xTaskGetTickCount();
+    if (scenes == idHmiMainPage){scenes = idHmiWaitPage;mb.Hreg(399, scenes);}
     // gui mqtt data nhan vien
     Serial.print(" Ma NV :");
     Serial.println(idRfidmain);
   }
-  if (xTaskGetTickCount() - delay_ms > 1000) {
+  if ((xTaskGetTickCount() - timeoutDataMqtt > 5000)&& (scenes == idHmiWaitPage)){
+   timeoutDataMqtt = xTaskGetTickCount();
+    scenes = idHmiTimeOutPage;
+    mb.Hreg(399, scenes);
+  }
+  else if ((xTaskGetTickCount() - timeoutDataMqtt > 2000)&& (scenes == idHmiTimeOutPage)){
+   timeoutDataMqtt = xTaskGetTickCount();
+  scenes = idHmiMainPage;
+    mb.Hreg(399, 0);
+  }
+ 
+  if (xTaskGetTickCount() - delay_ms > 5000) {
     delay_ms = xTaskGetTickCount();
     sogui = sogui + 1;
     mb.Hreg(301, sogui);
     mb.Hreg(302, sogui >> 16);
+    printf("Free Heap = %d\n",ESP.getFreeHeap());    
   }
   mb.task();
- // yield();
 }

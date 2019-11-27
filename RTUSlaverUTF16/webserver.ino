@@ -120,7 +120,7 @@ void wifiOnDisconnect()
  //   free(time_blink);            
     xTimerStop(mqttReconnectTimer, 0); // tat tu dong ket noi mqtt
     scenes = idHmiWifiDisConnect;
-     mb.Hreg(300, scenes);
+     mb.Hreg(399, scenes);
     statusWifiConnect = false ; 
 }
 void wifigotip()
@@ -129,16 +129,12 @@ void wifigotip()
             intCounterWifi=0;
             WiFi.softAPdisconnect(true);
             printf("Wifi %s\n",WiFi.localIP().toString().c_str());
-            for (int j = 0 ; j < sizeof(WiFi.localIP().toString().c_str()) ; j = j+2) {
-            memset(WiFiConf.sta_ssid, '\0', sizeof(WiFiConf.sta_ssid));
-            mb.Hreg(416 + j/2, (((uint16_t)WiFi.localIP().toString().c_str()[j+1]<< 8 )|((uint16_t)WiFi.localIP().toString().c_str()[j])));
-  }
-         //   uint16_t* time_blink = (uint16_t*)malloc(sizeof(uint16_t));
-          //  *time_blink = 2000;
-      //      xQueueSend(Queue_Time_blink, time_blink, (TickType_t) 1);    
-         //   free(time_blink);
+            mb.Hreg(416 , WiFi.localIP()[0]);
+            mb.Hreg(417 , WiFi.localIP()[1]);
+            mb.Hreg(418 , WiFi.localIP()[2]);
+            mb.Hreg(419 , WiFi.localIP()[3]);
          scenes = idHmiMainPage;
-         mb.Hreg(300, scenes);
+         mb.Hreg(399, 0);
          connectToMqtt();
 }
 void WiFiEvent(WiFiEvent_t event)

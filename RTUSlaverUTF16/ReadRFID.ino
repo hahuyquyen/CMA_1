@@ -35,7 +35,7 @@ void TaskRFID( void * pvParameters ){
                     myEPClength = sizeof(myEPC);
                     if (nano.parseResponse(myEPC,myEPClength)){
                              if (myEPC[0] == 0x00){ 
-                                 array_to_string(&myEPC[5], 7, idRfid);
+                                 array_to_string(&myEPC[0], 12, idRfid);
                                  if (strcmp(idRfid,idRfidOld) != 0){strncpy( idRfidOld,idRfid, sizeof(idRfid));xQueueSend( Queue_RFID, &idRfid, xTicksToWait );}
                               }
                     }

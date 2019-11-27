@@ -35,7 +35,8 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
       size_t valuelen = utf8towchar(mqttData.nameNvUtf8, SIZE_MAX, modbusData.nameNvUtf16, sizeof(modbusData.nameNvUtf16));
       for (int j = 0 ; j < sizeof(modbusData.nameNvUtf16) / 2 ; j++) {mb.Hreg(REGN + j, modbusData.nameNvUtf16[j]);}
       time_cho = xTaskGetTickCount();
-      scenes = 11;mb.Hreg(300, scenes);
+      scenes = 11;
+      mb.Hreg(300, scenes);mb.Hreg(399, 0); //399 là dịa chi popup 
       memset(mqttData.nameNvUtf8, '\0', sizeof(mqttData.nameNvUtf8));
   }
 }
