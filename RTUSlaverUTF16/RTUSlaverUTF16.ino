@@ -60,14 +60,17 @@ void setup() {
     }, WiFiEvent_t::SYSTEM_EVENT_STA_GOT_IP);
   setupWiFiConf();
   server.begin();
-  Serial2.begin(115200, SERIAL_8N1);
+  Serial2.begin(187500, SERIAL_8N1);
   mb.begin(&Serial2);
   mb.slave(SLAVE_ID);
-  mb.addHreg(REGN, 0x0000, 450);
+  mb.addHreg(REGN, 0x0000, 300);
+  mb.addHreg(300, 0x0000, 10);
+  mb.addHreg(390, 0x0000, 50);
   scenes = 10;
   mb.Hreg(399, 0);
   mb.Hreg(301, 0);
   mb.Hreg(302, 0);
+  mb.Hreg(432, 0);
   mb.Hreg(300, scenes);
   for (int j = 0 ; j < sizeof(WiFiConf.sta_ssid) ; j = j+2) {
     mb.Hreg(400 + j/2, (((uint16_t)WiFiConf.sta_ssid[j+1]<< 8 )|((uint16_t)WiFiConf.sta_ssid[j])));
@@ -97,24 +100,19 @@ long timeTaskDelay = 0;
 long timeoutDataMqtt = 0;
 void loop() {
   vTaskDelay(10);
-  if (statusWifiConnect == false){
-    if (intCounterWifi == 30){
-      if (xTaskGetTickCount() - timeTaskDelay> 500){
+  if (statusWifiConnect == 0){
+       if ((xTaskGetTickCount() - timeTaskDelay> 3000) && (mb.Hreg(432) == 0)){
         timeTaskDelay=xTaskGetTickCount();
-        WiFi.disconnect(true);
-        printf("Chuyen\n");
-        wifi_connect(2, WIFI_AP_STA, WiFiConf.sta_ssid, WiFiConf.sta_pwd,(char *)"esp32");
-        intCounterWifi++;
-      }
-    }
-    else if (intCounterWifi < 30) {
-       if (xTaskGetTickCount() - timeTaskDelay> 500){
-        timeTaskDelay=xTaskGetTickCount();
-        intCounterWifi = intCounterWifi + 1;
+        //intCounterWifi = intCounterWifi + 1;
         wifi_connect(0, WIFI_STA,WiFiConf.sta_ssid,WiFiConf.sta_pwd,WiFiConf.ap_ssid);
        }
-    }
+       else if (mb.Hreg(432)== 1){
+        Serial.println("AP Mode");
+        statusWifiConnect = 2;
+        wifi_connect(1, WIFI_AP, WiFiConf.sta_ssid, WiFiConf.sta_pwd,(char *)"esp32");
+       }
   }
+  else if ((mb.Hreg(432) == 1)&&(statusWifiConnect == 1)){ mb.Hreg(432,0);}
   if ((xTaskGetTickCount() - time_cho > 8000) && (scenes == 11)) {
     scenes = 10;
     mb.Hreg(300, scenes);
@@ -132,17 +130,15 @@ void loop() {
     mb.Hreg(399, scenes);
   }
   else if ((xTaskGetTickCount() - timeoutDataMqtt > 2000)&& (scenes == idHmiTimeOutPage)){
-   timeoutDataMqtt = xTaskGetTickCount();
-  scenes = idHmiMainPage;
-    mb.Hreg(399, 0);
+    timeoutDataMqtt = xTaskGetTickCount();
+    scenes = idHmiMainPage;
+      mb.Hreg(399, 0);
   }
  
   if (xTaskGetTickCount() - delay_ms > 5000) {
     delay_ms = xTaskGetTickCount();
     sogui = sogui + 1;
-    mb.Hreg(301, sogui);
-    mb.Hreg(302, sogui >> 16);
-    printf("Free Heap = %d\n",ESP.getFreeHeap());    
+    printf("Free vfhgf Heap = %d , %d , %d\n",ESP.getFreeHeap(),sogui,mb.Hreg(432));    
   }
   mb.task();
 }

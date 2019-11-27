@@ -121,11 +121,11 @@ void wifiOnDisconnect()
     xTimerStop(mqttReconnectTimer, 0); // tat tu dong ket noi mqtt
     scenes = idHmiWifiDisConnect;
      mb.Hreg(399, scenes);
-    statusWifiConnect = false ; 
+    statusWifiConnect = 0 ; 
 }
 void wifigotip()
 {            
-            statusWifiConnect = true;
+            statusWifiConnect = 1;
             intCounterWifi=0;
             WiFi.softAPdisconnect(true);
             printf("Wifi %s\n",WiFi.localIP().toString().c_str());
