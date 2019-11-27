@@ -18,7 +18,6 @@ extern "C" {
 #include "RTClib.h"
 #include <SPI.h>
 
-///#include <driver/uart.h>
 RTC_DS3231 rtc;
 SPIClass SDSPI(HSPI);
 U8G2_ST7920_128X64_F_HW_SPI u8g2(U8G2_R0,/*CS=*/ U8X8_PIN_NONE,/*CS=*/ U8X8_PIN_NONE);// 
