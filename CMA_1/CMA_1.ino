@@ -75,7 +75,9 @@ void khoiTaoGiaTri(){
     inforServer.maThanhPham[0]=0;
 }
 void setup()
-{   Queue_can = xQueueCreate(5,sizeof(Data_CAN));
+{       pinMode(pinPower, OUTPUT);
+    digitalWrite(pinPower, HIGH);
+    Queue_can = xQueueCreate(5,sizeof(Data_CAN));
     Queue_RFID= xQueueCreate(5,sizeof(Data_RFID));
     Queue_RFID_NV= xQueueCreate(5,sizeof(Data_RFID));
     Queue_mqtt = xQueueCreate(10,sizeof(Data_TH));
@@ -88,6 +90,7 @@ void setup()
     xSignal_Display_checkdone = xSemaphoreCreateCounting( 2, 0 );
     xreset_id_nv = xSemaphoreCreateCounting( 2, 0 );
     xResetRfidMaRo = xSemaphoreCreateCounting( 2, 0 );
+
     EEPROM.begin(1024);
     WiFi.disconnect(true);
     if(!SPIFFS.begin(true)){printf("An Error has occurred while mounting SPIFFS\n");}

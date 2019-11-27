@@ -16,7 +16,12 @@ EasyButton button_left(button_left_pin,200,true);
 EasyButton button_right(button_right_pin,200,true);
 EasyButton button_ok(button_ok_pin,200,true);
 EasyButton buttonExit(buttonExitPin,200,true);
-EasyButton button_du_phong(button_du_phong_pin,1000,true);
+EasyButton buttonError(buttonErrorPin,200,true);\
+EasyButton buttonPower(pinReadPower,200,true);
+
+void onPressedPower() {
+ if (xTaskGetTickCount() > 1000){digitalWrite(pinPower, LOW);}
+}
 void onPressed_left() {
   if ((Status_setting.state_select == 0)&&(inforServer.PhanLoaiKV > 0)){ inforServer.PhanLoaiKV = static_cast<PhanLoai::PhanLoai>((inforServer.PhanLoaiKV - 1) % (PhanLoai::LANG_OUT+1));}
   else  if ((Status_setting.state_select == 1)&&(inforServer.userSelectLoaiCa > 0)){ inforServer.userSelectLoaiCa = inforServer.userSelectLoaiCa - 1 ;}
@@ -51,7 +56,7 @@ void onPressedExit() {
   state_Running_conf::state_Running = state_Running_conf::Setting;
   Serial.println("onPressed_vitri");
 }
-void onPressed() {
+void onPressedError() {
 Serial.println("onPressed");
 }
 void LCD_print_KV(uint8_t vitri = 48){
@@ -87,12 +92,12 @@ void LCD_thong_tin(uint8_t chedo_HT,Data_TH* Data_TH  , uint8_t daucham = 0){
           u8g2.setCursor(0, 12);
           u8g2.print(F("NV:"));
           u8g2.setFont(u8g2_font_6x12_tf); 
-          u8g2.print(Data_TH->id_RFID_NV);
+          u8g2.print(Data_TH->id_RFID_NV[10]);
           u8g2.setCursor(0, 28);
           u8g2.setFont(u8g2_font_unifont_t_vietnamese1);
           u8g2.print(F("Rổ:"));
           u8g2.setFont(u8g2_font_6x12_tf); 
-          u8g2.print(Data_TH->id_RFID);
+          u8g2.print(Data_TH->id_RFID[10]);
           u8g2.setFont(u8g2_font_unifont_t_vietnamese1);
           u8g2.setCursor(0, 44);
           u8g2.print(F("Kg:"));
@@ -157,8 +162,6 @@ void LCD_thong_tin(uint8_t chedo_HT,Data_TH* Data_TH  , uint8_t daucham = 0){
 void Display( void * pvParameters ){
     boolean status_led= true;
     Data_TH Data_TH;
-    pinMode(2, OUTPUT);
-    pinMode(Pin_Coi, OUTPUT);
     unsigned long getTimeBlinkLed=0;
     unsigned long timeoutDisplay =0;
     unsigned long _time_blink_LCD=0;
@@ -174,12 +177,14 @@ void Display( void * pvParameters ){
     button_right.begin();
     buttonExit.begin();
     button_ok.begin();
-    button_du_phong.begin();
+    buttonError.begin();
+    buttonPower.begin();
     button_left.onPressed(onPressed_left);
     button_right.onPressed(onPressed_right);
     buttonExit.onPressed(onPressedExit);
     button_ok.onPressed(onPressed_ok);
-    button_du_phong.onPressed(onPressed);
+    buttonError.onPressed(onPressedError);
+    buttonPower.onPressed(onPressedPower);
     unsigned long timeoutLcdLangDaIn = 0;
    for (;;){Serial.print("Time Task Display : ");
       Serial.println(millis());
@@ -246,6 +251,8 @@ void Display( void * pvParameters ){
         button_ok.read();
       }
       buttonExit.read();
+      buttonError.read();
+      buttonPower.read();
       vTaskDelay(20);
     }
     vTaskDelete(NULL) ;

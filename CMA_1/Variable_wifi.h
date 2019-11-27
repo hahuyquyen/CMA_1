@@ -59,9 +59,9 @@ struct inforServerStruct{
   uint16_t maLoaica[20];
   uint16_t maThanhPham[20];
   uint16_t maNhaCC[20];
-  char nameLoaiCa[20][50];
-  char nameSoLo[20][50];
-  char nameThanhPham[20][50];
+  char nameLoaiCa[20][80];
+  char nameSoLo[20][80];
+  char nameThanhPham[20][80];
 }inforServer={
   PhanLoai::Not_Choose,
   0,

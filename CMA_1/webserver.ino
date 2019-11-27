@@ -40,7 +40,7 @@ void handleDoUpdate(AsyncWebServerRequest *request, const String& filename, size
       Update.printError(Serial);
     }
   }
-    if (!index) {
+ /*   if (!index) {
       writeEvent("INFO", "updt", "Firmware update started", filename.c_str());
       Update.runAsync(true);
       if (!Update.begin((ESP.getFreeSketchSpace() - 0x1000) & 0xFFFFF000)) {
@@ -49,7 +49,7 @@ void handleDoUpdate(AsyncWebServerRequest *request, const String& filename, size
         Update.printError(Serial);
         #endif
       }
-    }
+    }*/
   if (Update.write(data, len) != len) {
     Update.printError(Serial);
   }

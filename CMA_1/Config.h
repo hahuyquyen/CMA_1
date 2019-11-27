@@ -1,3 +1,5 @@
+
+
 #define using_sta true
 #define USING_IN true
 #define BUF_SIZE_UART (125)
@@ -20,17 +22,20 @@
 
 #define uart_can_baud_rate 115200
 #define uart_rfid_baud_rate 9600
-
 #define time_out_display_data 5000
-
-#define Pin_Coi 4
 
 #define MaRo_RFID 0xE2
 #define MaNV_RFID 0x00
 #define MaLoaiCa_RFID 0x01
 
-#define button_left_pin 32
+#define button_left_pin 36
 #define button_right_pin 34
 #define button_ok_pin 35
-#define buttonExitPin 36
-#define button_du_phong_pin 39
+#define buttonExitPin 39
+#define buttonErrorPin 0
+#define pinPower 33
+#define pinReadPower 32
+#define pinBuzzer 4
+#define pinLedRed 5
+#define pinLedGreen 2
+#define pinAnalogPower 25
