@@ -1,7 +1,7 @@
 #define WIFI_CONF_FORMAT {0, 0, 0, 1}
 const uint8_t wifi_conf_format[] = WIFI_CONF_FORMAT;
 #define WIFI_CONF_START 0
-boolean statusWifiConnect = false;
+uint8_t statusWifiConnect = 0;
 uint8_t intCounterWifi = 0;
 static byte myEPC[12]; //Most EPCs are 12 bytes
 static byte myEPClength;
