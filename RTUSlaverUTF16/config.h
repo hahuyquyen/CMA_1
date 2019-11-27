@@ -1,10 +1,12 @@
 #define WIFI_CONF_FORMAT {0, 0, 0, 1}
 const uint8_t wifi_conf_format[] = WIFI_CONF_FORMAT;
 #define WIFI_CONF_START 0
-
+boolean statusWifiConnect = false;
+uint8_t intCounterWifi = 0;
 static byte myEPC[12]; //Most EPCs are 12 bytes
 static byte myEPClength;
 
+QueueHandle_t Queue_RFID;
 static struct mqttDataConf{
   char nameNvUtf8[50];
 }mqttData;
@@ -47,3 +49,13 @@ static struct WiFiConfStruct {
   "x",
   "IN"
 };
+//############################
+const char* update_path = "/firmware";
+const char* update_username = "CMA";
+const char* update_password = "123456";
+//##########################################
+static IPAddress local_IP(192, 168, 1, 241);
+static IPAddress gateway(192, 168, 1, 1);
+static IPAddress subnet(255, 255, 255, 0);
+static IPAddress primaryDNS(8, 8, 8, 8); //optional
+static IPAddress secondaryDNS(8, 8, 4, 4); //optional

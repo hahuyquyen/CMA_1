@@ -76,7 +76,9 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
   printf("MQTT GET: %s \n",topic);
   //printf("QOS: %c \n", properties.qos);
  // printf("noi dung: %s \n", payload);
-
+/*
+ * {"name":"Pham An Nhàn"}
+ */
   StaticJsonDocument<1500> jsonBuffer;
   DeserializationError error = deserializeJson(jsonBuffer,payload);
   if (error) Serial.println("error json");

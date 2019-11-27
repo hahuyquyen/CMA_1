@@ -14,22 +14,19 @@ void TaskRFID( void * pvParameters ){
     const TickType_t xTicksToWait = pdMS_TO_TICKS(1);
     unsigned long _time_counting_task_rfid = 0;
     int i =0;
-    Serial1.begin(9600, SERIAL_8N1, 26, 12); 
+    Serial1.begin(9600, SERIAL_8N1, 26, 27); 
     RFID nano; 
     nano.begin(Serial1); 
-    nano.set_mode_timming(2,5000); // Set mode eprom 0x70, timeout chá»� káº¿t quáº£ 5000ms
+    nano.set_mode_timming(2,5000); // Set mode eprom 0x70, timeout chÃ¡Â»ï¿½ kÃ¡ÂºÂ¿t quÃ¡ÂºÂ£ 5000ms
     nano.set_timing_message(0x64,5000);
-    nano.set_power(0x20,5000);
+    nano.set_power(0x64,5000);
     nano.set_out_mode(1,5000);
     nano.set_time_ner(0x05,5000);
     nano.set_reset_reader(2000);
     char idRfid[25];
     char idRfidOld[25];
-    for (;;){Serial.print("Time Task RFID : ");
-      Serial.println(millis());
-      /*
-       * Chuyển task 24ms
-       */
+    for (;;){
+
                 if (xTaskGetTickCount()-_time_counting_task_rfid > 2000){
                     _time_counting_task_rfid = xTaskGetTickCount();
                     i=i+1; 
@@ -38,8 +35,8 @@ void TaskRFID( void * pvParameters ){
                     myEPClength = sizeof(myEPC);
                     if (nano.parseResponse(myEPC,myEPClength)){
                              if (myEPC[0] == 0x00){ 
-                                 array_to_string(&myEPC[5], 7, idRfid);
-                                 if (strcmp(idRfid,idRfidOld) != 0){strncpy( idRfidOld,idRfid, sizeof(idRfid));}
+                                 array_to_string(&myEPC[0], 12, idRfid);
+                                 if (strcmp(idRfid,idRfidOld) != 0){strncpy( idRfidOld,idRfid, sizeof(idRfid));xQueueSend( Queue_RFID, &idRfid, xTicksToWait );}
                               }
                     }
                   }
