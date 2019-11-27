@@ -11,8 +11,8 @@ void http_re( void * pvParameters ){
     unsigned long timeGetQueueRfidRo = 0;
     unsigned long timeGetQueueRfidNV = 0;
     unsigned long _time_get_tam = 0;
-    unsigned long _time_timeout_data=10000;
-    unsigned long _time_timeout_data_VAO=10000;
+    unsigned long timeCompareMode1=10000;
+    unsigned long timeCompareMode2=10000;
     unsigned long timeScheduTaskCheck=0;
     double canDataOutOld = 0;
     for (;;){
@@ -47,8 +47,8 @@ void http_re( void * pvParameters ){
      */
     if (state_Running_conf::state_Running == state_Running_conf::Running){
           if ((timeGetQueueCan > timeGetQueueRfidRo + 500)&&(timeGetQueueRfidRo > 0)){ // chỉ nhận khi dữ liệu cân lớn hơn dữ liệu rfid 500 stick
-               _time_timeout_data = timeGetQueueCan - timeGetQueueRfidRo;
-              if (_time_timeout_data < time_2_lan_nhan_data){ // 2 dữ liệu phải nhỏ hơn thời gian cài đặt mới là 1 cặp đúng
+               timeCompareMode1 = timeGetQueueCan - timeGetQueueRfidRo;
+              if (timeCompareMode1 < time_2_lan_nhan_data){ // 2 dữ liệu phải nhỏ hơn thời gian cài đặt mới là 1 cặp đúng
                 if ((inforServer.PhanLoaiKV == PhanLoai::Fil_IN)||(inforServer.PhanLoaiKV == PhanLoai::Fil_OUT)){
                     strncpy( Data_TH.id_RFID_NV,Data_RFID_NV.id_RFID, sizeof(Data_RFID_NV.id_RFID));
                     Data_TH.data_weight=Data_CAN_TH.data_can;
@@ -82,7 +82,7 @@ void http_re( void * pvParameters ){
                      */
                    
                     if ((inforServer.PhanLoaiKV == PhanLoai::Fil_IN)||(inforServer.PhanLoaiKV == PhanLoai::Fil_OUT)||(inforServer.PhanLoaiKV == PhanLoai::LANG_OUT)){          
-                    printf("CHECK OUT: Time: %ld - Kg: %f - RFID: %s \n",_time_timeout_data,Data_TH.data_weight,Data_TH.id_RFID);
+                    printf("CHECK OUT: Time: %ld - Kg: %f - RFID: %s \n",timeCompareMode1,Data_TH.data_weight,Data_TH.id_RFID);
                     xQueueSend( Queue_mqtt, &Data_TH, xTicksToWait );
                     }
                     else {
@@ -90,7 +90,7 @@ void http_re( void * pvParameters ){
                     }
                 }
                 xSemaphoreGive(xSignal_Display_check);     
-                _time_timeout_data = 10000;
+                timeCompareMode1 = 10000;
                 timeGetQueueCan = 0;
                 timeGetQueueRfidRo = 0;
                 _time_get_tam=xTaskGetTickCount();
@@ -104,14 +104,14 @@ void http_re( void * pvParameters ){
           }
           if ( inforServer.PhanLoaiKV == PhanLoai::LANG_IN){   
               if ((timeGetQueueRfidNV > _time_get_tam)&& (_time_get_tam >0)){ 
-                  _time_timeout_data_VAO = timeGetQueueRfidNV - _time_get_tam;
-                  if (_time_timeout_data_VAO < time_cho_nhan_RFID_NV){
+                  timeCompareMode2 = timeGetQueueRfidNV - _time_get_tam;
+                  if (timeCompareMode2 < time_cho_nhan_RFID_NV){
                     _time_get_tam=timeGetQueueRfidNV;
                     strncpy( Data_TH.id_RFID_NV,Data_RFID_NV.id_RFID, sizeof(Data_RFID_NV.id_RFID));
-                    printf("CHECK IN: Time: %ld - Kg: %f - RFID: %s - RFID NV: %s\n",_time_timeout_data_VAO,Data_TH.data_weight,Data_TH.id_RFID,Data_TH.id_RFID_NV);
+                    printf("CHECK IN: Time: %ld - Kg: %f - RFID: %s - RFID NV: %s\n",timeCompareMode2,Data_TH.data_weight,Data_TH.id_RFID,Data_TH.id_RFID_NV);
                     xQueueSend( Queue_display, &Data_TH, xTicksToWait );
                     xQueueSend( Queue_mqtt, &Data_TH, xTicksToWait );
-                    _time_timeout_data_VAO=10000;
+                    timeCompareMode2=10000;
                     timeGetQueueRfidNV=0;
                     _time_get_tam = 0;
                   }

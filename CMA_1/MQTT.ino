@@ -82,7 +82,8 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
   StaticJsonDocument<1500> jsonBuffer;
   DeserializationError error = deserializeJson(jsonBuffer,payload);
   if (error) Serial.println("error json");
-  if ((strcmp(WiFiConf.mqtt_subto1,topic) == 0)||(strcmp(MQTT_TOPIC.configGetId,topic) == 0)){
+  else if ((strcmp(WiFiConf.mqtt_subto1,topic) == 0)||(strcmp(MQTT_TOPIC.configGetId,topic) == 0)){
+        if (!jsonBuffer.containsKey("t")) {return;}
         if (jsonBuffer["t"].as<uint8_t>() == 1){
           inforServer.tongLoaiCa=jsonBuffer["l"].as<uint8_t>();
           strlcpy(inforServer.nameLoaiCa[0], ramChuaChon, sizeof(inforServer.nameLoaiCa[0]));
@@ -109,14 +110,15 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
         }  
 
   }
-  if (strcmp(MQTT_TOPIC.dataAck,topic) == 0){
+  else if (strcmp(MQTT_TOPIC.dataAck,topic) == 0){
+      if (!jsonBuffer.containsKey("i")) {return;}
       uint32_t sttData = jsonBuffer["i"].as<uint32_t>();
       uint8_t statusSaveData = jsonBuffer["s"].as<uint8_t>();
       char textToWrite[ 16 ];
       sprintf(textToWrite,"/CMA/%lu", ( unsigned long )sttData);
       if (statusSaveData == 1)deleteFile(SD,textToWrite);
   }
-  if (strcmp(WiFiConf.mqtt_subto3,topic) == 0){printf("vung 3 \n");}
+  else if (strcmp(WiFiConf.mqtt_subto3,topic) == 0){printf("vung 3 \n");}
 }
 
 void onMqttPublish(uint16_t packetId) {
