@@ -13,7 +13,6 @@ void onMqttConnect(bool sessionPresent) {
 }
 
 void onMqttDisconnect(AsyncMqttClientDisconnectReason reason) {
-// status_mqtt_connect = false;
   if (WiFi.isConnected()) {xTimerStart(mqttReconnectTimer, 0);}
 }
 
@@ -29,7 +28,6 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
   printf("MQTT GET: %s \n",topic);
   StaticJsonDocument<2500> jsonBuffer;
   DeserializationError error = deserializeJson(jsonBuffer,payload);
-  serializeJsonPretty(jsonBuffer, Serial);
   if (error) {Serial.println("error json");}
   else if (strcmp(WiFiConf.mqtt_subto1,topic) == 0){
       if (!jsonBuffer.containsKey("name")) {
