@@ -1,9 +1,7 @@
 
 
 #define using_sta true
-//#define USING_IN true
 #define BUF_SIZE_UART (125)
-//#define chedo "IN"  // 0 lÃ  IN,1 lÃ  OUT
 #define web_port 4999
 #define time_2_lan_nhan_data 5000
 #define time_cho_nhan_RFID_NV 8000

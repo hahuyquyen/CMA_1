@@ -59,18 +59,18 @@ void khoiTaoGiaTri(){
     sprintf(MQTT_TOPIC.dataAck, "/data/ack/%lu", ( unsigned long )idDevice) ;
     sprintf(MQTT_TOPIC.configGetId, "/config/%lu", ( unsigned long )idDevice) ;
     strlcpy(inforServer.nameThanhPham[0], ramChoDuLieu, sizeof(inforServer.nameThanhPham[0]));
-    strlcpy(inforServer.nameSoLo[0], ramChoDuLieu, sizeof(inforServer.nameSoLo[0]));
+    strlcpy(inforServer.nameNhaCC[0], ramChoDuLieu, sizeof(inforServer.nameNhaCC[0]));
   //  strlcpy(inforServer.nameLoaiCa[0], ramChoDuLieu, sizeof(inforServer.nameLoaiCa[0]));
     state_Running_conf::state_Running = state_Running_conf::Setting;
     Status_setting.state_select = 0;
     inforServer.PhanLoaiKV = PhanLoai::Not_Choose;
-    inforServer.userSelectLoaiCa = 0;
+  //  inforServer.userSelectLoaiCa = 0;
     inforServer.userSelectNhaCC = 0;
     inforServer.userSelectThanhPham = 0;
     inforServer.tongThanhPham = 0;
     inforServer.tongNhaCC = 0;
-    inforServer.tongLoaiCa = 0;
-    inforServer.maLoaica[0]=0;
+   // inforServer.tongLoaiCa = 0;
+  //  inforServer.maLoaica[0]=0;
     inforServer.maNhaCC[0]=0;
     inforServer.maThanhPham[0]=0;
 }
@@ -171,7 +171,7 @@ void setup()
   mqttClient.setServer(WiFiConf.mqtt_server, atoi(WiFiConf.mqtt_port));       
   mqttClient.setCredentials(WiFiConf.mqtt_user,WiFiConf.mqtt_pass);      
 //  printf("END set \n");
-    root_CMA = SD.open("/CMA");
+  root_CMA = SD.open("/CMA");
 }
 /*
  * Main Loop luÃ´n cháº¡y Core 1
@@ -202,7 +202,7 @@ void loop()
   }
   else if ((status_mqtt_connect)&&((xTaskGetTickCount() - timeCheckMQTT_SD >timeTruyenMQTT))){
       /*
-       * Check nếu có file còn thì đọc và gửi MQTT
+       * Check nếu có file còn lưu trong thu muc SD card thì đọc và gửi MQTT den server
        */
        timeCheckMQTT_SD=xTaskGetTickCount();
        if (statusGetAllSD == false){
@@ -224,6 +224,8 @@ void loop()
    * Lịch gửi server yêu cầu config
    */
   if ((status_mqtt_connect)&&(state_Running_conf::state_Running == state_Running_conf::Setting)){  
+    /*
+     */
     if((xTaskGetTickCount() - timeFirstGetDataFromServer>30000)|| (timeFirstGetDataFromServer == 0)){
       timeFirstGetDataFromServer = xTaskGetTickCount();
       StaticJsonDocument<35> doc;

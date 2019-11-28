@@ -50,22 +50,23 @@ struct setting_button{
 
 struct inforServerStruct{
   PhanLoai::PhanLoai PhanLoaiKV;
-  uint8_t tongLoaiCa; 
+  //uint8_t tongLoaiCa; 
   uint8_t tongNhaCC;   
   uint8_t tongThanhPham; 
   uint8_t userSelectNhaCC;
-  uint8_t userSelectLoaiCa;
+  //uint8_t userSelectLoaiCa;
   uint8_t userSelectThanhPham;
-  uint16_t maLoaica[20];
+ // uint16_t maLoaica[20];
   uint16_t maThanhPham[20];
   uint16_t maNhaCC[20];
   uint8_t sttGdSoLo[20]; 
   uint8_t sttGdThanhPham[20]; 
 //  char nameLoaiCa[20][80];
-  char nameSoLo[20][100];
+  char nameNhaCC[20][100];
   char nameThanhPham[20][100];
 }inforServer={
   PhanLoai::Not_Choose,
+  0,
   0,
   0,
   0,
