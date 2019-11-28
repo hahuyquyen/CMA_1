@@ -35,8 +35,7 @@ void TaskRFID( void * pvParameters ){
     nano.set_out_mode(1,5000);
     nano.set_time_ner(0x05,5000);
     nano.set_reset_reader(2000);
-    for (;;){Serial.print("Time Task RFID : ");
-      Serial.println(millis());
+    for (;;){
       /*
        * Chuyển task 24ms
        */

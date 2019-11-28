@@ -16,8 +16,7 @@ void http_re( void * pvParameters ){
     unsigned long timeScheduTaskCheck=0;
     double canDataOutOld = 0;
     for (;;){
-      Serial.print("Time Task Check : ");
-      Serial.println(millis());
+
       /*
        * Nhận Cân
        */

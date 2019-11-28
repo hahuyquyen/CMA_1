@@ -84,7 +84,7 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
   if (error) Serial.println("error json");
   else if ((strcmp(WiFiConf.mqtt_subto1,topic) == 0)||(strcmp(MQTT_TOPIC.configGetId,topic) == 0)){
         if (!jsonBuffer.containsKey("t")) {return;}
-        if (jsonBuffer["t"].as<uint8_t>() == 1){
+       /* if (jsonBuffer["t"].as<uint8_t>() == 1){
           inforServer.tongLoaiCa=jsonBuffer["l"].as<uint8_t>();
           strlcpy(inforServer.nameLoaiCa[0], ramChuaChon, sizeof(inforServer.nameLoaiCa[0]));
           for (int i=0;i<inforServer.tongLoaiCa;i++){
@@ -92,7 +92,7 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
             strlcpy(inforServer.nameLoaiCa[i+1], jsonBuffer["data"][i]["n"], sizeof(inforServer.nameLoaiCa[i]));
           }      
         }
-        else if (jsonBuffer["t"].as<uint8_t>() == 2){
+        else */if (jsonBuffer["t"].as<uint8_t>() == 2){
            strlcpy(inforServer.nameSoLo[0], ramChuaChon, sizeof(inforServer.nameSoLo[0]));
           inforServer.tongNhaCC=jsonBuffer["l"].as<uint8_t>();
           for (int i=0;i<inforServer.tongNhaCC;i++){

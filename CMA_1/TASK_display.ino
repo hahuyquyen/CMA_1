@@ -24,7 +24,7 @@ void onPressedPower() {
 }
 void onPressed_left() {
   if ((Status_setting.state_select == 0)&&(inforServer.PhanLoaiKV > 0)){ inforServer.PhanLoaiKV = static_cast<PhanLoai::PhanLoai>((inforServer.PhanLoaiKV - 1) % (PhanLoai::LANG_OUT+1));}
-  else  if ((Status_setting.state_select == 1)&&(inforServer.userSelectLoaiCa > 0)){ inforServer.userSelectLoaiCa = inforServer.userSelectLoaiCa - 1 ;}
+  //else  if ((Status_setting.state_select == 1)&&(inforServer.userSelectLoaiCa > 0)){ inforServer.userSelectLoaiCa = inforServer.userSelectLoaiCa - 1 ;}
   else if ((Status_setting.state_select == 2)&&(inforServer.userSelectNhaCC > 0)){inforServer.userSelectNhaCC = inforServer.userSelectNhaCC-1  ;}
   else if ((Status_setting.state_select == 3)&&(inforServer.userSelectThanhPham > 0)){inforServer.userSelectThanhPham = inforServer.userSelectThanhPham - 1; }
   Scrolling_lcd = 0;
@@ -32,7 +32,7 @@ void onPressed_left() {
 }
 void onPressed_right() {
   if (Status_setting.state_select == 0){inforServer.PhanLoaiKV = static_cast<PhanLoai::PhanLoai>((inforServer.PhanLoaiKV + 1) % (PhanLoai::LANG_OUT+1));}
-  else if ((Status_setting.state_select == 1)&&(inforServer.tongLoaiCa > 0)){inforServer.userSelectLoaiCa = (inforServer.userSelectLoaiCa > inforServer.tongLoaiCa )? 0 : (inforServer.userSelectLoaiCa + 1); }
+ // else if ((Status_setting.state_select == 1)&&(inforServer.tongLoaiCa > 0)){inforServer.userSelectLoaiCa = (inforServer.userSelectLoaiCa > inforServer.tongLoaiCa )? 0 : (inforServer.userSelectLoaiCa + 1); }
   else if ((Status_setting.state_select == 2)&&(inforServer.tongNhaCC > 0)){inforServer.userSelectNhaCC = (inforServer.userSelectNhaCC > inforServer.tongNhaCC) ? 0 : (inforServer.userSelectNhaCC + 1);}
   else if ((Status_setting.state_select == 3)&&(inforServer.tongThanhPham > 0)){inforServer.userSelectThanhPham = (inforServer.userSelectThanhPham > inforServer.tongThanhPham) ? 0 : (inforServer.userSelectThanhPham + 1);}
   Scrolling_lcd = 0;
@@ -40,13 +40,14 @@ void onPressed_right() {
 }
 void onPressed_ok() {
   if ((Status_setting.state_select == 0)&& (inforServer.PhanLoaiKV == 0)) return;
-  if ((Status_setting.state_select == 1)&& (inforServer.userSelectLoaiCa == 0)) return;
+ // if ((Status_setting.state_select == 1)&& (inforServer.userSelectLoaiCa == 0)) return;
   if ((Status_setting.state_select == 2)&& (inforServer.userSelectNhaCC == 0)) return;
   if ((Status_setting.state_select == 3)&& (inforServer.userSelectThanhPham == 0)) return;
   if  ((Status_setting.state_select == 0)&& ((inforServer.PhanLoaiKV == PhanLoai::Fil_OUT )||(inforServer.PhanLoaiKV == PhanLoai::LANG_OUT ))) {
      Status_setting.state_select = 3;
   }
-  else{Status_setting.state_select = (Status_setting.state_select == 2) ? 4:Status_setting.state_select + 1;}
+  else{Status_setting.state_select = (Status_setting.state_select == 2) ? 4:(Status_setting.state_select == 0 )? 2 : Status_setting.state_select+ 1;}
+  //else{Status_setting.state_select = (Status_setting.state_select == 2) ? 4:Status_setting.state_select + 1;}
   if (Status_setting.state_select > 4){state_Running_conf::state_Running = state_Running_conf::Running;}
   Scrolling_lcd = 0;
   update_lcd_setting = true;
@@ -120,8 +121,8 @@ void LCD_thong_tin(uint8_t chedo_HT,Data_TH* Data_TH  , uint8_t daucham = 0){
           u8g2.setCursor(2, 48);  
            if ((inforServer.PhanLoaiKV == PhanLoai::Fil_IN ) || (inforServer.PhanLoaiKV == PhanLoai::LANG_IN )){
              u8g2.print(inforServer.nameSoLo[inforServer.userSelectNhaCC]);  
-             u8g2.setCursor(2, 60);
-             u8g2.print(inforServer.nameLoaiCa[inforServer.userSelectLoaiCa]);  
+            // u8g2.setCursor(2, 60);
+            // u8g2.print(inforServer.nameLoaiCa[inforServer.userSelectLoaiCa]);  
            }
            else {u8g2.print(inforServer.nameThanhPham[inforServer.userSelectThanhPham]);      }               
    }
@@ -130,10 +131,10 @@ void LCD_thong_tin(uint8_t chedo_HT,Data_TH* Data_TH  , uint8_t daucham = 0){
           hienthiSetting(stringdem,"");
           LCD_print_KV();  
    }
-   else if (chedo_HT == 3) {
+ /*  else if (chedo_HT == 3) {
           char stringdem[] = "Loại Cá";
           hienthiSetting(stringdem,inforServer.nameLoaiCa[inforServer.userSelectLoaiCa]); 
-   }
+   }*/
     else if (chedo_HT == 4) {
          char stringdem[] = "Nhà Cup Cấp";
          hienthiSetting(stringdem,inforServer.nameSoLo[inforServer.userSelectNhaCC]); 
@@ -150,8 +151,8 @@ void LCD_thong_tin(uint8_t chedo_HT,Data_TH* Data_TH  , uint8_t daucham = 0){
           u8g2.setCursor(2, 48); 
            if ((inforServer.PhanLoaiKV == PhanLoai::Fil_IN ) || (inforServer.PhanLoaiKV == PhanLoai::LANG_IN )){  
              u8g2.print(inforServer.nameSoLo[inforServer.userSelectNhaCC]);  
-             u8g2.setCursor(2, 60);
-             u8g2.print(inforServer.nameLoaiCa[inforServer.userSelectLoaiCa]);  
+           //  u8g2.setCursor(2, 60);
+            // u8g2.print(inforServer.nameLoaiCa[inforServer.userSelectLoaiCa]);  
            }
            else {u8g2.print(inforServer.nameThanhPham[inforServer.userSelectThanhPham]); }    
    }
@@ -186,19 +187,17 @@ void Display( void * pvParameters ){
     buttonError.onPressed(onPressedError);
     buttonPower.onPressed(onPressedPower);
     unsigned long timeoutLcdLangDaIn = 0;
-   for (;;){Serial.print("Time Task Display : ");
-      Serial.println(millis());
+   for (;;){
       /*
        * 30ms
        */
       if (state_Running_conf::state_Running == state_Running_conf::Running){
                 if(xQueueReceive( Queue_display, &Data_TH,  ( TickType_t ) 1 )== pdPASS ){ state_LCD_Display = 0;if ((strcmp(Data_TH.id_RFID_NV,"x") != 0)&& (inforServer.PhanLoaiKV ==PhanLoai::LANG_IN )) {timeoutLcdLangDaIn= xTaskGetTickCount();}}     
-                if(xSemaphoreTake(xSignal_Display_check, 1)){
-                  digitalWrite(Pin_Coi,HIGH); timeoutDisplay = xTaskGetTickCount();
+                if(xSemaphoreTake(xSignal_Display_check, 1)){timeoutDisplay = xTaskGetTickCount();
                }
                 if(xSemaphoreTake(xSignal_Display_checkdone, 1)){ //Che do IN qua timeout se tat 
                   state_LCD_Display = 1;
-                  digitalWrite(Pin_Coi,LOW);
+                  
                 }
                 switch (inforServer.PhanLoaiKV){ //inforServer.PhanLoaiKV == PhanLoai::LANG_OUT
                       case PhanLoai::Not_Choose : if ((xTaskGetTickCount() - timeoutDisplay > Time_check)&&(timeoutDisplay > 0 )){digitalWrite(4,LOW);state_LCD_Display = 1;timeoutDisplay=0;}break;
