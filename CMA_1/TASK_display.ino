@@ -33,8 +33,34 @@ void onPressed_left() {
 void onPressed_right() {
   if (Status_setting.state_select == 0){inforServer.PhanLoaiKV = static_cast<PhanLoai::PhanLoai>((inforServer.PhanLoaiKV + 1) % (PhanLoai::LANG_OUT+1));}
  // else if ((Status_setting.state_select == 1)&&(inforServer.tongLoaiCa > 0)){inforServer.userSelectLoaiCa = (inforServer.userSelectLoaiCa > inforServer.tongLoaiCa )? 0 : (inforServer.userSelectLoaiCa + 1); }
-  else if ((Status_setting.state_select == 2)&&(inforServer.tongNhaCC > 0)){inforServer.userSelectNhaCC = (inforServer.userSelectNhaCC > inforServer.tongNhaCC) ? 0 : (inforServer.userSelectNhaCC + 1);}
-  else if ((Status_setting.state_select == 3)&&(inforServer.tongThanhPham > 0)){inforServer.userSelectThanhPham = (inforServer.userSelectThanhPham > inforServer.tongThanhPham) ? 0 : (inforServer.userSelectThanhPham + 1);}
+  else if ((Status_setting.state_select == 2)&&(inforServer.tongNhaCC > 0)){
+    while(true){
+                  if ((inforServer.PhanLoaiKV == PhanLoai::Fil_IN)||(inforServer.PhanLoaiKV == PhanLoai::Fil_OUT)){    
+                  inforServer.userSelectNhaCC = (inforServer.userSelectNhaCC > inforServer.tongNhaCC) ? 0 : (inforServer.userSelectNhaCC + 1);
+                  if (inforServer.userSelectNhaCC == 0) break;
+                  if (inforServer.sttGdSoLo[inforServer.userSelectNhaCC] == 1) {break;}
+                  }
+                  else if ((inforServer.PhanLoaiKV == PhanLoai::LANG_IN)||(inforServer.PhanLoaiKV == PhanLoai::LANG_OUT)){    
+                  inforServer.userSelectNhaCC = (inforServer.userSelectNhaCC > inforServer.tongNhaCC) ? 0 : (inforServer.userSelectNhaCC + 1);
+                  if (inforServer.userSelectNhaCC == 0) break;
+                  if (inforServer.sttGdSoLo[inforServer.userSelectNhaCC] == 2) {break;}
+                  }
+    }
+  }
+  else if ((Status_setting.state_select == 3)&&(inforServer.tongThanhPham > 0)){
+        while(true){
+                          if ((inforServer.PhanLoaiKV == PhanLoai::Fil_IN)||(inforServer.PhanLoaiKV == PhanLoai::Fil_OUT)){    
+                               inforServer.userSelectThanhPham = (inforServer.userSelectThanhPham > inforServer.tongThanhPham) ? 0 : (inforServer.userSelectThanhPham + 1);
+                              if (inforServer.userSelectThanhPham == 0) break;
+                              if (inforServer.sttGdThanhPham[inforServer.userSelectThanhPham] == 1) {break;}
+                          }
+                          else if ((inforServer.PhanLoaiKV == PhanLoai::LANG_IN)||(inforServer.PhanLoaiKV == PhanLoai::LANG_OUT)){    
+                              inforServer.userSelectThanhPham = (inforServer.userSelectThanhPham > inforServer.tongThanhPham) ? 0 : (inforServer.userSelectThanhPham + 1);
+                              if (inforServer.userSelectThanhPham == 0) break;
+                              if (inforServer.sttGdThanhPham[inforServer.userSelectThanhPham] == 2) {break;}
+                          }
+          }
+    }
   Scrolling_lcd = 0;
   update_lcd_setting = true;
 }
@@ -128,7 +154,7 @@ void LCD_thong_tin(uint8_t chedo_HT,Data_TH* Data_TH  , uint8_t daucham = 0){
    }
    else if (chedo_HT == 2) {
           char stringdem[] = "KHU VỰC CÂN";
-          hienthiSetting(stringdem,"");
+          hienthiSetting(stringdem," ");
           LCD_print_KV();  
    }
  /*  else if (chedo_HT == 3) {

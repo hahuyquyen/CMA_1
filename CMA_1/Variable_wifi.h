@@ -59,6 +59,8 @@ struct inforServerStruct{
   uint16_t maLoaica[20];
   uint16_t maThanhPham[20];
   uint16_t maNhaCC[20];
+  uint8_t sttGdSoLo[20]; 
+  uint8_t sttGdThanhPham[20]; 
 //  char nameLoaiCa[20][80];
   char nameSoLo[20][100];
   char nameThanhPham[20][100];

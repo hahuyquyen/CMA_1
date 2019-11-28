@@ -67,8 +67,8 @@ void onMqttUnsubscribe(uint16_t packetId) {// printf("Unsubscribe acknowledged: 
 
 
 /*{"t":"3","l":"3","data":[{"i":"5455","n":"nhàn 1"},{"i":"68","n":"nhàn 2"},{"i":"98","n":"nhàn 3"}]}
-
- * 
+{"i":"5455","n":"nhàn 1","g":1}
+ g = 1 hoặc 2 1laf fille 2 la sua ca
  */
 
 void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties properties, size_t len, size_t index, size_t total) {
@@ -97,6 +97,7 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
           inforServer.tongNhaCC=jsonBuffer["l"].as<uint8_t>();
           for (int i=0;i<inforServer.tongNhaCC;i++){
             inforServer.maNhaCC[i+1]=jsonBuffer["data"][i]["i"].as<uint16_t>();
+            inforServer.sttGdSoLo[i+1]=jsonBuffer["data"][i]["g"].as<uint8_t>();
             strlcpy(inforServer.nameSoLo[i+1], jsonBuffer["data"][i]["n"], sizeof(inforServer.nameSoLo[i]));
           }  
         }
@@ -105,6 +106,7 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
           inforServer.tongThanhPham=jsonBuffer["l"].as<uint8_t>();
           for (int i=0;i<inforServer.tongThanhPham;i++){
             inforServer.maThanhPham[i+1]=jsonBuffer["data"][i]["i"].as<uint16_t>();
+            inforServer.sttGdThanhPham[i+1]=jsonBuffer["data"][i]["g"].as<uint8_t>();
             strlcpy(inforServer.nameThanhPham[i+1], jsonBuffer["data"][i]["n"], sizeof(inforServer.nameThanhPham[i+1]));
           }
         }  

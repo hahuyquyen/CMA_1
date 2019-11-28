@@ -56,8 +56,8 @@ void handleDoUpdate(AsyncWebServerRequest *request, const String& filename, size
 
   if (final) {
     AsyncWebServerResponse *response = request->beginResponse(302, "text/plain", "Please wait while the device reboots");
-    response->addHeader("Refresh", "20");  
-    response->addHeader("Location", "/");
+    response->addHeader(F("Refresh"), "20");  
+    response->addHeader(F("Location"), "/");
     request->send(response);
     if (!Update.end(true)){
       Update.printError(Serial);
