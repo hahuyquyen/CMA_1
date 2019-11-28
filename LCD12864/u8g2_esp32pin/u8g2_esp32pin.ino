@@ -32,19 +32,26 @@ int Scrolling_lcd=0;
 u8g2_uint_t title_scroll_x = 0;
 void hienthiSetting(char* dataUserDisplay){
   u8g2.clearBuffer();
+    u8g2.firstPage();
+  do {
    u8g2.setFont(u8g2_font_unifont_t_vietnamese1);
    u8g2.setCursor(0, 48);
    uint16_t strLen = strlen(dataUserDisplay) * 8;
    char temstr[20];
    memset(temstr, '\0', sizeof(temstr));
    memcpy (temstr, dataUserDisplay + Scrolling_lcd, 16);
+   while( Scrolling_lcd<strlen(dataUserDisplay)){
    Serial.println(strLen);
           if (strLen > 120){
-                u8g2.print(temstr);
+                u8g2.drawUTF8(0, 48,temstr);
                 Scrolling_lcd = Scrolling_lcd +1 ;
-                if (Scrolling_lcd>strlen(dataUserDisplay))Scrolling_lcd=0;
+                
           }
-u8g2.sendBuffer();          
+   }
+   Scrolling_lcd = Scrolling_lcd +1 ;
+   if (Scrolling_lcd>strlen(dataUserDisplay))Scrolling_lcd=0;
+    } while ( u8g2.nextPage() );
+ // u8g2.sendBuffer();          
 }
 void loop(void) {
 //    u8g2.clearBuffer();
@@ -53,5 +60,5 @@ void loop(void) {
     hienthiSetting("Cá Semi cua pham an nhan la goi ấ ahsdfa asdfaf afasgfqa fafa âf");
   //  u8g2.sendBuffer();
   
-       delay(500);                          // do some small delay
+       delay(800);                          // do some small delay
 }
