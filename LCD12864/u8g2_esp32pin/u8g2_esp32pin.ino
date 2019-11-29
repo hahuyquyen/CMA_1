@@ -1,3 +1,21 @@
+
+/*
+  Vào thu vien sua file u8g2.h chỗ khai bao 16 bit de xu lý chuoi lon
+
+  The following macro enables 16 Bit mode.
+  Without defining this macro all calulations are done with 8 Bit (1 Byte) variables.
+  Especially on AVR architecture, this will save some space.
+  If this macro is defined, then U8g2 will switch to 16 Bit mode.
+  Use 16 Bit mode for any display with more than 240 pixel in one
+  direction.
+*/
+//#define U8G2_16BIT
+
+
+
+
+
+
 #include <Arduino.h>
 #include <U8g2lib.h>
 
@@ -8,52 +26,52 @@
 #include <Wire.h>
 #endif
 
-U8G2_ST7920_128X64_F_SW_SPI u8g2(U8G2_R0, /* clock=*/ 18, /* data=*/ 5, /* CS=*/ U8X8_PIN_NONE);
-
-
-
+//U8G2_ST7920_128X64_F_HW_SPI u8g2(U8G2_R0,/*CS=*/ U8X8_PIN_NONE,/*CS=*/ U8X8_PIN_NONE);//
+//U8G2_ST7920_128X64_F_SW_SPI u8g2(U8G2_R0, /* clock=*/ 18, /* data=*/ 23, /* CS=*/ U8X8_PIN_NONE, /* reset=*/ U8X8_PIN_NONE);
 void setup(void) {
+  Serial.begin(115200);
+  //  SPI.setClockDivider( SPI_CLOCK_DIV32 );
   u8g2.begin();
- // u8g2.setFlipMode(0);
-
- u8g2.clearBuffer();
-     u8g2.setFont(u8g2_font_5x7_tf); // u8g2_font_6x10_tf
-    u8g2.drawStr(0,10,"192.168.1.10 - IN");
-    u8g2.setFont(u8g2_font_6x10_tf);
-    u8g2.drawStr(0,25,"ID NV :");
-    u8g2.drawStr(0,40,"ID:");
-    u8g2.drawStr(0,55,"Kg:");
-    u8g2.sendBuffer();  
- // u8g2.setFont(u8g2_font_unifont_t_chinese2);  // use chinese2 for all the glyphs of "你好世界"
-/*   u8g2.clearBuffer();
-  u8g2.setFont(u8g2_font_cu12_tr);
-  u8g2.setFontDirection(0);
+  u8g2.enableUTF8Print();
+ // u8g2.setBusClock(600000);
   u8g2.clearBuffer();
-  u8g2.setCursor(0, 15);
-  u8g2.print("Hello World!");
-  u8g2.setCursor(0, 40);
-  u8g2.sendBuffer();*/
- /* int bien = 100;
-    do {
-    u8g2.setFont(u8g2_font_5x7_tf); // u8g2_font_6x10_tf
-    u8g2.drawStr(0,8,"192.168.1.10 - IN");
-    u8g2.setFont(u8g2_font_5x8_tf );
-    u8g2.drawStr(0,23,"ID NV :");
-    u8g2.drawStr(0,35,"ID:");
-    u8g2.drawStr(0,47,"Kg:");u8g2.setCursor(30, 47);u8g2.print(bien);
-    u8g2.setFont(u8g2_font_unifont_t_vietnamese1);
-    u8g2.setCursor(0, 59);
-    u8g2.drawUTF8(0,64,"Loại Cá:");
-    //u8g2.print("Loại cá");
-    //
-  } while ( u8g2.nextPage() );*/
-} 
 
+  u8g2.firstPage();
+  do {
+    u8g2.setFont(u8g2_font_5x7_tf); // u8g2_font_6x10_tf
+    u8g2.drawStr(0, 10, "192.168.1.10 - IN");
+    u8g2.setFont(u8g2_font_6x10_tf);
+    u8g2.drawStr(0, 25, "ID NV :");
+    u8g2.drawStr(0, 40, "ID:");
+    u8g2.drawStr(0, 55, "Kg:");
+  } while ( u8g2.nextPage() );
+}
+u8g2_uint_t offset;      // current offset for the scrolling text
+u8g2_uint_t width;
+int Scrolling_lcd = 0;
+u8g2_uint_t title_scroll_x = 0;
+void hienthiSetting(char* dataUserDisplay) {
+  u8g2.setFont(u8g2_font_unifont_t_vietnamese1);
+  Serial.print("begin ");
+  Serial.println(millis());
+  u8g2.clearBuffer();
+  u8g2.setCursor(0, 48);
+  if (u8g2.getUTF8Width(dataUserDisplay) > 128) {
+    u8g2.drawStr(Scrolling_lcd, 48, dataUserDisplay);
+    Scrolling_lcd = Scrolling_lcd - 12 ;
+    if (abs(Scrolling_lcd) > u8g2.getUTF8Width(dataUserDisplay))Scrolling_lcd = 0;
+  }
+  Serial.print("end ");
+  u8g2.sendBuffer();
+  //u8g2.updateDisplayArea(10,48,20,20);
+  Serial.println(millis());
+}
 void loop(void) {
-  /*u8g2.clearBuffer();          // clear the internal memory
-  u8g2.setFont(u8g2_font_cu12_tr); // choose a suitable font
-  u8g2.drawStr(0,10,"Hello World!");  // write something to the internal memory
-  u8g2.sendBuffer();          // transfer internal memory to the display*/
-  
-  delay(10000);  
+  //    u8g2.clearBuffer();
+
+  //   hienthiSetting("Pham An ");
+  hienthiSetting("Cá Semi cua pham an nhan la goi ấ ahsdfa asdfaf afasgfqa fafa âf");
+  //  u8g2.sendBuffer();
+
+  delay(800);                          // do some small delay
 }

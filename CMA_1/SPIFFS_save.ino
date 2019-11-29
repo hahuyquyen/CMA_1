@@ -1,4 +1,5 @@
 void deleteFile(fs::FS &fs, const char * path){fs.remove(path);}
+
 void readFile(fs::FS &fs, const char * path,uint32_t len){
     //Serial.printf("Reading : %s , L %lu \n", path,( unsigned long )len);
     File file = fs.open(path);

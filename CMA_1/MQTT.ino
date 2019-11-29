@@ -23,7 +23,7 @@ QoS2 Broker/client Ä‘áº£m báº£m khi gá»Ÿi dá»¯ liá»‡u thÃ¬ 
 }
   */
  
- void connectToMqtt() {
+void connectToMqtt() {
   mqttClient.connect();
 }
 void truyen_mqtt(){
@@ -35,7 +35,7 @@ void truyen_mqtt(){
       doc["s"] = (unsigned long) idDevice;      
       doc["w"] = datatruyen_mqtt.data_weight;
       doc["t"] = now.unixtime();
-      doc["m"] = inforServer.maLoaica[inforServer.userSelectLoaiCa];
+      //doc["m"] = inforServer.maLoaica[inforServer.userSelectLoaiCa];
       doc["c"] = inforServer.maNhaCC[inforServer.userSelectNhaCC];
       doc["p"] = inforServer.maThanhPham[inforServer.userSelectThanhPham];
       char buffer[500];
@@ -67,8 +67,10 @@ void onMqttUnsubscribe(uint16_t packetId) {// printf("Unsubscribe acknowledged: 
 
 
 /*{"t":"3","l":"3","data":[{"i":"5455","n":"nhàn 1"},{"i":"68","n":"nhàn 2"},{"i":"98","n":"nhàn 3"}]}
+{"i":"5455","n":"nhàn 1","g":1}
+ g = 1 hoặc 2 1laf fille 2 la sua ca
 
- * 
+ {"t":"3","l":"3","data":[{"i":"5455","n":"nhàn 1","g":1},{"i":"68","n":"nhàn 2","g":2},{"i":"98","n":"nhàn 3","g":1},,{"i":"98","n":"nhàn 4","g":2}]}
  */
 
 void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties properties, size_t len, size_t index, size_t total) {
@@ -82,8 +84,12 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
   StaticJsonDocument<1500> jsonBuffer;
   DeserializationError error = deserializeJson(jsonBuffer,payload);
   if (error) Serial.println("error json");
-  if ((strcmp(WiFiConf.mqtt_subto1,topic) == 0)||(strcmp(MQTT_TOPIC.configGetId,topic) == 0)){
-        if (jsonBuffer["t"].as<uint8_t>() == 1){
+  else if ((strcmp(WiFiConf.mqtt_subto1,topic) == 0)||(strcmp(MQTT_TOPIC.configGetId,topic) == 0)){
+    /*
+     Nhan thong tin server cai dat ca lam viec
+     */
+        if (!jsonBuffer.containsKey("t")) {return;}
+       /* if (jsonBuffer["t"].as<uint8_t>() == 1){
           inforServer.tongLoaiCa=jsonBuffer["l"].as<uint8_t>();
           strlcpy(inforServer.nameLoaiCa[0], ramChuaChon, sizeof(inforServer.nameLoaiCa[0]));
           for (int i=0;i<inforServer.tongLoaiCa;i++){
@@ -91,12 +97,13 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
             strlcpy(inforServer.nameLoaiCa[i+1], jsonBuffer["data"][i]["n"], sizeof(inforServer.nameLoaiCa[i]));
           }      
         }
-        else if (jsonBuffer["t"].as<uint8_t>() == 2){
-           strlcpy(inforServer.nameSoLo[0], ramChuaChon, sizeof(inforServer.nameSoLo[0]));
+        else */if (jsonBuffer["t"].as<uint8_t>() == 2){
+           strlcpy(inforServer.nameNhaCC[0], ramChuaChon, sizeof(inforServer.nameNhaCC[0]));
           inforServer.tongNhaCC=jsonBuffer["l"].as<uint8_t>();
           for (int i=0;i<inforServer.tongNhaCC;i++){
             inforServer.maNhaCC[i+1]=jsonBuffer["data"][i]["i"].as<uint16_t>();
-            strlcpy(inforServer.nameSoLo[i+1], jsonBuffer["data"][i]["n"], sizeof(inforServer.nameSoLo[i]));
+            inforServer.sttGdSoLo[i+1]=jsonBuffer["data"][i]["g"].as<uint8_t>();
+            strlcpy(inforServer.nameNhaCC[i+1], jsonBuffer["data"][i]["n"], sizeof(inforServer.nameNhaCC[i]));
           }  
         }
         else if (jsonBuffer["t"].as<uint8_t>() == 3){
@@ -104,19 +111,24 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
           inforServer.tongThanhPham=jsonBuffer["l"].as<uint8_t>();
           for (int i=0;i<inforServer.tongThanhPham;i++){
             inforServer.maThanhPham[i+1]=jsonBuffer["data"][i]["i"].as<uint16_t>();
+            inforServer.sttGdThanhPham[i+1]=jsonBuffer["data"][i]["g"].as<uint8_t>();
             strlcpy(inforServer.nameThanhPham[i+1], jsonBuffer["data"][i]["n"], sizeof(inforServer.nameThanhPham[i+1]));
           }
         }  
 
   }
-  if (strcmp(MQTT_TOPIC.dataAck,topic) == 0){
+  else if (strcmp(MQTT_TOPIC.dataAck,topic) == 0){
+    /*
+     Khi Nhan duoc data server bao luu thanh cong goi tin thi sẽ xoa file luu trong sd card
+     */
+      if (!jsonBuffer.containsKey("i")) {return;}
       uint32_t sttData = jsonBuffer["i"].as<uint32_t>();
       uint8_t statusSaveData = jsonBuffer["s"].as<uint8_t>();
       char textToWrite[ 16 ];
       sprintf(textToWrite,"/CMA/%lu", ( unsigned long )sttData);
       if (statusSaveData == 1)deleteFile(SD,textToWrite);
   }
-  if (strcmp(WiFiConf.mqtt_subto3,topic) == 0){printf("vung 3 \n");}
+  else if (strcmp(WiFiConf.mqtt_subto3,topic) == 0){printf("vung 3 \n");}
 }
 
 void onMqttPublish(uint16_t packetId) {

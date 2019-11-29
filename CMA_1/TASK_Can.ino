@@ -8,8 +8,6 @@ void TaskCAN( void * pvParameters ){
     int tam=0;
     unsigned long timeScheduSendCan=0;
     for (;;){
-      Serial.print("Time Task CAN : ");
-      Serial.println(millis());
       if (Serial1.available()){ 
        uint8_t incomingData = Serial1.read();
        if ( incomingData == 0x3D){tam=0;}
@@ -29,7 +27,14 @@ void TaskCAN( void * pvParameters ){
        }
        else {uart_bien[tam++]=incomingData;if(tam>10)tam=0;}  
      }
-      vTaskDelay(25);   
+     vTaskDelay(25); 
+     
+    //  vTaskDelay(5000); 
+    //  printf("Task CAN StackHigh %d, Free Heap = %d\n",uxTaskGetStackHighWaterMark(NULL),ESP.getFreeHeap());     
+      /*
+       Hien thi thong tin cua stack de chinh bo nho
+      task nay can  2048 bo nho stack -> chỉnh 3072 dư 50%
+       */
     }
     vTaskDelete(NULL) ;
 }

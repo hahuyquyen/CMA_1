@@ -59,23 +59,25 @@ void khoiTaoGiaTri(){
     sprintf(MQTT_TOPIC.dataAck, "/data/ack/%lu", ( unsigned long )idDevice) ;
     sprintf(MQTT_TOPIC.configGetId, "/config/%lu", ( unsigned long )idDevice) ;
     strlcpy(inforServer.nameThanhPham[0], ramChoDuLieu, sizeof(inforServer.nameThanhPham[0]));
-    strlcpy(inforServer.nameSoLo[0], ramChoDuLieu, sizeof(inforServer.nameSoLo[0]));
-    strlcpy(inforServer.nameLoaiCa[0], ramChoDuLieu, sizeof(inforServer.nameLoaiCa[0]));
+    strlcpy(inforServer.nameNhaCC[0], ramChoDuLieu, sizeof(inforServer.nameNhaCC[0]));
+  //  strlcpy(inforServer.nameLoaiCa[0], ramChoDuLieu, sizeof(inforServer.nameLoaiCa[0]));
     state_Running_conf::state_Running = state_Running_conf::Setting;
     Status_setting.state_select = 0;
     inforServer.PhanLoaiKV = PhanLoai::Not_Choose;
-    inforServer.userSelectLoaiCa = 0;
+  //  inforServer.userSelectLoaiCa = 0;
     inforServer.userSelectNhaCC = 0;
     inforServer.userSelectThanhPham = 0;
     inforServer.tongThanhPham = 0;
     inforServer.tongNhaCC = 0;
-    inforServer.tongLoaiCa = 0;
-    inforServer.maLoaica[0]=0;
+   // inforServer.tongLoaiCa = 0;
+  //  inforServer.maLoaica[0]=0;
     inforServer.maNhaCC[0]=0;
     inforServer.maThanhPham[0]=0;
 }
 void setup()
-{   Queue_can = xQueueCreate(5,sizeof(Data_CAN));
+{       pinMode(pinPower, OUTPUT);
+    digitalWrite(pinPower, HIGH);
+    Queue_can = xQueueCreate(5,sizeof(Data_CAN));
     Queue_RFID= xQueueCreate(5,sizeof(Data_RFID));
     Queue_RFID_NV= xQueueCreate(5,sizeof(Data_RFID));
     Queue_mqtt = xQueueCreate(10,sizeof(Data_TH));
@@ -88,6 +90,7 @@ void setup()
     xSignal_Display_checkdone = xSemaphoreCreateCounting( 2, 0 );
     xreset_id_nv = xSemaphoreCreateCounting( 2, 0 );
     xResetRfidMaRo = xSemaphoreCreateCounting( 2, 0 );
+
     EEPROM.begin(1024);
     WiFi.disconnect(true);
     if(!SPIFFS.begin(true)){printf("An Error has occurred while mounting SPIFFS\n");}
@@ -121,7 +124,7 @@ void setup()
     xTaskCreatePinnedToCore(
                         TaskRFID,   /* Function to implement the task */
                         "TaskRFID", /* Name of the task */
-                        8192,      /* Stack size in words */
+                        3072,      /* Stack size in words */
                         NULL,       /* Task input parameter */
                         15,          /* Priority of the task */
                         NULL,       /* Task handle. */
@@ -129,7 +132,7 @@ void setup()
     xTaskCreatePinnedToCore(
                         TaskCAN,   /* Function to implement the task */
                         "TaskCAN", /* Name of the task */
-                        8192,      /* Stack size in words */
+                        3072,      /* Stack size in words */
                         NULL,       /* Task input parameter */
                         14,          /* Priority of the task */
                         NULL,       /* Task handle. */
@@ -145,7 +148,7 @@ void setup()
     xTaskCreatePinnedToCore(
                         http_re,   /* Function to implement the task */
                         "http_re", /* Name of the task */
-                        8192,      /* Stack size in words */
+                        4096,      /* Stack size in words */
                         NULL,       /* Task input parameter */
                         13,          /* Priority of the task */
                         NULL,       /* Task handle. */
@@ -153,7 +156,7 @@ void setup()
   xTaskCreatePinnedToCore(
                         Check_button,   /* Function to implement the task */
                         "Check_button", /* Name of the task */
-                        2048,      /* Stack size in words */
+                        3072,      /* Stack size in words */
                         NULL,       /* Task input parameter */
                         11,          /* Priority of the task */
                         NULL,       /* Task handle. */
@@ -168,7 +171,7 @@ void setup()
   mqttClient.setServer(WiFiConf.mqtt_server, atoi(WiFiConf.mqtt_port));       
   mqttClient.setCredentials(WiFiConf.mqtt_user,WiFiConf.mqtt_pass);      
 //  printf("END set \n");
-    root_CMA = SD.open("/CMA");
+  root_CMA = SD.open("/CMA");
 }
 /*
  * Main Loop luÃ´n cháº¡y Core 1
@@ -199,7 +202,7 @@ void loop()
   }
   else if ((status_mqtt_connect)&&((xTaskGetTickCount() - timeCheckMQTT_SD >timeTruyenMQTT))){
       /*
-       * Check nếu có file còn thì đọc và gửi MQTT
+       * Check nếu có file còn lưu trong thu muc SD card thì đọc và gửi MQTT den server
        */
        timeCheckMQTT_SD=xTaskGetTickCount();
        if (statusGetAllSD == false){
@@ -221,16 +224,18 @@ void loop()
    * Lịch gửi server yêu cầu config
    */
   if ((status_mqtt_connect)&&(state_Running_conf::state_Running == state_Running_conf::Setting)){  
+    /*
+     */
     if((xTaskGetTickCount() - timeFirstGetDataFromServer>30000)|| (timeFirstGetDataFromServer == 0)){
       timeFirstGetDataFromServer = xTaskGetTickCount();
       StaticJsonDocument<35> doc;
       char buffer[35];
       doc["i"]= idDevice;
-      if (inforServer.tongLoaiCa == 0){
+      /*if (inforServer.tongLoaiCa == 0){
         doc["t"]= 1 ;
         serializeJson(doc, buffer);
         mqttClient.publish("/config", 0, true,buffer); 
-      }
+      }*/
       if (inforServer.tongThanhPham == 0){
         doc["t"]= 3 ;
         serializeJson(doc, buffer);

@@ -3,6 +3,7 @@
  * 
  * 
  */
+
 const char ramChoDuLieu[] ="Chờ Dữ Liệu"; // dung can lây FPSTR(ramChoDuLieu) và strlcpy_P  tiet kiem RAM cho heap memory
 const char ramChuaChon[] ="Chưa Chọn";
 const char htmlPortMQTT[] PROGMEM ="PortMQTT"; // dung can lây FPSTR(htmlPortMQTT) và strlcpy_P  tiet kiem RAM cho heap memory
@@ -48,22 +49,34 @@ struct setting_button{
   uint8_t state_select;
 }Status_setting;
 
+struct variLcdUpdateConf{
+  int numScroll;
+  boolean updateLCD ;
+  uint8_t stateDisplayLCD;
+}variLcdUpdate={
+  0,
+  false,
+  0
+};
 struct inforServerStruct{
   PhanLoai::PhanLoai PhanLoaiKV;
-  uint8_t tongLoaiCa; 
+  //uint8_t tongLoaiCa; 
   uint8_t tongNhaCC;   
   uint8_t tongThanhPham; 
   uint8_t userSelectNhaCC;
-  uint8_t userSelectLoaiCa;
+  //uint8_t userSelectLoaiCa;
   uint8_t userSelectThanhPham;
-  uint16_t maLoaica[20];
+ // uint16_t maLoaica[20];
   uint16_t maThanhPham[20];
   uint16_t maNhaCC[20];
-  char nameLoaiCa[20][50];
-  char nameSoLo[20][50];
-  char nameThanhPham[20][50];
+  uint8_t sttGdSoLo[20]; 
+  uint8_t sttGdThanhPham[20]; 
+//  char nameLoaiCa[20][80];
+  char nameNhaCC[20][100];
+  char nameThanhPham[20][100];
 }inforServer={
   PhanLoai::Not_Choose,
+  0,
   0,
   0,
   0,

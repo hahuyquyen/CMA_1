@@ -35,8 +35,7 @@ void TaskRFID( void * pvParameters ){
     nano.set_out_mode(1,5000);
     nano.set_time_ner(0x05,5000);
     nano.set_reset_reader(2000);
-    for (;;){Serial.print("Time Task RFID : ");
-      Serial.println(millis());
+    for (;;){
       /*
        * Chuyển task 24ms
        */
@@ -48,7 +47,7 @@ void TaskRFID( void * pvParameters ){
                     myEPClength = sizeof(myEPC);
                     if (nano.parseResponse(myEPC,myEPClength)){
                               if (myEPC[0] == MaRo_RFID){ 
-                                array_to_string(&myEPC[5], 7, Data_rfid.id_RFID); //0->12 5->7
+                                array_to_string(&myEPC[0], 12, Data_rfid.id_RFID); //0->12 5->7
                                 /*
                                  * nếu là khu vực cân 2 lần thì sẽ lúc nào cũng gửi về
                                  */
@@ -66,7 +65,7 @@ void TaskRFID( void * pvParameters ){
                               }
                               
                               else if (myEPC[0] == MaNV_RFID){ 
-                                 array_to_string(&myEPC[5], 7, Data_rfid_nv.id_RFID);
+                                 array_to_string(&myEPC[0], 12, Data_rfid_nv.id_RFID);
                                  if (strcmp(Data_rfid_nv.id_RFID,Data_rfid_nv.id_RFID_Old) != 0){
                                     strncpy( Data_rfid_nv.id_RFID_Old,Data_rfid_nv.id_RFID, sizeof(Data_rfid_nv.id_RFID));
                                     xQueueSend( Queue_RFID_NV, &Data_rfid_nv, xTicksToWait );
@@ -81,6 +80,8 @@ void TaskRFID( void * pvParameters ){
                        strncpy( Data_rfid.id_RFID_Old,"", sizeof(""));
                   }
                 vTaskDelay(20);
+                     // vTaskDelay(5000); 
+     // printf("Task RFID StackHigh %d, Free Heap = %d\n",uxTaskGetStackHighWaterMark(NULL),ESP.getFreeHeap());    
     }
     vTaskDelete(NULL) ;
 }
