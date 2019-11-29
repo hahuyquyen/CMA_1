@@ -27,7 +27,14 @@ void TaskCAN( void * pvParameters ){
        }
        else {uart_bien[tam++]=incomingData;if(tam>10)tam=0;}  
      }
-      vTaskDelay(25);   
+     vTaskDelay(25); 
+     
+    //  vTaskDelay(5000); 
+    //  printf("Task CAN StackHigh %d, Free Heap = %d\n",uxTaskGetStackHighWaterMark(NULL),ESP.getFreeHeap());     
+      /*
+       Hien thi thong tin cua stack de chinh bo nho
+      task nay can  2048 bo nho stack -> chỉnh 3072 dư 50%
+       */
     }
     vTaskDelete(NULL) ;
 }

@@ -8,83 +8,13 @@
  * 
  * 
  */
-#include <EasyButton.h>
-boolean update_lcd_setting = false;
-int Scrolling_lcd = 0;
-const char* LCD_setting = "Cài Đặt";
-EasyButton button_left(button_left_pin,200,true);
-EasyButton button_right(button_right_pin,200,true);
-EasyButton button_ok(button_ok_pin,200,true);
-EasyButton buttonExit(buttonExitPin,200,true);
-EasyButton buttonError(buttonErrorPin,200,true);\
-EasyButton buttonPower(pinReadPower,200,true);
 
-void onPressedPower() {
- if (xTaskGetTickCount() > 1000){digitalWrite(pinPower, LOW);}
-}
-void onPressed_left() {
-  if ((Status_setting.state_select == 0)&&(inforServer.PhanLoaiKV > 0)){ inforServer.PhanLoaiKV = static_cast<PhanLoai::PhanLoai>((inforServer.PhanLoaiKV - 1) % (PhanLoai::LANG_OUT+1));}
-  //else  if ((Status_setting.state_select == 1)&&(inforServer.userSelectLoaiCa > 0)){ inforServer.userSelectLoaiCa = inforServer.userSelectLoaiCa - 1 ;}
-  else if ((Status_setting.state_select == 2)&&(inforServer.userSelectNhaCC > 0)){inforServer.userSelectNhaCC = inforServer.userSelectNhaCC-1  ;}
-  else if ((Status_setting.state_select == 3)&&(inforServer.userSelectThanhPham > 0)){inforServer.userSelectThanhPham = inforServer.userSelectThanhPham - 1; }
-  Scrolling_lcd = 0;
-  update_lcd_setting = true;
-}
-void onPressed_right() {
-  if (Status_setting.state_select == 0){inforServer.PhanLoaiKV = static_cast<PhanLoai::PhanLoai>((inforServer.PhanLoaiKV + 1) % (PhanLoai::LANG_OUT+1));}
- // else if ((Status_setting.state_select == 1)&&(inforServer.tongLoaiCa > 0)){inforServer.userSelectLoaiCa = (inforServer.userSelectLoaiCa > inforServer.tongLoaiCa )? 0 : (inforServer.userSelectLoaiCa + 1); }
-  else if ((Status_setting.state_select == 2)&&(inforServer.tongNhaCC > 0)){
-     for (int tangTam = 0 ; tangTam < inforServer.tongNhaCC ; tangTam ++){
-                  if ((inforServer.PhanLoaiKV == PhanLoai::Fil_IN)||(inforServer.PhanLoaiKV == PhanLoai::Fil_OUT)){    
-                                    inforServer.userSelectNhaCC = (inforServer.userSelectNhaCC > inforServer.tongNhaCC) ? 0 : (inforServer.userSelectNhaCC + 1);
-                                    if (inforServer.userSelectNhaCC == 0) break;   // quua 1 vong
-                                    if (inforServer.sttGdSoLo[inforServer.userSelectNhaCC] == 1) {break;} // dung du lieu cua khu fille
-                  }
-                  else if ((inforServer.PhanLoaiKV == PhanLoai::LANG_IN)||(inforServer.PhanLoaiKV == PhanLoai::LANG_OUT)){    
-                          inforServer.userSelectNhaCC = (inforServer.userSelectNhaCC > inforServer.tongNhaCC) ? 0 : (inforServer.userSelectNhaCC + 1);
-                          if (inforServer.userSelectNhaCC == 0) break;
-                          if (inforServer.sttGdSoLo[inforServer.userSelectNhaCC] == 2) {break;}
-                  }
-    }
-  }
-  else if ((Status_setting.state_select == 3)&&(inforServer.tongThanhPham > 0)){
-        for (int tangTam = 0 ; tangTam < inforServer.tongThanhPham ; tangTam ++){
-                          if ((inforServer.PhanLoaiKV == PhanLoai::Fil_IN)||(inforServer.PhanLoaiKV == PhanLoai::Fil_OUT)){    
-                               inforServer.userSelectThanhPham = (inforServer.userSelectThanhPham > inforServer.tongThanhPham) ? 0 : (inforServer.userSelectThanhPham + 1);
-                              if (inforServer.userSelectThanhPham == 0) break;
-                              if (inforServer.sttGdThanhPham[inforServer.userSelectThanhPham] == 1) {break;}
-                          }
-                          else if ((inforServer.PhanLoaiKV == PhanLoai::LANG_IN)||(inforServer.PhanLoaiKV == PhanLoai::LANG_OUT)){    
-                              inforServer.userSelectThanhPham = (inforServer.userSelectThanhPham > inforServer.tongThanhPham) ? 0 : (inforServer.userSelectThanhPham + 1);
-                              if (inforServer.userSelectThanhPham == 0) break;
-                              if (inforServer.sttGdThanhPham[inforServer.userSelectThanhPham] == 2) {break;}
-                          }
-          }
-  }
-  Scrolling_lcd = 0;
-  update_lcd_setting = true;
-}
-void onPressed_ok() {
-  if ((Status_setting.state_select == 0)&& (inforServer.PhanLoaiKV == 0)) return;
- // if ((Status_setting.state_select == 1)&& (inforServer.userSelectLoaiCa == 0)) return;
-  else if ((Status_setting.state_select == 2)&& (inforServer.userSelectNhaCC == 0)) return;
-  else if ((Status_setting.state_select == 3)&& (inforServer.userSelectThanhPham == 0)) return;
-  if  ((Status_setting.state_select == 0)&& ((inforServer.PhanLoaiKV == PhanLoai::Fil_OUT )||(inforServer.PhanLoaiKV == PhanLoai::LANG_OUT ))) {Status_setting.state_select = 3;
-  }
-  else{Status_setting.state_select = (Status_setting.state_select == 2) ? 4:(Status_setting.state_select == 0 )? 2 : Status_setting.state_select+ 1;}
-  //else{Status_setting.state_select = (Status_setting.state_select == 2) ? 4:Status_setting.state_select + 1;}
-  if (Status_setting.state_select > 4){state_Running_conf::state_Running = state_Running_conf::Running;}
-  Scrolling_lcd = 0;
-  update_lcd_setting = true;
-}
-void onPressedExit() {
-  Status_setting.state_select = 0 ;
-  state_Running_conf::state_Running = state_Running_conf::Setting;
-  Serial.println("onPressed_vitri");
-}
-void onPressedError() {
-Serial.println("onPressed");
-}
+
+
+const char* LCD_setting = "Cài Đặt";
+
+
+
 void LCD_print_KV(uint8_t vitri = 48){
           char stringdem1[] = "Fille-Đầu Vào";
           char stringdem2[] = "Fille-Đầu Ra";
@@ -98,15 +28,25 @@ void LCD_print_KV(uint8_t vitri = 48){
             case PhanLoai::LANG_OUT :u8g2.setCursor(((128 - (u8g2.getUTF8Width(stringdem4))) / 2), vitri); u8g2.print(stringdem4);break;
           }
 }
-void hienthiSetting(char* dataDisplay,char* dataUserDisplay){
-          u8g2.setCursor(((128 - (u8g2.getUTF8Width(LCD_setting))) / 2), 16);
-          u8g2.print(LCD_setting);
-          u8g2.setCursor(((128 - (u8g2.getUTF8Width(dataDisplay))) / 2), 32);
-          u8g2.print(dataDisplay);
+void hienthiSetting(char* dataDisplay = NULL,char* dataUserDisplay = NULL){ 
+          if (dataDisplay != NULL ){
+                  u8g2.setCursor(((128 - (u8g2.getUTF8Width(LCD_setting))) / 2), 16);
+                  u8g2.print(LCD_setting);
+                  u8g2.setCursor(((128 - (u8g2.getUTF8Width(dataDisplay))) / 2), 32);
+                  u8g2.print(dataDisplay);
+          }
           if (u8g2.getUTF8Width(dataUserDisplay) > 128){
-                u8g2.drawUTF8(Scrolling_lcd, 48, dataUserDisplay);
-                Scrolling_lcd = Scrolling_lcd - 10 ;
-                if (Scrolling_lcd>128)Scrolling_lcd=0;
+                u8g2.drawUTF8(variLcdUpdate.numScroll, 48, dataUserDisplay);
+                variLcdUpdate.numScroll = variLcdUpdate.numScroll - 15 ;
+                if (abs(variLcdUpdate.numScroll) > u8g2.getUTF8Width(dataUserDisplay))variLcdUpdate.numScroll=0;
+          }
+          else u8g2.drawUTF8(((128 - (u8g2.getUTF8Width(dataUserDisplay))) / 2), 48, dataUserDisplay);  
+}
+void hienthiRunning(char* dataUserDisplay){
+          if (u8g2.getUTF8Width(dataUserDisplay) > 128){
+                u8g2.drawUTF8(variLcdUpdate.numScroll, 48, dataUserDisplay);
+                variLcdUpdate.numScroll = variLcdUpdate.numScroll - 15 ;
+                if (abs(variLcdUpdate.numScroll) > u8g2.getUTF8Width(dataUserDisplay))variLcdUpdate.numScroll=0;
           }
           else u8g2.drawUTF8(((128 - (u8g2.getUTF8Width(dataUserDisplay))) / 2), 48, dataUserDisplay);  
 }
@@ -144,12 +84,8 @@ void LCD_thong_tin(uint8_t chedo_HT,Data_TH* Data_TH  , uint8_t daucham = 0){
           u8g2.print(F("Kg:"));   
           u8g2.print(can_data);  
           u8g2.setCursor(2, 48);  
-           if ((inforServer.PhanLoaiKV == PhanLoai::Fil_IN ) || (inforServer.PhanLoaiKV == PhanLoai::LANG_IN )){
-             u8g2.print(inforServer.nameNhaCC[inforServer.userSelectNhaCC]);  
-            // u8g2.setCursor(2, 60);
-            // u8g2.print(inforServer.nameLoaiCa[inforServer.userSelectLoaiCa]);  
-           }
-           else {u8g2.print(inforServer.nameThanhPham[inforServer.userSelectThanhPham]);      }               
+          if ((inforServer.PhanLoaiKV == PhanLoai::Fil_IN ) || (inforServer.PhanLoaiKV == PhanLoai::LANG_IN )){hienthiSetting(NULL,inforServer.nameNhaCC[inforServer.userSelectNhaCC]);}
+          else {hienthiSetting(NULL, inforServer.nameThanhPham[inforServer.userSelectThanhPham]);}               
    }
    else if (chedo_HT == 2) {
           char stringdem[] = "KHU VỰC CÂN";
@@ -174,12 +110,8 @@ void LCD_thong_tin(uint8_t chedo_HT,Data_TH* Data_TH  , uint8_t daucham = 0){
           u8g2.print(xacnhan);
           LCD_print_KV(32);
           u8g2.setCursor(2, 48); 
-           if ((inforServer.PhanLoaiKV == PhanLoai::Fil_IN ) || (inforServer.PhanLoaiKV == PhanLoai::LANG_IN )){  
-             u8g2.print(inforServer.nameNhaCC[inforServer.userSelectNhaCC]);  
-           //  u8g2.setCursor(2, 60);
-            // u8g2.print(inforServer.nameLoaiCa[inforServer.userSelectLoaiCa]);  
-           }
-           else {u8g2.print(inforServer.nameThanhPham[inforServer.userSelectThanhPham]); }    
+          if ((inforServer.PhanLoaiKV == PhanLoai::Fil_IN ) || (inforServer.PhanLoaiKV == PhanLoai::LANG_IN )){hienthiSetting(NULL,inforServer.nameNhaCC[inforServer.userSelectNhaCC]);}
+          else {hienthiSetting(NULL, inforServer.nameThanhPham[inforServer.userSelectThanhPham]);}   
    }
    u8g2.sendBuffer();  
 }
@@ -193,43 +125,33 @@ void Display( void * pvParameters ){
     unsigned long _time_blink_LCD=0;
     uint16_t Time_blink= 1000;
     uint16_t Time_check= 1500;  
-    SPI.setClockDivider( SPI_CLOCK_DIV32 );
+   // SPI.setClockDivider( SPI_CLOCK_DIV32 );
     u8g2.begin();
     u8g2.enableUTF8Print();
+    u8g2.setBusClock(600000);
     LCD_thong_tin(2,&Data_TH);
-    uint8_t state_LCD_Display = 1;
+    variLcdUpdate.stateDisplayLCD = 1;
     uint8_t daucham_lcd = 0;
-    button_left.begin();
-    button_right.begin();
-    buttonExit.begin();
-    button_ok.begin();
-    buttonError.begin();
-    buttonPower.begin();
-    button_left.onPressed(onPressed_left);
-    button_right.onPressed(onPressed_right);
-    buttonExit.onPressed(onPressedExit);
-    button_ok.onPressed(onPressed_ok);
-    buttonError.onPressed(onPressedError);
-    buttonPower.onPressed(onPressedPower);
+
     unsigned long timeoutLcdLangDaIn = 0;
    for (;;){
       /*
        * 30ms
        */
       if (state_Running_conf::state_Running == state_Running_conf::Running){
-                if(xQueueReceive( Queue_display, &Data_TH,  ( TickType_t ) 1 )== pdPASS ){ state_LCD_Display = 0;if ((strcmp(Data_TH.id_RFID_NV,"x") != 0)&& (inforServer.PhanLoaiKV ==PhanLoai::LANG_IN )) {timeoutLcdLangDaIn= xTaskGetTickCount();}}     
+                if(xQueueReceive( Queue_display, &Data_TH,  ( TickType_t ) 1 )== pdPASS ){ variLcdUpdate.stateDisplayLCD = 0;if ((strcmp(Data_TH.id_RFID_NV,"x") != 0)&& (inforServer.PhanLoaiKV ==PhanLoai::LANG_IN )) {timeoutLcdLangDaIn= xTaskGetTickCount();}}     
                 if(xSemaphoreTake(xSignal_Display_check, 1)){timeoutDisplay = xTaskGetTickCount();
                }
                 if(xSemaphoreTake(xSignal_Display_checkdone, 1)){ //Che do IN qua timeout se tat 
-                  state_LCD_Display = 1;
+                  variLcdUpdate.stateDisplayLCD = 1;
                   
                 }
                 switch (inforServer.PhanLoaiKV){ //inforServer.PhanLoaiKV == PhanLoai::LANG_OUT
-                      case PhanLoai::Not_Choose : if ((xTaskGetTickCount() - timeoutDisplay > Time_check)&&(timeoutDisplay > 0 )){digitalWrite(4,LOW);state_LCD_Display = 1;timeoutDisplay=0;}break;
-                      case PhanLoai::Fil_OUT : if ((xTaskGetTickCount() - timeoutDisplay > Time_check)&&(timeoutDisplay > 0 )){digitalWrite(4,LOW);state_LCD_Display = 1;timeoutDisplay=0;}break;
-                      case PhanLoai::Fil_IN : if ((xTaskGetTickCount() - timeoutDisplay > Time_check)&&(timeoutDisplay > 0 )){digitalWrite(4,LOW);state_LCD_Display = 1;timeoutDisplay=0;}break;
-                      case PhanLoai::LANG_OUT : if((xTaskGetTickCount() - timeoutDisplay > Time_check)&&(timeoutDisplay > 0 )){digitalWrite(4,LOW);state_LCD_Display = 1;timeoutDisplay=0;}break;
-                      case PhanLoai::LANG_IN : if ((xTaskGetTickCount() - timeoutLcdLangDaIn > Time_check)&&(timeoutLcdLangDaIn > 0 )){digitalWrite(4,LOW);state_LCD_Display = 1;timeoutLcdLangDaIn=0;}break;
+                      case PhanLoai::Not_Choose : if ((xTaskGetTickCount() - timeoutDisplay > Time_check)&&(timeoutDisplay > 0 )){digitalWrite(4,LOW);variLcdUpdate.stateDisplayLCD = 1;timeoutDisplay=0;}break;
+                      case PhanLoai::Fil_OUT : if ((xTaskGetTickCount() - timeoutDisplay > Time_check)&&(timeoutDisplay > 0 )){digitalWrite(4,LOW);variLcdUpdate.stateDisplayLCD = 1;timeoutDisplay=0;}break;
+                      case PhanLoai::Fil_IN : if ((xTaskGetTickCount() - timeoutDisplay > Time_check)&&(timeoutDisplay > 0 )){digitalWrite(4,LOW);variLcdUpdate.stateDisplayLCD = 1;timeoutDisplay=0;}break;
+                      case PhanLoai::LANG_OUT : if((xTaskGetTickCount() - timeoutDisplay > Time_check)&&(timeoutDisplay > 0 )){digitalWrite(4,LOW);variLcdUpdate.stateDisplayLCD = 1;timeoutDisplay=0;}break;
+                      case PhanLoai::LANG_IN : if ((xTaskGetTickCount() - timeoutLcdLangDaIn > Time_check)&&(timeoutLcdLangDaIn > 0 )){digitalWrite(4,LOW);variLcdUpdate.stateDisplayLCD = 1;timeoutLcdLangDaIn=0;}break;
                       default: break;
                 }
                     
@@ -240,14 +162,13 @@ void Display( void * pvParameters ){
                 if (xTaskGetTickCount()- getTimeBlinkLed > Time_blink){
                   getTimeBlinkLed = xTaskGetTickCount();
                   status_led=!status_led;
-                  digitalWrite(2,status_led);
                 }
                 printDebugHeap();
-                switch (state_LCD_Display){
+                switch (variLcdUpdate.stateDisplayLCD){
                   case 0:
                         
                         LCD_thong_tin(0,&Data_TH,daucham_lcd);
-                        state_LCD_Display=4;
+                        variLcdUpdate.stateDisplayLCD=4;
                         break;
                   case 1:
                         if (xTaskGetTickCount()- _time_blink_LCD > 800){
@@ -258,25 +179,17 @@ void Display( void * pvParameters ){
                         }
                         break;
                   case 2:
-                        state_LCD_Display=4;
+                        variLcdUpdate.stateDisplayLCD=4;
                         break;
                   default: break;
                 }
       }
-      else if ((xTaskGetTickCount()- _time_blink_LCD > 800)|| update_lcd_setting ){
-                update_lcd_setting = false;
+      else if ((xTaskGetTickCount()- _time_blink_LCD > 1000)|| variLcdUpdate.updateLCD ){
+                variLcdUpdate.updateLCD = false;
                _time_blink_LCD = xTaskGetTickCount();
                LCD_thong_tin(Status_setting.state_select + 2,&Data_TH,daucham_lcd);
       }
       printDebugHeap();
-      if (state_Running_conf::state_Running == state_Running_conf::Setting){
-        button_left.read();
-        button_right.read();
-        button_ok.read();
-      }
-      buttonExit.read();
-      buttonError.read();
-      buttonPower.read();
       vTaskDelay(20);
     }
     vTaskDelete(NULL) ;
@@ -307,3 +220,85 @@ double  8   %lf
 long double 12    %Lf
 We can use the sizeof() operator to check the size of a variable. See the following C program for
  */
+
+
+
+ /*
+ Chinh cgho phu hop ESP32 FreeRTOS
+  uint8_t u8x8_gpio_and_delay_espidf(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, U8X8_UNUSED void *arg_ptr)
+{
+    uint8_t i;
+    switch(msg)
+    {
+    case U8X8_MSG_GPIO_AND_DELAY_INIT:
+        for( i = 0; i < U8X8_PIN_CNT; i++ )
+            if ( u8x8->pins[i] != U8X8_PIN_NONE )
+            {
+            bool success;
+                if ( i < U8X8_PIN_OUTPUT_CNT )
+                {
+          success = u8x8_setpinoutput_espidf(u8x8->pins[i]);
+                }
+                else
+                {
+          success = u8x8_setpininput_espidf(u8x8->pins[i]);
+                }
+                if (!success) return 0;
+            }
+
+        break;
+
+    case U8X8_MSG_DELAY_NANO:
+        ets_delay_us(arg_int==0?0:1);
+        break;
+
+    case U8X8_MSG_DELAY_10MICRO:
+        break;
+
+    case U8X8_MSG_DELAY_100NANO:
+        break;
+
+    case U8X8_MSG_DELAY_MILLI:
+        vTaskDelay(arg_int);
+        break;
+    case U8X8_MSG_DELAY_I2C:
+        ets_delay_us(arg_int<=2?5:2);
+        break;
+    case U8X8_MSG_GPIO_I2C_CLOCK:
+    case U8X8_MSG_GPIO_I2C_DATA:
+    auto pin = u8x8_GetPinValue(u8x8, msg);
+        if ( arg_int == 0 )
+        {
+            if (
+            (!u8x8_setpinoutput_espidf(pin)) ||
+            (gpio_set_level(pin, 0) != ESP_OK)
+            ) return 0;
+        }
+        else
+        {
+            if (!u8x8_setpininput_espidf(pin)) return 0;
+        }
+        break;
+    default:
+        if ( msg >= U8X8_MSG_GPIO(0) )
+        {
+            i = u8x8_GetPinValue(u8x8, msg);
+            if ( i != U8X8_PIN_NONE )
+            {
+                if ( u8x8_GetPinIndex(u8x8, msg) < U8X8_PIN_OUTPUT_CNT )
+                {
+                    gpio_set_level(i, arg_int);
+                }
+                else
+                {
+                    u8x8_SetGPIOResult(u8x8, gpio_get_level(i));
+                }
+            }
+            break;
+        }
+
+        return 0;
+    }
+    return 1;
+}
+  */

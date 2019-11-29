@@ -3,6 +3,7 @@
  * 
  * 
  */
+
 const char ramChoDuLieu[] ="Chờ Dữ Liệu"; // dung can lây FPSTR(ramChoDuLieu) và strlcpy_P  tiet kiem RAM cho heap memory
 const char ramChuaChon[] ="Chưa Chọn";
 const char htmlPortMQTT[] PROGMEM ="PortMQTT"; // dung can lây FPSTR(htmlPortMQTT) và strlcpy_P  tiet kiem RAM cho heap memory
@@ -48,6 +49,15 @@ struct setting_button{
   uint8_t state_select;
 }Status_setting;
 
+struct variLcdUpdateConf{
+  int numScroll;
+  boolean updateLCD ;
+  uint8_t stateDisplayLCD;
+}variLcdUpdate={
+  0,
+  false,
+  0
+};
 struct inforServerStruct{
   PhanLoai::PhanLoai PhanLoaiKV;
   //uint8_t tongLoaiCa; 

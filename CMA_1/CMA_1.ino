@@ -124,7 +124,7 @@ void setup()
     xTaskCreatePinnedToCore(
                         TaskRFID,   /* Function to implement the task */
                         "TaskRFID", /* Name of the task */
-                        8192,      /* Stack size in words */
+                        3072,      /* Stack size in words */
                         NULL,       /* Task input parameter */
                         15,          /* Priority of the task */
                         NULL,       /* Task handle. */
@@ -132,7 +132,7 @@ void setup()
     xTaskCreatePinnedToCore(
                         TaskCAN,   /* Function to implement the task */
                         "TaskCAN", /* Name of the task */
-                        8192,      /* Stack size in words */
+                        3072,      /* Stack size in words */
                         NULL,       /* Task input parameter */
                         14,          /* Priority of the task */
                         NULL,       /* Task handle. */
@@ -148,7 +148,7 @@ void setup()
     xTaskCreatePinnedToCore(
                         http_re,   /* Function to implement the task */
                         "http_re", /* Name of the task */
-                        8192,      /* Stack size in words */
+                        4096,      /* Stack size in words */
                         NULL,       /* Task input parameter */
                         13,          /* Priority of the task */
                         NULL,       /* Task handle. */
@@ -156,7 +156,7 @@ void setup()
   xTaskCreatePinnedToCore(
                         Check_button,   /* Function to implement the task */
                         "Check_button", /* Name of the task */
-                        2048,      /* Stack size in words */
+                        3072,      /* Stack size in words */
                         NULL,       /* Task input parameter */
                         11,          /* Priority of the task */
                         NULL,       /* Task handle. */

@@ -69,6 +69,8 @@ void onMqttUnsubscribe(uint16_t packetId) {// printf("Unsubscribe acknowledged: 
 /*{"t":"3","l":"3","data":[{"i":"5455","n":"nhàn 1"},{"i":"68","n":"nhàn 2"},{"i":"98","n":"nhàn 3"}]}
 {"i":"5455","n":"nhàn 1","g":1}
  g = 1 hoặc 2 1laf fille 2 la sua ca
+
+ {"t":"3","l":"3","data":[{"i":"5455","n":"nhàn 1","g":1},{"i":"68","n":"nhàn 2","g":2},{"i":"98","n":"nhàn 3","g":1},,{"i":"98","n":"nhàn 4","g":2}]}
  */
 
 void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties properties, size_t len, size_t index, size_t total) {

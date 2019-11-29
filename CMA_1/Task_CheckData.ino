@@ -127,6 +127,8 @@ void http_re( void * pvParameters ){
     }
       
     vTaskDelay(10);
+       //   vTaskDelay(5000); 
+   //   printf("Task CHECK StackHigh %d, Free Heap = %d\n",uxTaskGetStackHighWaterMark(NULL),ESP.getFreeHeap());    
     }
     vTaskDelete(NULL) ;
 }
