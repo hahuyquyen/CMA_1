@@ -1,10 +1,10 @@
 #include <EasyButton.h>
-EasyButton button_left(button_left_pin,200,true);
-EasyButton button_right(button_right_pin,200,true);
-EasyButton button_ok(button_ok_pin,200,true);
-EasyButton buttonExit(buttonExitPin,200,true);
-EasyButton buttonError(buttonErrorPin,200,true);
-EasyButton buttonPower(pinReadPower,200,true);
+EasyButton button_left(button_left_pin,80,true);
+EasyButton button_right(button_right_pin,80,true);
+EasyButton button_ok(button_ok_pin,80,true);
+EasyButton buttonExit(buttonExitPin,80,true);
+EasyButton buttonError(buttonErrorPin,80,true);
+EasyButton buttonPower(pinReadPower,80,true);
 void onPressedPower() {
  if (xTaskGetTickCount() > 1000){digitalWrite(pinPower, LOW);}
 }
