@@ -1,3 +1,21 @@
+
+/*
+Vào thu vien sua file u8g2.h chỗ khai bao 16 bit de xu lý chuoi lon
+/*
+  The following macro enables 16 Bit mode. 
+  Without defining this macro all calulations are done with 8 Bit (1 Byte) variables.
+  Especially on AVR architecture, this will save some space. 
+  If this macro is defined, then U8g2 will switch to 16 Bit mode.
+  Use 16 Bit mode for any display with more than 240 pixel in one 
+  direction.
+*/
+//#define U8G2_16BIT
+
+
+
+ 
+ */
+
 #include <Arduino.h>
 #include <U8g2lib.h>
 
@@ -11,9 +29,10 @@
 U8G2_ST7920_128X64_F_HW_SPI u8g2(U8G2_R0,/*CS=*/ U8X8_PIN_NONE,/*CS=*/ U8X8_PIN_NONE);// 
 void setup(void) {
   Serial.begin(115200);
-    SPI.setClockDivider( SPI_CLOCK_DIV32 );
+  //  SPI.setClockDivider( SPI_CLOCK_DIV32 );
     u8g2.begin();
     u8g2.enableUTF8Print();
+    u8g2.setBusClock(10000000);
  u8g2.clearBuffer();
 
   u8g2.firstPage();

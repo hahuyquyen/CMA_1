@@ -34,21 +34,21 @@ void onPressed_right() {
   if (Status_setting.state_select == 0){inforServer.PhanLoaiKV = static_cast<PhanLoai::PhanLoai>((inforServer.PhanLoaiKV + 1) % (PhanLoai::LANG_OUT+1));}
  // else if ((Status_setting.state_select == 1)&&(inforServer.tongLoaiCa > 0)){inforServer.userSelectLoaiCa = (inforServer.userSelectLoaiCa > inforServer.tongLoaiCa )? 0 : (inforServer.userSelectLoaiCa + 1); }
   else if ((Status_setting.state_select == 2)&&(inforServer.tongNhaCC > 0)){
-    while(true){
+     for (int tangTam = 0 ; tangTam < inforServer.tongNhaCC ; tangTam ++){
                   if ((inforServer.PhanLoaiKV == PhanLoai::Fil_IN)||(inforServer.PhanLoaiKV == PhanLoai::Fil_OUT)){    
-                  inforServer.userSelectNhaCC = (inforServer.userSelectNhaCC > inforServer.tongNhaCC) ? 0 : (inforServer.userSelectNhaCC + 1);
-                  if (inforServer.userSelectNhaCC == 0) break;
-                  if (inforServer.sttGdSoLo[inforServer.userSelectNhaCC] == 1) {break;}
+                                    inforServer.userSelectNhaCC = (inforServer.userSelectNhaCC > inforServer.tongNhaCC) ? 0 : (inforServer.userSelectNhaCC + 1);
+                                    if (inforServer.userSelectNhaCC == 0) break;   // quua 1 vong
+                                    if (inforServer.sttGdSoLo[inforServer.userSelectNhaCC] == 1) {break;} // dung du lieu cua khu fille
                   }
                   else if ((inforServer.PhanLoaiKV == PhanLoai::LANG_IN)||(inforServer.PhanLoaiKV == PhanLoai::LANG_OUT)){    
-                  inforServer.userSelectNhaCC = (inforServer.userSelectNhaCC > inforServer.tongNhaCC) ? 0 : (inforServer.userSelectNhaCC + 1);
-                  if (inforServer.userSelectNhaCC == 0) break;
-                  if (inforServer.sttGdSoLo[inforServer.userSelectNhaCC] == 2) {break;}
+                          inforServer.userSelectNhaCC = (inforServer.userSelectNhaCC > inforServer.tongNhaCC) ? 0 : (inforServer.userSelectNhaCC + 1);
+                          if (inforServer.userSelectNhaCC == 0) break;
+                          if (inforServer.sttGdSoLo[inforServer.userSelectNhaCC] == 2) {break;}
                   }
     }
   }
   else if ((Status_setting.state_select == 3)&&(inforServer.tongThanhPham > 0)){
-        while(true){
+        for (int tangTam = 0 ; tangTam < inforServer.tongThanhPham ; tangTam ++){
                           if ((inforServer.PhanLoaiKV == PhanLoai::Fil_IN)||(inforServer.PhanLoaiKV == PhanLoai::Fil_OUT)){    
                                inforServer.userSelectThanhPham = (inforServer.userSelectThanhPham > inforServer.tongThanhPham) ? 0 : (inforServer.userSelectThanhPham + 1);
                               if (inforServer.userSelectThanhPham == 0) break;
@@ -60,17 +60,16 @@ void onPressed_right() {
                               if (inforServer.sttGdThanhPham[inforServer.userSelectThanhPham] == 2) {break;}
                           }
           }
-    }
+  }
   Scrolling_lcd = 0;
   update_lcd_setting = true;
 }
 void onPressed_ok() {
   if ((Status_setting.state_select == 0)&& (inforServer.PhanLoaiKV == 0)) return;
  // if ((Status_setting.state_select == 1)&& (inforServer.userSelectLoaiCa == 0)) return;
-  if ((Status_setting.state_select == 2)&& (inforServer.userSelectNhaCC == 0)) return;
-  if ((Status_setting.state_select == 3)&& (inforServer.userSelectThanhPham == 0)) return;
-  if  ((Status_setting.state_select == 0)&& ((inforServer.PhanLoaiKV == PhanLoai::Fil_OUT )||(inforServer.PhanLoaiKV == PhanLoai::LANG_OUT ))) {
-     Status_setting.state_select = 3;
+  else if ((Status_setting.state_select == 2)&& (inforServer.userSelectNhaCC == 0)) return;
+  else if ((Status_setting.state_select == 3)&& (inforServer.userSelectThanhPham == 0)) return;
+  if  ((Status_setting.state_select == 0)&& ((inforServer.PhanLoaiKV == PhanLoai::Fil_OUT )||(inforServer.PhanLoaiKV == PhanLoai::LANG_OUT ))) {Status_setting.state_select = 3;
   }
   else{Status_setting.state_select = (Status_setting.state_select == 2) ? 4:(Status_setting.state_select == 0 )? 2 : Status_setting.state_select+ 1;}
   //else{Status_setting.state_select = (Status_setting.state_select == 2) ? 4:Status_setting.state_select + 1;}
@@ -146,7 +145,7 @@ void LCD_thong_tin(uint8_t chedo_HT,Data_TH* Data_TH  , uint8_t daucham = 0){
           u8g2.print(can_data);  
           u8g2.setCursor(2, 48);  
            if ((inforServer.PhanLoaiKV == PhanLoai::Fil_IN ) || (inforServer.PhanLoaiKV == PhanLoai::LANG_IN )){
-             u8g2.print(inforServer.nameSoLo[inforServer.userSelectNhaCC]);  
+             u8g2.print(inforServer.nameNhaCC[inforServer.userSelectNhaCC]);  
             // u8g2.setCursor(2, 60);
             // u8g2.print(inforServer.nameLoaiCa[inforServer.userSelectLoaiCa]);  
            }
@@ -163,7 +162,7 @@ void LCD_thong_tin(uint8_t chedo_HT,Data_TH* Data_TH  , uint8_t daucham = 0){
    }*/
     else if (chedo_HT == 4) {
          char stringdem[] = "Nhà Cup Cấp";
-         hienthiSetting(stringdem,inforServer.nameSoLo[inforServer.userSelectNhaCC]); 
+         hienthiSetting(stringdem,inforServer.nameNhaCC[inforServer.userSelectNhaCC]); 
    }
     else if (chedo_HT == 5) {
           char stringdem[] = "Loại Thành Phẩm";
@@ -176,7 +175,7 @@ void LCD_thong_tin(uint8_t chedo_HT,Data_TH* Data_TH  , uint8_t daucham = 0){
           LCD_print_KV(32);
           u8g2.setCursor(2, 48); 
            if ((inforServer.PhanLoaiKV == PhanLoai::Fil_IN ) || (inforServer.PhanLoaiKV == PhanLoai::LANG_IN )){  
-             u8g2.print(inforServer.nameSoLo[inforServer.userSelectNhaCC]);  
+             u8g2.print(inforServer.nameNhaCC[inforServer.userSelectNhaCC]);  
            //  u8g2.setCursor(2, 60);
             // u8g2.print(inforServer.nameLoaiCa[inforServer.userSelectLoaiCa]);  
            }
@@ -286,8 +285,8 @@ unsigned long getTimeSendHeapDebug=0;
 void printDebugHeap(){
         if (xTaskGetTickCount()- getTimeSendHeapDebug > 15000){
                   DateTime now = rtc.now();
-                  getTimeSendHeapDebug = xTaskGetTickCount();
-                  printf("Time 1/1/1970 = %lu ,Free Heap = %d\n",(unsigned long )now.unixtime(),ESP.getFreeHeap());    
+                  getTimeSendHeapDebug = xTaskGetTickCount();               
+                  printf("Time 1/1/1970 = %lu ,StackHigh %d, Free Heap = %d\n",(unsigned long )now.unixtime(),uxTaskGetStackHighWaterMark(NULL),ESP.getFreeHeap());    
       }
 }
 /*

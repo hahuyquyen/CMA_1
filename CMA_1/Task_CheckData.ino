@@ -50,24 +50,20 @@ void http_re( void * pvParameters ){
               if (timeCompareMode1 < time_2_lan_nhan_data){ // 2 dữ liệu phải nhỏ hơn thời gian cài đặt mới là 1 cặp đúng
                 if ((inforServer.PhanLoaiKV == PhanLoai::Fil_IN)||(inforServer.PhanLoaiKV == PhanLoai::Fil_OUT)){
                     strncpy( Data_TH.id_RFID_NV,Data_RFID_NV.id_RFID, sizeof(Data_RFID_NV.id_RFID));
-                    Data_TH.data_weight=Data_CAN_TH.data_can;
-                    strncpy( Data_TH.id_RFID,"x", sizeof("x"));
+                    strncpy( Data_TH.id_RFID,"x", sizeof("x"));     
                 }
                 else {
                       strncpy( Data_TH.id_RFID,Data_RFID_TH.id_RFID, sizeof(Data_RFID_TH.id_RFID));
-                      Data_TH.data_weight=Data_CAN_TH.data_can;
                       strncpy( Data_TH.id_RFID_NV,"x", sizeof("x"));
                 }
+                Data_TH.data_weight=Data_CAN_TH.data_can;
                 boolean tt = true;
                 if (inforServer.PhanLoaiKV == PhanLoai::LANG_OUT){
                   /*
                    * nêu khác mã rổ thì không cần check cân
                    */
                     tt = false;
-                  if (strcmp(Data_TH.id_RFID,idRFID_OLD) != 0){
-                    strncpy( idRFID_OLD,Data_TH.id_RFID, sizeof(Data_TH.id_RFID));
-                    if (Data_CAN_TH.data_can >0.5) tt = true;
-                  }
+                  if (strcmp(Data_TH.id_RFID,idRFID_OLD) != 0){strncpy( idRFID_OLD,Data_TH.id_RFID, sizeof(Data_TH.id_RFID));if (Data_CAN_TH.data_can >0.5) tt = true;}
                   else {  
                         double tam = Data_CAN_TH.data_can > canDataOutOld ?Data_CAN_TH.data_can - canDataOutOld :canDataOutOld - Data_CAN_TH.data_can ;
                         if ((tam > 0.8)&&(Data_CAN_TH.data_can >0.5))tt = true;
@@ -81,12 +77,10 @@ void http_re( void * pvParameters ){
                      */
                    
                     if ((inforServer.PhanLoaiKV == PhanLoai::Fil_IN)||(inforServer.PhanLoaiKV == PhanLoai::Fil_OUT)||(inforServer.PhanLoaiKV == PhanLoai::LANG_OUT)){          
-                    printf("CHECK OUT: Time: %ld - Kg: %f - RFID: %s \n",timeCompareMode1,Data_TH.data_weight,Data_TH.id_RFID);
-                    xQueueSend( Queue_mqtt, &Data_TH, xTicksToWait );
+                        printf("CHECK OUT: Time: %ld - Kg: %f - RFID: %s \n",timeCompareMode1,Data_TH.data_weight,Data_TH.id_RFID);
+                        xQueueSend( Queue_mqtt, &Data_TH, xTicksToWait );
                     }
-                    else {
-                      xSemaphoreGive(xreset_id_nv);            
-                    }
+                    else xSemaphoreGive(xreset_id_nv);            
                 }
                 xSemaphoreGive(xSignal_Display_check);     
                 timeCompareMode1 = 10000;
