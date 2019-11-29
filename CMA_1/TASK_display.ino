@@ -126,9 +126,10 @@ void Display( void * pvParameters ){
     uint16_t Time_blink= 1000;
     uint16_t Time_check= 1500;  
    // SPI.setClockDivider( SPI_CLOCK_DIV32 );
+   u8g2.setBusClock(600000);
     u8g2.begin();
     u8g2.enableUTF8Print();
-    u8g2.setBusClock(600000);
+    
     LCD_thong_tin(2,&Data_TH);
     variLcdUpdate.stateDisplayLCD = 1;
     uint8_t daucham_lcd = 0;
