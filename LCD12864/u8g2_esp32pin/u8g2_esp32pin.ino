@@ -39,13 +39,14 @@ void hienthiSetting(char* dataUserDisplay){
    uint16_t strLen = strlen(dataUserDisplay) * 8;
    char temstr[20];
    memset(temstr, '\0', sizeof(temstr));
-   memcpy (temstr, dataUserDisplay + Scrolling_lcd, 16);
+   
    while( Scrolling_lcd<strlen(dataUserDisplay)){
+    memcpy (temstr, dataUserDisplay + Scrolling_lcd, 16);
    Serial.println(strLen);
           if (strLen > 120){
                 u8g2.drawUTF8(0, 48,temstr);
                 Scrolling_lcd = Scrolling_lcd +1 ;
-                
+                u8g2.clearBuffer();
           }
    }
    Scrolling_lcd = Scrolling_lcd +1 ;
