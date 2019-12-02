@@ -28,7 +28,8 @@ void http_re( void * pvParameters ){
      * Nếu khu fille thì không nhận mã rỗ.
      */
     if(xQueueReceive( Queue_RFID, &Data_RFID_TH,  ( TickType_t ) 1 )== pdPASS ){
-      if ((inforServer.PhanLoaiKV == PhanLoai::LANG_IN)||(inforServer.PhanLoaiKV == PhanLoai::LANG_OUT)){
+      //if ((inforServer.PhanLoaiKV == PhanLoai::LANG_IN)||(inforServer.PhanLoaiKV == PhanLoai::LANG_OUT)){ 
+      if (giaiDoanCan.maGiaiDoan[giaiDoanCan.userSelecGiaiDoan] == kvSuaCa) {
       timeGetQueueRfidRo=xTaskGetTickCount();
       }     
     }
@@ -37,7 +38,8 @@ void http_re( void * pvParameters ){
      * Nếu là khu Filler chỉ nhận mã rỗ thì swap time tới mã rỗ để khỏi viết lại code
      */
     if(xQueueReceive( Queue_RFID_NV, &Data_RFID_NV,  ( TickType_t ) 1 )== pdPASS ){
-            if ((inforServer.PhanLoaiKV == PhanLoai::Fil_IN)||(inforServer.PhanLoaiKV == PhanLoai::Fil_OUT)){timeGetQueueRfidRo=xTaskGetTickCount();}
+           // if ((inforServer.PhanLoaiKV == PhanLoai::Fil_IN)||(inforServer.PhanLoaiKV == PhanLoai::Fil_OUT)){timeGetQueueRfidRo=xTaskGetTickCount();}
+            if (giaiDoanCan.maGiaiDoan[giaiDoanCan.userSelecGiaiDoan]==kvFille){timeGetQueueRfidRo=xTaskGetTickCount();}
             else timeGetQueueRfidNV=xTaskGetTickCount();
     }
     /*
@@ -48,7 +50,8 @@ void http_re( void * pvParameters ){
           if ((timeGetQueueCan > timeGetQueueRfidRo + 500)&&(timeGetQueueRfidRo > 0)){ // chỉ nhận khi dữ liệu cân lớn hơn dữ liệu rfid 500 stick
                timeCompareMode1 = timeGetQueueCan - timeGetQueueRfidRo;
               if (timeCompareMode1 < time_2_lan_nhan_data){ // 2 dữ liệu phải nhỏ hơn thời gian cài đặt mới là 1 cặp đúng
-                if ((inforServer.PhanLoaiKV == PhanLoai::Fil_IN)||(inforServer.PhanLoaiKV == PhanLoai::Fil_OUT)){
+              //  if ((inforServer.PhanLoaiKV == PhanLoai::Fil_IN)||(inforServer.PhanLoaiKV == PhanLoai::Fil_OUT)){
+               if (giaiDoanCan.maGiaiDoan[giaiDoanCan.userSelecGiaiDoan] == kvFille){
                     strncpy( Data_TH.id_RFID_NV,Data_RFID_NV.id_RFID, sizeof(Data_RFID_NV.id_RFID));
                     strncpy( Data_TH.id_RFID,"x", sizeof("x"));     
                 }
@@ -58,7 +61,8 @@ void http_re( void * pvParameters ){
                 }
                 Data_TH.data_weight=Data_CAN_TH.data_can;
                 boolean tt = true;
-                if (inforServer.PhanLoaiKV == PhanLoai::LANG_OUT){
+                if ((giaiDoanCan.maGiaiDoan[giaiDoanCan.userSelecGiaiDoan] == kvSuaCa)&&(giaiDoanCan.cheDoInOut == cheDoOut)){
+               // if (inforServer.PhanLoaiKV == PhanLoai::LANG_OUT){
                   /*
                    * nêu khác mã rổ thì không cần check cân
                    */
@@ -76,7 +80,9 @@ void http_re( void * pvParameters ){
                      * Nếu là Phi le và lạng da ngõ ra thì ko cần mã NV nên sẽ truyền MQTT
                      */
                    
-                    if ((inforServer.PhanLoaiKV == PhanLoai::Fil_IN)||(inforServer.PhanLoaiKV == PhanLoai::Fil_OUT)||(inforServer.PhanLoaiKV == PhanLoai::LANG_OUT)){          
+                   // if ((inforServer.PhanLoaiKV == PhanLoai::Fil_IN)||(inforServer.PhanLoaiKV == PhanLoai::Fil_OUT)||(inforServer.PhanLoaiKV == PhanLoai::LANG_OUT)){       
+                   
+                    if ((giaiDoanCan.maGiaiDoan[giaiDoanCan.userSelecGiaiDoan] != kvSuaCa)||(giaiDoanCan.cheDoInOut == cheDoOut)){
                         printf("CHECK OUT: Time: %ld - Kg: %f - RFID: %s \n",timeCompareMode1,Data_TH.data_weight,Data_TH.id_RFID);
                         xQueueSend( Queue_mqtt, &Data_TH, xTicksToWait );
                     }
@@ -95,7 +101,8 @@ void http_re( void * pvParameters ){
                 xSemaphoreGive(xreset_id_nv);      
                 xSemaphoreGive(xSignal_Display_checkdone);
           }
-          if ( inforServer.PhanLoaiKV == PhanLoai::LANG_IN){   
+        //  if ( inforServer.PhanLoaiKV == PhanLoai::LANG_IN){  
+            if ((giaiDoanCan.maGiaiDoan[giaiDoanCan.userSelecGiaiDoan] == kvSuaCa)&&(giaiDoanCan.cheDoInOut == cheDoIN)){ 
               if ((timeGetQueueRfidNV > _time_get_tam)&& (_time_get_tam >0)){ 
                   timeCompareMode2 = timeGetQueueRfidNV - _time_get_tam;
                   if (timeCompareMode2 < time_cho_nhan_RFID_NV){

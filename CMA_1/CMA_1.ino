@@ -60,10 +60,11 @@ void khoiTaoGiaTri(){
     sprintf(MQTT_TOPIC.configGetId, "/config/%lu", ( unsigned long )idDevice) ;
     strlcpy(inforServer.nameThanhPham[0], ramChoDuLieu, sizeof(inforServer.nameThanhPham[0]));
     strlcpy(inforServer.nameNhaCC[0], ramChoDuLieu, sizeof(inforServer.nameNhaCC[0]));
+    strlcpy(giaiDoanCan.nameGiaiDoan[0], ramChoDuLieu, sizeof(giaiDoanCan.nameGiaiDoan[0]));
   //  strlcpy(inforServer.nameLoaiCa[0], ramChoDuLieu, sizeof(inforServer.nameLoaiCa[0]));
     state_Running_conf::state_Running = state_Running_conf::Setting;
     Status_setting.state_select = 0;
-    inforServer.PhanLoaiKV = PhanLoai::Not_Choose;
+  //  inforServer.PhanLoaiKV = PhanLoai::Not_Choose;
   //  inforServer.userSelectLoaiCa = 0;
     inforServer.userSelectNhaCC = 0;
     inforServer.userSelectThanhPham = 0;
@@ -73,6 +74,11 @@ void khoiTaoGiaTri(){
   //  inforServer.maLoaica[0]=0;
     inforServer.maNhaCC[0]=0;
     inforServer.maThanhPham[0]=0;
+
+    giaiDoanCan.cheDoInOut=0;
+    giaiDoanCan.tongGiaiDoan=0;
+    giaiDoanCan.userSelecGiaiDoan=0;
+    giaiDoanCan.maGiaiDoan[0]=0;
 }
 void setup()
 {       pinMode(pinPower, OUTPUT);
@@ -226,10 +232,16 @@ void loop()
   if ((status_mqtt_connect)&&(state_Running_conf::state_Running == state_Running_conf::Setting)){  
     /*
      */
-    if((xTaskGetTickCount() - timeFirstGetDataFromServer>30000)|| (timeFirstGetDataFromServer == 0)){
+    if((xTaskGetTickCount() - timeFirstGetDataFromServer>5000)|| (timeFirstGetDataFromServer == 0)){
       timeFirstGetDataFromServer = xTaskGetTickCount();
-      StaticJsonDocument<35> doc;
-      char buffer[35];
+      checkSendMQTTConfig();
+    }
+  }
+}
+
+void checkSendMQTTConfig(){
+      StaticJsonDocument<55> doc;
+      char buffer[55];
       doc["i"]= idDevice;
       /*if (inforServer.tongLoaiCa == 0){
         doc["t"]= 1 ;
@@ -237,17 +249,25 @@ void loop()
         mqttClient.publish("/config", 0, true,buffer); 
       }*/
       if (inforServer.tongThanhPham == 0){
-        doc["t"]= 3 ;
+        doc["t"]= 1 ;
         serializeJson(doc, buffer);
         mqttClient.publish("/config", 0, true, buffer); 
       }
-      if(inforServer.tongNhaCC== 0){
+      if (giaiDoanCan.tongGiaiDoan == 0){
+        /*
+         * laay thong tin giai doan
+         */
         doc["t"]= 2 ;
         serializeJson(doc, buffer);
         mqttClient.publish("/config", 0, true, buffer); 
       }
-    }
-  }
+      else if(inforServer.tongNhaCC== 0){
+        /*
+         * lay thong tin cac nha cung cap
+         */
+        doc["t"]= 3 ;
+        doc["d"]=giaiDoanCan.maGiaiDoan[giaiDoanCan.userSelecGiaiDoan];
+        serializeJson(doc, buffer);
+        mqttClient.publish("/config", 0, true, buffer); 
+      }
 }
-
- 

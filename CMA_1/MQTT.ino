@@ -29,7 +29,8 @@ void connectToMqtt() {
 void truyen_mqtt(){
       DateTime now = rtc.now();
       StaticJsonDocument<500> doc;
-      doc["k"] = static_cast<uint8_t>(inforServer.PhanLoaiKV);
+      doc["k"] = giaiDoanCan.cheDoInOut;
+      doc["x"] = giaiDoanCan.maGiaiDoan[giaiDoanCan.userSelecGiaiDoan];
       doc["b"] = datatruyen_mqtt.id_RFID;
       doc["e"] = datatruyen_mqtt.id_RFID_NV;
       doc["s"] = (unsigned long) idDevice;      
@@ -71,6 +72,7 @@ void onMqttUnsubscribe(uint16_t packetId) {// printf("Unsubscribe acknowledged: 
  g = 1 hoặc 2 1laf fille 2 la sua ca
 
  {"t":"3","l":"3","data":[{"i":"5455","n":"nhàn 1","g":1},{"i":"68","n":"nhàn 2","g":2},{"i":"98","n":"nhàn 3","g":1},,{"i":"98","n":"nhàn 4","g":2}]}
+ {"t":"2","l":"2","data":[{"i":1,"n":"Fille"},{"i":2,"n":"Sữa Cá"}]}
  */
 
 void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties properties, size_t len, size_t index, size_t total) {
@@ -97,23 +99,39 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
             strlcpy(inforServer.nameLoaiCa[i+1], jsonBuffer["data"][i]["n"], sizeof(inforServer.nameLoaiCa[i]));
           }      
         }
-        else */if (jsonBuffer["t"].as<uint8_t>() == 2){
+        else */if (jsonBuffer["t"].as<uint8_t>() == 1){
            strlcpy(inforServer.nameNhaCC[0], ramChuaChon, sizeof(inforServer.nameNhaCC[0]));
           inforServer.tongNhaCC=jsonBuffer["l"].as<uint8_t>();
           for (int i=0;i<inforServer.tongNhaCC;i++){
-            inforServer.maNhaCC[i+1]=jsonBuffer["data"][i]["i"].as<uint16_t>();
-            inforServer.sttGdSoLo[i+1]=jsonBuffer["data"][i]["g"].as<uint8_t>();
-            strlcpy(inforServer.nameNhaCC[i+1], jsonBuffer["data"][i]["n"], sizeof(inforServer.nameNhaCC[i]));
+            inforServer.maNhaCC[i+1]=jsonBuffer["d"][i]["i"].as<uint16_t>();
+         //   inforServer.sttGdSoLo[i+1]=jsonBuffer["d"][i]["g"].as<uint8_t>();
+            strlcpy(inforServer.nameNhaCC[i+1], jsonBuffer["d"][i]["n"], sizeof(inforServer.nameNhaCC[i]));
           }  
         }
-        else if (jsonBuffer["t"].as<uint8_t>() == 3){
-          strlcpy(inforServer.nameThanhPham[0], ramChuaChon, sizeof(inforServer.nameThanhPham[0]));
+        else if (jsonBuffer["t"].as<uint8_t>() == 2){
+        /*  strlcpy(inforServer.nameThanhPham[0], ramChuaChon, sizeof(inforServer.nameThanhPham[0]));
           inforServer.tongThanhPham=jsonBuffer["l"].as<uint8_t>();
           for (int i=0;i<inforServer.tongThanhPham;i++){
             inforServer.maThanhPham[i+1]=jsonBuffer["data"][i]["i"].as<uint16_t>();
             inforServer.sttGdThanhPham[i+1]=jsonBuffer["data"][i]["g"].as<uint8_t>();
             strlcpy(inforServer.nameThanhPham[i+1], jsonBuffer["data"][i]["n"], sizeof(inforServer.nameThanhPham[i+1]));
+          }*/
+          strlcpy(giaiDoanCan.nameGiaiDoan[0], ramChuaChon, sizeof(giaiDoanCan.nameGiaiDoan[0]));
+          giaiDoanCan.tongGiaiDoan=jsonBuffer["l"].as<uint8_t>();
+          for (int i=0;i<giaiDoanCan.tongGiaiDoan;i++){
+            giaiDoanCan.maGiaiDoan[i+1]=jsonBuffer["d"][i]["i"].as<uint16_t>();
+            strlcpy(giaiDoanCan.nameGiaiDoan[i+1], jsonBuffer["d"][i]["n"], sizeof(giaiDoanCan.nameGiaiDoan[i+1]));
           }
+          timeFirstGetDataFromServer = 0;
+        }
+         else if (jsonBuffer["t"].as<uint8_t>() == 3){
+          strlcpy(inforServer.nameThanhPham[0], ramChuaChon, sizeof(inforServer.nameThanhPham[0]));
+          inforServer.tongThanhPham=jsonBuffer["l"].as<uint8_t>();
+          for (int i=0;i<inforServer.tongThanhPham;i++){
+            inforServer.maThanhPham[i+1]=jsonBuffer["d"][i]["i"].as<uint16_t>();
+            strlcpy(inforServer.nameThanhPham[i+1], jsonBuffer["d"][i]["n"], sizeof(inforServer.nameThanhPham[i+1]));
+          }
+          timeFirstGetDataFromServer = 0;
         }  
 
   }

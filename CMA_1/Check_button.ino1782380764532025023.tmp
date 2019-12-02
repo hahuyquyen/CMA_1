@@ -57,7 +57,7 @@ void onPressed_right() {
    if (Status_setting.state_select == 0){ giaiDoanCan.cheDoInOut = (giaiDoanCan.cheDoInOut > 1) ? 0 : (giaiDoanCan.cheDoInOut + 1);   }
   else if ((Status_setting.state_select == 1)&&(giaiDoanCan.tongGiaiDoan > 0)){ giaiDoanCan.userSelecGiaiDoan = (giaiDoanCan.userSelecGiaiDoan > giaiDoanCan.tongGiaiDoan) ? 0 : (giaiDoanCan.userSelecGiaiDoan + 1);}
   else if ((Status_setting.state_select == 2)&&(inforServer.tongNhaCC > 0)){
-     inforServer.userSelectNhaCC = (inforServer.userSelectNhaCC > (inforServer.tongNhaCC - 1)) ? 0 : (inforServer.userSelectNhaCC + 1);
+     inforServer.userSelectNhaCC = (inforServer.userSelectNhaCC > inforServer.tongNhaCC) ? 0 : (inforServer.userSelectNhaCC + 1);
      /*
      for (int tangTam = 0 ; tangTam < inforServer.tongNhaCC ; tangTam ++){
                   if ((inforServer.PhanLoaiKV == PhanLoai::Fil_IN)||(inforServer.PhanLoaiKV == PhanLoai::Fil_OUT)){    
@@ -73,7 +73,7 @@ void onPressed_right() {
     }*/
   }
   else if ((Status_setting.state_select == 3)&&(inforServer.tongThanhPham > 0)){
-    inforServer.userSelectThanhPham = (inforServer.userSelectThanhPham > (inforServer.tongThanhPham-1)) ? 0 : (inforServer.userSelectThanhPham + 1);
+    inforServer.userSelectThanhPham = (inforServer.userSelectThanhPham > inforServer.tongThanhPham) ? 0 : (inforServer.userSelectThanhPham + 1);
       /*  for (int tangTam = 0 ; tangTam < inforServer.tongThanhPham ; tangTam ++){
                           if ((inforServer.PhanLoaiKV == PhanLoai::Fil_IN)||(inforServer.PhanLoaiKV == PhanLoai::Fil_OUT)){    
                                inforServer.userSelectThanhPham = (inforServer.userSelectThanhPham > inforServer.tongThanhPham) ? 0 : (inforServer.userSelectThanhPham + 1);

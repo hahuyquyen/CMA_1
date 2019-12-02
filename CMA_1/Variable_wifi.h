@@ -30,7 +30,7 @@ uint8_t firstGetDataFromServer=0;
 /*
  * 
  */
-namespace PhanLoai {
+/*namespace PhanLoai {
     enum PhanLoai: uint8_t { 
       Not_Choose=0, 
       Fil_IN=1, 
@@ -39,6 +39,7 @@ namespace PhanLoai {
       LANG_OUT=4 
     };
 }
+*/
 namespace state_Running_conf {
     enum state_Running: uint8_t { 
       Setting=0, 
@@ -58,8 +59,16 @@ struct variLcdUpdateConf{
   false,
   0
 };
+char cheDoInOutDis[3][30]={"Chưa Chọn","Đầu Vào","Đầu Ra"};
+struct giaiDoanCanConf{
+  uint8_t cheDoInOut;
+  uint8_t tongGiaiDoan;
+  uint8_t userSelecGiaiDoan;
+  uint8_t maGiaiDoan[10];
+  char nameGiaiDoan[10][30];
+}giaiDoanCan;
 struct inforServerStruct{
-  PhanLoai::PhanLoai PhanLoaiKV;
+  //PhanLoai::PhanLoai PhanLoaiKV;
   //uint8_t tongLoaiCa; 
   uint8_t tongNhaCC;   
   uint8_t tongThanhPham; 
@@ -75,7 +84,7 @@ struct inforServerStruct{
   char nameNhaCC[20][100];
   char nameThanhPham[20][100];
 }inforServer={
-  PhanLoai::Not_Choose,
+ // PhanLoai::Not_Choose,
   0,
   0,
   0,

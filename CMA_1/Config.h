@@ -37,3 +37,11 @@
 #define pinLedRed 5
 #define pinLedGreen 2
 #define pinAnalogPower 25
+
+#define cheDoIN 1
+#define cheDoOut 2
+#define cheDoNotChoose 0
+
+#define kvFille 1
+#define kvSuaCa 2
+#define kvNotChoose 0
