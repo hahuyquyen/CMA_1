@@ -238,7 +238,10 @@ void sendMQTTConfig(uint8_t loaiconfig = 0 , uint8_t maboxung = 0){
 void checkSendMQTTConfig(){
       if(inforServer.tongNhaCC == 0){sendMQTTConfig(1,0);}
       else if (giaiDoanCan.tongGiaiDoan == 0){sendMQTTConfig(2,0);}
-      else if ((giaiDoanCan.userSelecGiaiDoan == 0)&&(inforServer.tongThanhPham == 0)){ // Co chon giai doan moi gui yeu cau loai thanh pham
+      //Fix loi 01
+      else if ((giaiDoanCan.userSelecGiaiDoan != 0)&&(inforServer.tongThanhPham == 0)&&(stateMachine.bottonSelect>1)){ // Chi gui yeu cau khi da chon khu vuc can và qua buoc chọn thành phảm
+         Serial.print("dsgfdgfs ");
+        Serial.println(giaiDoanCan.maGiaiDoan[giaiDoanCan.userSelecGiaiDoan]);
        sendMQTTConfig(3,giaiDoanCan.maGiaiDoan[giaiDoanCan.userSelecGiaiDoan]);
       }
 }
