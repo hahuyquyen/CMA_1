@@ -53,8 +53,8 @@ void printProgress(size_t prg, size_t sz) {
  * Setup
  */
 void khoiTaoGiaTri(){
-    sprintf(MQTT_TOPIC.dataAck, "/data/ack/%lu", ( unsigned long )stateMachine.idDevice) ;
-    sprintf(MQTT_TOPIC.configGetId, "/config/%lu", ( unsigned long )stateMachine.idDevice) ;
+    sprintf(mqttConfig.topicGetStatusACK, "/data/ack/%lu", ( unsigned long )stateMachine.idDevice) ;
+    sprintf(mqttConfig.topicGetConfig, "/config/%lu", ( unsigned long )stateMachine.idDevice) ;
     strlcpy(inforServer.nameThanhPham[0], ramChoDuLieu, sizeof(inforServer.nameThanhPham[0]));
     strlcpy(inforServer.nameNhaCC[0], ramChoDuLieu, sizeof(inforServer.nameNhaCC[0]));
     strlcpy(giaiDoanCan.nameGiaiDoan[0], ramChoDuLieu, sizeof(giaiDoanCan.nameGiaiDoan[0]));
@@ -79,16 +79,17 @@ void setup()
     Queue_RFID_NV= xQueueCreate(5,sizeof(Data_RFID));
     Queue_mqtt = xQueueCreate(10,sizeof(Data_TH));
     Queue_display = xQueueCreate(3,sizeof(Data_TH));
-    Queue_can_interrup= xQueueCreate(3,sizeof(rfid_data));
+ //   Queue_can_interrup= xQueueCreate(3,sizeof(rfid_data));
     Queue_Time_blink= xQueueCreate(3,sizeof(uint16_t));
     xCountingSemaphore = xSemaphoreCreateCounting( 10, 0 );
     xSignal_FromRFID = xSemaphoreCreateCounting( 10, 0 );
-    xSignal_Display_check = xSemaphoreCreateCounting( 10, 0 );
+    xSignal_Display_check = xSemaphoreCreateCounting( 2, 0 );
     xSignal_Display_checkdone = xSemaphoreCreateCounting( 2, 0 );
     xreset_id_nv = xSemaphoreCreateCounting( 2, 0 );
     xResetRfidMaRo = xSemaphoreCreateCounting( 2, 0 );
     EEPROM.begin(1024);
     WiFi.disconnect(true);
+    WiFi.setSleep(false);
     if(!SPIFFS.begin(true)){printf("An Error has occurred while mounting SPIFFS\n");}
     Serial1.begin(9600, SERIAL_8N1, 26, 12); //12 tx 13 lÃ  rx(bau,se,rx,tx)
     Serial.begin(115200);
@@ -219,44 +220,25 @@ void loop()
    * Lịch gửi server yêu cầu config
    */
   if ((status_mqtt_connect)&&(stateMachine.deviceStatus == deviceSetting)){  
-    /*
-     */
-    if((xTaskGetTickCount() - MQTT_lastTimeGetDataConfig>5000)|| (MQTT_lastTimeGetDataConfig == 0)){
+    if((xTaskGetTickCount() - MQTT_lastTimeGetDataConfig>1000)|| (MQTT_lastTimeGetDataConfig == 0)){
       MQTT_lastTimeGetDataConfig = xTaskGetTickCount();
       checkSendMQTTConfig();
     }
   }
 }
-
-void checkSendMQTTConfig(){
+void sendMQTTConfig(uint8_t loaiconfig = 0 , uint8_t maboxung = 0){
       StaticJsonDocument<55> doc;
       char buffer[55];
       doc["i"]= stateMachine.idDevice;
-      /*if (inforServer.tongLoaiCa == 0){
-        doc["t"]= 1 ;
-        serializeJson(doc, buffer);
-        mqttClient.publish("/config", 0, true,buffer); 
-      }*/
-      if (inforServer.tongThanhPham == 0){
-        doc["t"]= 3 ;
-        serializeJson(doc, buffer);
-        mqttClient.publish("/config", 0, true, buffer); 
-      }
-      if (giaiDoanCan.tongGiaiDoan == 0){
-        /*
-         * laay thong tin giai doan
-         */
-        doc["t"]= 2 ;
-        serializeJson(doc, buffer);
-        mqttClient.publish("/config", 0, true, buffer); 
-      }
-      else if(inforServer.tongNhaCC== 0){
-        /*
-         * lay thong tin cac nha cung cap
-         */
-        doc["t"]= 1 ;
-        doc["d"]=giaiDoanCan.maGiaiDoan[giaiDoanCan.userSelecGiaiDoan];
-        serializeJson(doc, buffer);
-        mqttClient.publish("/config", 0, true, buffer); 
+      doc["t"]= loaiconfig ;
+      doc["d"]=maboxung;
+      serializeJson(doc, buffer);
+      mqttClient.publish("/config", 0, true, buffer); 
+}
+void checkSendMQTTConfig(){
+      if(inforServer.tongNhaCC == 0){sendMQTTConfig(1,0);}
+      else if (giaiDoanCan.tongGiaiDoan == 0){sendMQTTConfig(2,0);}
+      else if ((giaiDoanCan.userSelecGiaiDoan == 0)&&(inforServer.tongThanhPham == 0)){ // Co chon giai doan moi gui yeu cau loai thanh pham
+       sendMQTTConfig(3,giaiDoanCan.maGiaiDoan[giaiDoanCan.userSelecGiaiDoan]);
       }
 }

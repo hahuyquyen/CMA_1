@@ -12,7 +12,7 @@
 
 
 
-const char* LCD_setting = "Cài Đặt";
+const char* LCD_setting = "Cài Đặt TRƯỜNG";
 void LCD_print_KV(uint8_t vitri = 48) {
   u8g2.setCursor(5, vitri); u8g2.print(giaiDoanCan.nameGiaiDoan[giaiDoanCan.userSelecGiaiDoan]);
   u8g2.setCursor(60 , vitri); u8g2.print(" - ");
@@ -20,7 +20,6 @@ void LCD_print_KV(uint8_t vitri = 48) {
 }
 void hienthiSetting(char* dataDisplay = NULL, char* dataUserDisplay = NULL) {
   if (dataDisplay != NULL ) {
-  //  u8g2.setDrawColor(0);
     u8g2.setCursor(((128 - (u8g2.getUTF8Width(LCD_setting))) / 2), 16);
     u8g2.print(LCD_setting);
     u8g2.setDrawColor(1);
@@ -28,11 +27,11 @@ void hienthiSetting(char* dataDisplay = NULL, char* dataUserDisplay = NULL) {
     u8g2.print(dataDisplay);
   }
   if (u8g2.getUTF8Width(dataUserDisplay) > 128) {
-    u8g2.drawUTF8(variLcdUpdate.numScroll, 48, dataUserDisplay);
+    u8g2.drawUTF8(variLcdUpdate.numScroll, 52, dataUserDisplay);
     variLcdUpdate.numScroll = variLcdUpdate.numScroll - 35 ;
     if (abs(variLcdUpdate.numScroll) > u8g2.getUTF8Width(dataUserDisplay))variLcdUpdate.numScroll = 0;
   }
-  else u8g2.drawUTF8(((128 - (u8g2.getUTF8Width(dataUserDisplay))) / 2), 48, dataUserDisplay);
+  else u8g2.drawUTF8(((128 - (u8g2.getUTF8Width(dataUserDisplay))) / 2), 52, dataUserDisplay);
 }
 void hienthiRunning(char* dataUserDisplay) {
   if (u8g2.getUTF8Width(dataUserDisplay) > 128) {
@@ -44,31 +43,23 @@ void hienthiRunning(char* dataUserDisplay) {
 }
 void LCD_thong_tin(uint8_t chedo_HT, Data_TH* Data_TH  , uint8_t daucham = 0) {
   u8g2.clearBuffer();
-  u8g2.sendF("c", 0x01 );
- // u8g2.clear();
-  u8g2.setFont(u8g2_font_unifont_t_vietnamese1);
+  u8g2.setFont(u8g2_font_unifont_t_vietnamese2);
   if (chedo_HT == 0) {
     char rfidDisplay[10];
     u8g2.setCursor(0, 12);
     u8g2.print(F("NV:"));
-   // u8g2.setFont(u8g2_font_6x12_tf);
      memcpy(rfidDisplay, & Data_TH->id_RFID_NV[16], 8);
-    if (Data_TH->id_RFID_NV[0] == 'x'){
-      u8g2.print(" x ");
-    }
+     rfidDisplay[9]='\0';
+    if (Data_TH->id_RFID_NV[0] == 'x'){ u8g2.print("x");}
     else u8g2.print(rfidDisplay);
     u8g2.setCursor(0, 28);
-    u8g2.setFont(u8g2_font_unifont_t_vietnamese1);
+    u8g2.setFont(u8g2_font_unifont_t_vietnamese2);
     u8g2.print(F("Rổ:"));
-  //  u8g2.setFont(u8g2_font_6x12_tf);
     memcpy(rfidDisplay, & Data_TH->id_RFID[16], 8);
     rfidDisplay[9]='\0';
-    //rfidDisplay[10]='\0';
-    if (Data_TH->id_RFID[0] == 'x'){
-      u8g2.print(" x ");
-    }
+    if (Data_TH->id_RFID[0] == 'x'){u8g2.print("x");}
     else u8g2.print(rfidDisplay);
-    u8g2.setFont(u8g2_font_unifont_t_vietnamese1);
+    u8g2.setFont(u8g2_font_unifont_t_vietnamese2);
     u8g2.setCursor(0, 44);
     u8g2.print(F("Kg:"));
     u8g2.print(Data_TH->data_weight);
@@ -88,7 +79,6 @@ void LCD_thong_tin(uint8_t chedo_HT, Data_TH* Data_TH  , uint8_t daucham = 0) {
     u8g2.print(F("Kg:"));
     u8g2.print(can_data);
     u8g2.setCursor(2, 48);
-  //  if ((inforServer.PhanLoaiKV == PhanLoai::Fil_IN ) || (inforServer.PhanLoaiKV == PhanLoai::LANG_IN )) {
     if (giaiDoanCan.cheDoInOut == cheDoIN) {
       hienthiSetting(NULL, inforServer.nameNhaCC[inforServer.userSelectNhaCC]);
     }
@@ -139,17 +129,14 @@ void Display( void * pvParameters ) {
   unsigned long timeoutLcdLangDaIn = 0;
   unsigned long lastBlinkLCD = 0;
   uint16_t Time_blink = 1000;
-  uint16_t Time_check = 1500;
+  uint16_t Time_check = 2500;
   // SPI.setClockDivider( SPI_CLOCK_DIV32 );
   u8g2.setBusClock(850000);
   u8g2.begin();
   u8g2.enableUTF8Print();
-
   LCD_thong_tin(2, &Data_TH);
   variLcdUpdate.stateDisplayLCD = 1;
   uint8_t daucham_lcd = 0;
-
-  
   for (;;) {
     /*
        30ms
@@ -177,14 +164,7 @@ void Display( void * pvParameters ) {
         timeoutLcdLangDaIn = 0;
         timeoutDisplay = 0;
       }
-     /* if ((giaiDoanCan.cheDoInOut == cheDoIN)&& (giaiDoanCan.maGiaiDoan[giaiDoanCan.userSelecGiaiDoan]  == kvSuaCa)) {
-          if ((xTaskGetTickCount() - timeoutLcdLangDaIn > Time_check) && (timeoutLcdLangDaIn > 0 )) {
-            digitalWrite(4, LOW);
-            variLcdUpdate.stateDisplayLCD = 1;
-            timeoutLcdLangDaIn = 0; timeoutDisplay = 0;
-          }
-        }
-     else */if ((xTaskGetTickCount() - timeoutDisplay > Time_check) && (timeoutDisplay > 0 )) {
+    if ((xTaskGetTickCount() - timeoutDisplay > Time_check) && (timeoutDisplay > 0 )) {
             digitalWrite(4, LOW);
             variLcdUpdate.stateDisplayLCD = 1;
             timeoutDisplay = 0;timeoutLcdLangDaIn = 0; 
@@ -217,7 +197,7 @@ void Display( void * pvParameters ) {
         default: break;
       }
     }
-    else if ((xTaskGetTickCount() - lastBlinkLCD > 2000) || variLcdUpdate.updateLCD ) {
+    else if ((xTaskGetTickCount() - lastBlinkLCD > 1000) || variLcdUpdate.updateLCD ) {
       variLcdUpdate.updateLCD = false;
       lastBlinkLCD = xTaskGetTickCount();
       LCD_thong_tin(stateMachine.bottonSelect + 2, &Data_TH, daucham_lcd);

@@ -14,10 +14,11 @@ const char htmlPortMQTT[] PROGMEM = "PortMQTT"; // dung can lây FPSTR(htmlPortM
 #define WIFI_CONF_FORMAT {0, 0, 0, 1}
 const uint8_t wifi_conf_format[] = WIFI_CONF_FORMAT;
 #define WIFI_CONF_START 0
-boolean statusGetAllSD = false;
-uint8_t rfid_data[20];
+
+//uint8_t rfid_data[20];
 static byte myEPC[12]; 
 static byte myEPClength;
+boolean statusGetAllSD = false;
 unsigned long SD_lastTimeReadEnd = 0;
 unsigned long SD_lastTimeSendMQTT = 0;
 unsigned long MQTT_lastTimeGetDataConfig = 0;
@@ -72,10 +73,10 @@ struct inforServerStruct {
   0
 };
 
-static struct MQTT_TOPIC {
-  char dataAck[64];
-  char configGetId[64];
-} MQTT_TOPIC;
+static struct mqttConfigConf {
+  char topicGetStatusACK[64];
+  char topicGetConfig[64];
+} mqttConfig;
 
 static struct WiFiConfStruct {
   uint8_t format[4];
@@ -120,7 +121,7 @@ QueueHandle_t Queue_RFID;
 QueueHandle_t Queue_RFID_NV;
 QueueHandle_t Queue_mqtt;
 QueueHandle_t Queue_display;
-QueueHandle_t Queue_can_interrup;
+//QueueHandle_t Queue_can_interrup;
 QueueHandle_t Queue_Time_blink;
 /****************************
     Struct Data

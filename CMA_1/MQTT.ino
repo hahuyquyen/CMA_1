@@ -48,8 +48,8 @@ void truyen_mqtt(){
 }
 void onMqttConnect(bool sessionPresent) {
         status_mqtt_connect = true;
-        mqttClient.subscribe( MQTT_TOPIC.dataAck,0 ); 
-        mqttClient.subscribe( MQTT_TOPIC.configGetId,0 ); 
+        mqttClient.subscribe( mqttConfig.topicGetStatusACK,0 ); 
+        mqttClient.subscribe( mqttConfig.topicGetConfig,0 ); 
         if (WiFiConf.mqtt_subto1[0] != 'x'){mqttClient.subscribe( WiFiConf.mqtt_subto1,0 );}  //0,1,2 laf qos
 }
 
@@ -69,7 +69,7 @@ void onMqttUnsubscribe(uint16_t packetId) {// printf("Unsubscribe acknowledged: 
 Set thanh pham 
 {"t":"3","l":"3","d":[{"i":"10","n":"Thanh Pham 1"},{"i":"11","n":"Thanh Pham 2"},{"i":"12","n":"Thanh Pham 3"}]}
 Set nha CC
-{"t":"1","l":"3","d":[{"i":"20","n":"Loai Ca 1"},{"i":"21","n":"Loai Ca 2"},{"i":"22","n":"Loai Ca 3"}]}
+"{"t":"1","l":"3","d":[{"i":"20","n":"Loai Ca 1"},{"i":"21","n":"Loai Ca 2"},{"i":"22","n":"Loai Ca 3"}]}"
 Set Khu Vuc can
 {"t":"2","l":"2","d":[{"i":2,"n":"Sữa Cá"},{"i":1,"n":"Filler"}]}
 
@@ -79,14 +79,14 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
   
   printf("MQTT GET: %s \n",topic);
   //printf("QOS: %c \n", properties.qos);
- // printf("noi dung: %s \n", payload);
+  printf("noi dung: %s \n", payload);
 /*
  * {"name":"Pham An Nhàn"}
  */
   StaticJsonDocument<1500> jsonBuffer;
   DeserializationError error = deserializeJson(jsonBuffer,payload);
   if (error) Serial.println("error json");
-  else if ((strcmp(WiFiConf.mqtt_subto1,topic) == 0)||(strcmp(MQTT_TOPIC.configGetId,topic) == 0)){
+  else if ((strcmp(WiFiConf.mqtt_subto1,topic) == 0)||(strcmp(mqttConfig.topicGetConfig,topic) == 0)){
     /*
      Nhan thong tin server cai dat ca lam viec
      */
@@ -120,9 +120,8 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
           }
           MQTT_lastTimeGetDataConfig = 0;
         }  
-
   }
-  else if (strcmp(MQTT_TOPIC.dataAck,topic) == 0){
+  else if (strcmp(mqttConfig.topicGetStatusACK,topic) == 0){
     /*
      Khi Nhan duoc data server bao luu thanh cong goi tin thi sẽ xoa file luu trong sd card
      */
