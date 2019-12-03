@@ -54,15 +54,15 @@
 
 ```json
 {
-	"k": Mã trạm (Xem Trạm cân trong Định nghĩa hằng số),
-	"x": Mã giai đoạn cân,
-    "s": Mã cân,
-	"b": Mã rổ,
-    "w": Khối lượng cá,
-    "t": Thời gian gửi,
-	"c": Mã lô (Chỉ gửi ở trạm trước),
-	"e": Mã nhân viên (Chỉ gửi ở trạm trước),
-    "p": Mã thành phẩm (chỉ gửi trạm ở trạm sau),
+	"k": "Mã trạm (Xem Trạm cân trong Định nghĩa hằng số)",
+	"x": "Mã giai đoạn cân",
+    "s": "Mã cân",
+	"b": "Mã rổ",
+    "w": "Khối lượng cá",
+    "t": "Thời gian gửi",
+	"c": "Mã lô (Chỉ gửi ở trạm trước)",
+	"e": "Mã nhân viên (Chỉ gửi ở trạm trước)",
+    "p": "Mã thành phẩm (chỉ gửi trạm ở trạm sau)",
 }
 ```
 *Note: Giai đoạn sửa cá có 2 gói tin ở trạm sau, 1 gói chứa khối lượng thành phẩm, 1 gói chứa khối lượng phụ phẩm. Chỉ khi nhận  được 2 gói thì quy trình mới kết thúc. Nếu nhận rổ mới khi chưa đủ 2 gói, báo lỗi thiếu data*
@@ -70,14 +70,14 @@
 - Với giai đoạn **Fillet**:
 ```json
 {
-	"k": Mã trạm (Xem Trạm cân trong Định nghĩa hằng số),
-	"x": Mã giai đoạn cân,
-    "s": Mã cân,
-    "w": Khối lượng cá,
-    "t": Thời gian gửi,
-	"c": Mã lô (Chỉ gửi ở trạm trước),
-	"e": Mã nhân viên (Chỉ gửi ở trạm trước),
-    "p": Mã thành phẩm (chỉ gửi trạm ở trạm sau),
+	"k": "Mã trạm (Xem Trạm cân trong Định nghĩa hằng số)",
+	"x": "Mã giai đoạn cân",
+    "s": "Mã cân",
+    "w": "Khối lượng cá",
+    "t": "Thời gian gửi",
+	"c": "Mã lô (Chỉ gửi ở trạm trước)",
+	"e": "Mã nhân viên (Chỉ gửi ở trạm trước)",
+    "p": "Mã thành phẩm (chỉ gửi trạm ở trạm sau)",
 }
 ```
 *Note: Giai đoạn Fillet không sử dụng mã rổ, thông tin 2 gói được nối với nhau bằng mã nhân viên*
@@ -86,8 +86,8 @@
 
 ```json
 {
-    i: timestamp của gói,
-    s: Trạng thái lưu dữ liệu (Xem Trạng thái lưu dữ liệu trong Định nghĩa hằng số)
+    "i": "timestamp của gói",
+    "s": "Trạng thái lưu dữ liệu (Xem Trạng thái lưu dữ liệu trong Định nghĩa hằng số)"
 }
 ```
 
@@ -95,9 +95,9 @@
 
 ```json
 {
-    i: Mã cân,
-    t: Loại gói tin config (Xem Loại gói tin config trong Định nghĩa hằng số),
-	d: Tham số (Dùng khi cần gửi thêm thông tin, VD mã giai đoạn trong config lấy thành phẩm)
+    "i": "Mã cân",
+    "t": "Loại gói tin config (Xem Loại gói tin config trong Định nghĩa hằng số)",
+	"d": "Tham số (Dùng khi cần gửi thêm thông tin, VD mã giai đoạn trong config lấy thành phẩm)"
 }
 ```
 
@@ -108,12 +108,12 @@
     l: Số lượng record trong mảng d bên dưới,
     d: [
         {
-            i: Mã đối tượng (Dùng để gửi lên server trong gói tin),
-            n: Tên đối tượng (Dùng để hiển thị lên màn hình)
+            "i": "Mã đối tượng (Dùng để gửi lên server trong gói tin)",
+            "n": "Tên đối tượng (Dùng để hiển thị lên màn hình)"
         },
         {
-            i: Mã đối tượng (Dùng để gửi lên server trong gói tin),
-            n: Tên đối tượng (Dùng để hiển thị lên màn hình)
+            "i": "Mã đối tượng (Dùng để gửi lên server trong gói tin)",
+            "n": "Tên đối tượng (Dùng để hiển thị lên màn hình)"
         },
         ...
     ]
@@ -207,12 +207,12 @@
 	"l": 2,
 	"d": [
         {
-			i: 1,
-			n: "Cắt tiết"
+			"i": 1,
+			"n": "Cắt tiết"
 		},
 		{
-			i: 2,
-			n: "Fillet"
+			"i": 2,
+			"n": "Fillet"
         },
 	]
 }
@@ -225,12 +225,12 @@
 	"l": 2,
 	"d": [
 		{
-			i: 2,
-			n: "2.1 Cá fillet"
+			"i": 2,
+			"n": "2.1 Cá fillet"
 		},
 		{
-			i: 2,
-			n: "2.2 Cá xẻ bướm còn đầu"
+			"i": 2,
+			"n": "2.2 Cá xẻ bướm còn đầu"
 		},
 	]
 }
