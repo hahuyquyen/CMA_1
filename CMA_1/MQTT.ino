@@ -51,8 +51,6 @@ void onMqttConnect(bool sessionPresent) {
         mqttClient.subscribe( MQTT_TOPIC.dataAck,0 ); 
         mqttClient.subscribe( MQTT_TOPIC.configGetId,0 ); 
         if (WiFiConf.mqtt_subto1[0] != 'x'){mqttClient.subscribe( WiFiConf.mqtt_subto1,0 );}  //0,1,2 laf qos
-        if (WiFiConf.mqtt_subto2[0] != 'x'){mqttClient.subscribe(WiFiConf.mqtt_subto2,0);}
-        if (WiFiConf.mqtt_subto3[0] != 'x'){mqttClient.subscribe(WiFiConf.mqtt_subto3,0);}  
 }
 
 void onMqttDisconnect(AsyncMqttClientDisconnectReason reason) {
@@ -67,12 +65,14 @@ void onMqttUnsubscribe(uint16_t packetId) {// printf("Unsubscribe acknowledged: 
 }
 
 
-/*{"t":"3","l":"3","data":[{"i":"5455","n":"nhàn 1"},{"i":"68","n":"nhàn 2"},{"i":"98","n":"nhàn 3"}]}
-{"i":"5455","n":"nhàn 1","g":1}
- g = 1 hoặc 2 1laf fille 2 la sua ca
+/*
+Set thanh pham 
+{"t":"3","l":"3","d":[{"i":"10","n":"Thanh Pham 1"},{"i":"11","n":"Thanh Pham 2"},{"i":"12","n":"Thanh Pham 3"}]}
+Set nha CC
+{"t":"1","l":"3","d":[{"i":"20","n":"Loai Ca 1"},{"i":"21","n":"Loai Ca 2"},{"i":"22","n":"Loai Ca 3"}]}
+Set Khu Vuc can
+{"t":"2","l":"2","d":[{"i":2,"n":"Sữa Cá"},{"i":1,"n":"Filler"}]}
 
- {"t":"3","l":"3","data":[{"i":"5455","n":"nhàn 1","g":1},{"i":"68","n":"nhàn 2","g":2},{"i":"98","n":"nhàn 3","g":1},,{"i":"98","n":"nhàn 4","g":2}]}
- {"t":"2","l":"2","data":[{"i":1,"n":"Fille"},{"i":2,"n":"Sữa Cá"}]}
  */
 
 void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties properties, size_t len, size_t index, size_t total) {
@@ -91,15 +91,9 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
      Nhan thong tin server cai dat ca lam viec
      */
         if (!jsonBuffer.containsKey("t")) {return;}
-       /* if (jsonBuffer["t"].as<uint8_t>() == 1){
-          inforServer.tongLoaiCa=jsonBuffer["l"].as<uint8_t>();
-          strlcpy(inforServer.nameLoaiCa[0], ramChuaChon, sizeof(inforServer.nameLoaiCa[0]));
-          for (int i=0;i<inforServer.tongLoaiCa;i++){
-            inforServer.maLoaica[i+1]= jsonBuffer["data"][i]["i"].as<uint16_t>();
-            strlcpy(inforServer.nameLoaiCa[i+1], jsonBuffer["data"][i]["n"], sizeof(inforServer.nameLoaiCa[i]));
-          }      
-        }
-        else */if (jsonBuffer["t"].as<uint8_t>() == 1){
+        if (!jsonBuffer.containsKey("d")) {return;}
+        if (jsonBuffer["t"].as<uint8_t>() == 1){
+          
            strlcpy(inforServer.nameNhaCC[0], ramChuaChon, sizeof(inforServer.nameNhaCC[0]));
           inforServer.tongNhaCC=jsonBuffer["l"].as<uint8_t>();
           for (int i=0;i<inforServer.tongNhaCC;i++){
@@ -109,13 +103,6 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
           }  
         }
         else if (jsonBuffer["t"].as<uint8_t>() == 2){
-        /*  strlcpy(inforServer.nameThanhPham[0], ramChuaChon, sizeof(inforServer.nameThanhPham[0]));
-          inforServer.tongThanhPham=jsonBuffer["l"].as<uint8_t>();
-          for (int i=0;i<inforServer.tongThanhPham;i++){
-            inforServer.maThanhPham[i+1]=jsonBuffer["data"][i]["i"].as<uint16_t>();
-            inforServer.sttGdThanhPham[i+1]=jsonBuffer["data"][i]["g"].as<uint8_t>();
-            strlcpy(inforServer.nameThanhPham[i+1], jsonBuffer["data"][i]["n"], sizeof(inforServer.nameThanhPham[i+1]));
-          }*/
           strlcpy(giaiDoanCan.nameGiaiDoan[0], ramChuaChon, sizeof(giaiDoanCan.nameGiaiDoan[0]));
           giaiDoanCan.tongGiaiDoan=jsonBuffer["l"].as<uint8_t>();
           for (int i=0;i<giaiDoanCan.tongGiaiDoan;i++){
@@ -146,7 +133,6 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
       sprintf(textToWrite,"/CMA/%lu", ( unsigned long )sttData);
       if (statusSaveData == 1)deleteFile(SD,textToWrite);
   }
-  else if (strcmp(WiFiConf.mqtt_subto3,topic) == 0){printf("vung 3 \n");}
 }
 
 void onMqttPublish(uint16_t packetId) {

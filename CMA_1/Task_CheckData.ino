@@ -7,10 +7,10 @@ void http_re( void * pvParameters ){
     Data_RFID Data_RFID_TH;
     Data_RFID Data_RFID_NV;
     Data_TH Data_TH;
-    unsigned long timeGetQueueCan = 0;
-    unsigned long timeGetQueueRfidRo = 0;
-    unsigned long timeGetQueueRfidNV = 0;
-    unsigned long _time_get_tam = 0;
+    unsigned long lastTimeGetQueueCan = 0;
+    unsigned long lastTimeGetQueueRFID_Ro = 0;
+    unsigned long lastTimeGetQueueRFID_NV = 0;
+    unsigned long lastTimeGetData_RoVaCan = 0;
     unsigned long timeCompareMode1=10000;
     unsigned long timeCompareMode2=10000;
     unsigned long timeScheduTaskCheck=0;
@@ -21,7 +21,7 @@ void http_re( void * pvParameters ){
        * Nhận Cân
        */
     if(xQueueReceive( Queue_can, &Data_CAN_TH,  ( TickType_t ) 1 )== pdPASS ){
-      timeGetQueueCan=xTaskGetTickCount();
+      lastTimeGetQueueCan=xTaskGetTickCount();
     }
     /*
      * Nhận mã RFID mã Rổ
@@ -30,7 +30,7 @@ void http_re( void * pvParameters ){
     if(xQueueReceive( Queue_RFID, &Data_RFID_TH,  ( TickType_t ) 1 )== pdPASS ){
       //if ((inforServer.PhanLoaiKV == PhanLoai::LANG_IN)||(inforServer.PhanLoaiKV == PhanLoai::LANG_OUT)){ 
       if (giaiDoanCan.maGiaiDoan[giaiDoanCan.userSelecGiaiDoan] == kvSuaCa) {
-      timeGetQueueRfidRo=xTaskGetTickCount();
+      lastTimeGetQueueRFID_Ro=xTaskGetTickCount();
       }     
     }
     /*
@@ -38,17 +38,17 @@ void http_re( void * pvParameters ){
      * Nếu là khu Filler chỉ nhận mã rỗ thì swap time tới mã rỗ để khỏi viết lại code
      */
     if(xQueueReceive( Queue_RFID_NV, &Data_RFID_NV,  ( TickType_t ) 1 )== pdPASS ){
-           // if ((inforServer.PhanLoaiKV == PhanLoai::Fil_IN)||(inforServer.PhanLoaiKV == PhanLoai::Fil_OUT)){timeGetQueueRfidRo=xTaskGetTickCount();}
-            if (giaiDoanCan.maGiaiDoan[giaiDoanCan.userSelecGiaiDoan]==kvFille){timeGetQueueRfidRo=xTaskGetTickCount();}
-            else timeGetQueueRfidNV=xTaskGetTickCount();
+           // if ((inforServer.PhanLoaiKV == PhanLoai::Fil_IN)||(inforServer.PhanLoaiKV == PhanLoai::Fil_OUT)){lastTimeGetQueueRFID_Ro=xTaskGetTickCount();}
+            if (giaiDoanCan.maGiaiDoan[giaiDoanCan.userSelecGiaiDoan]==kvFille){lastTimeGetQueueRFID_Ro=xTaskGetTickCount();}
+            else lastTimeGetQueueRFID_NV=xTaskGetTickCount();
     }
     /*
      * Nếu là Khu Phi Le thì chỉ dùng mã NV để quét
      * state_Running
      */
-    if (state_Running_conf::state_Running == state_Running_conf::Running){
-          if ((timeGetQueueCan > timeGetQueueRfidRo + 500)&&(timeGetQueueRfidRo > 0)){ // chỉ nhận khi dữ liệu cân lớn hơn dữ liệu rfid 500 stick
-               timeCompareMode1 = timeGetQueueCan - timeGetQueueRfidRo;
+    if (stateMachine.deviceStatus == deviceRunning){
+          if ((lastTimeGetQueueCan > lastTimeGetQueueRFID_Ro + 300)&&(lastTimeGetQueueRFID_Ro > 0)){ // chỉ nhận khi dữ liệu cân lớn hơn dữ liệu rfid 500 stick
+               timeCompareMode1 = lastTimeGetQueueCan - lastTimeGetQueueRFID_Ro;
               if (timeCompareMode1 < time_2_lan_nhan_data){ // 2 dữ liệu phải nhỏ hơn thời gian cài đặt mới là 1 cặp đúng
               //  if ((inforServer.PhanLoaiKV == PhanLoai::Fil_IN)||(inforServer.PhanLoaiKV == PhanLoai::Fil_OUT)){
                if (giaiDoanCan.maGiaiDoan[giaiDoanCan.userSelecGiaiDoan] == kvFille){
@@ -82,48 +82,56 @@ void http_re( void * pvParameters ){
                    
                    // if ((inforServer.PhanLoaiKV == PhanLoai::Fil_IN)||(inforServer.PhanLoaiKV == PhanLoai::Fil_OUT)||(inforServer.PhanLoaiKV == PhanLoai::LANG_OUT)){       
                    
-                    if ((giaiDoanCan.maGiaiDoan[giaiDoanCan.userSelecGiaiDoan] != kvSuaCa)||(giaiDoanCan.cheDoInOut == cheDoOut)){
+                   /* if ((giaiDoanCan.maGiaiDoan[giaiDoanCan.userSelecGiaiDoan] != kvSuaCa)||(giaiDoanCan.cheDoInOut == cheDoOut)){
                         printf("CHECK OUT: Time: %ld - Kg: %f - RFID: %s \n",timeCompareMode1,Data_TH.data_weight,Data_TH.id_RFID);
                         xQueueSend( Queue_mqtt, &Data_TH, xTicksToWait );
                     }
-                    else xSemaphoreGive(xreset_id_nv);            
+                    else xSemaphoreGive(xreset_id_nv);   */
+                    if ((giaiDoanCan.cheDoInOut == cheDoIN)&& (giaiDoanCan.maGiaiDoan[giaiDoanCan.userSelecGiaiDoan]  == kvSuaCa)) {   
+                      xSemaphoreGive(xreset_id_nv);  
+                    }
+                    else {
+                        printf("CHECK OUT: Time: %ld - Kg: %f - RFID: %s \n",timeCompareMode1,Data_TH.data_weight,Data_TH.id_RFID);
+                        xQueueSend( Queue_mqtt, &Data_TH, xTicksToWait );
+                       // xSemaphoreGive(xSignal_Display_check);  
+                    }      
                 }
-                xSemaphoreGive(xSignal_Display_check);     
+              //  xSemaphoreGive(xSignal_Display_check);     
                 timeCompareMode1 = 10000;
-                timeGetQueueCan = 0;
-                timeGetQueueRfidRo = 0;
-                _time_get_tam=xTaskGetTickCount();
+                lastTimeGetQueueCan = 0;
+                lastTimeGetQueueRFID_Ro = 0;
+                lastTimeGetData_RoVaCan=xTaskGetTickCount();
               }
           }
-          else if ((timeGetQueueRfidRo >0)&&(xTaskGetTickCount()- timeGetQueueRfidRo > time_2_lan_nhan_data)){
+          
+          else if ((lastTimeGetQueueRFID_Ro >0)&&(xTaskGetTickCount()- lastTimeGetQueueRFID_Ro > time_2_lan_nhan_data)){
               printf("Over time: Ma Ro va Can \n");     
-                timeGetQueueRfidRo=0;
-                xSemaphoreGive(xreset_id_nv);      
-                xSemaphoreGive(xSignal_Display_checkdone);
+                lastTimeGetQueueRFID_Ro=0;
+                xSemaphoreGive(xreset_id_nv);    
+                if ((giaiDoanCan.maGiaiDoan[giaiDoanCan.userSelecGiaiDoan] != kvSuaCa)||(giaiDoanCan.cheDoInOut == cheDoOut)){xSemaphoreGive(xSignal_Display_checkdone);}              
           }
-        //  if ( inforServer.PhanLoaiKV == PhanLoai::LANG_IN){  
-            if ((giaiDoanCan.maGiaiDoan[giaiDoanCan.userSelecGiaiDoan] == kvSuaCa)&&(giaiDoanCan.cheDoInOut == cheDoIN)){ 
-              if ((timeGetQueueRfidNV > _time_get_tam)&& (_time_get_tam >0)){ 
-                  timeCompareMode2 = timeGetQueueRfidNV - _time_get_tam;
+          if ((giaiDoanCan.maGiaiDoan[giaiDoanCan.userSelecGiaiDoan] == kvSuaCa)&&(giaiDoanCan.cheDoInOut == cheDoIN)){ 
+              if ((lastTimeGetQueueRFID_NV > lastTimeGetData_RoVaCan)&& (lastTimeGetData_RoVaCan >0)){ 
+                  timeCompareMode2 = lastTimeGetQueueRFID_NV - lastTimeGetData_RoVaCan;
                   if (timeCompareMode2 < time_cho_nhan_RFID_NV){
-                    _time_get_tam=timeGetQueueRfidNV;
+                    lastTimeGetData_RoVaCan=lastTimeGetQueueRFID_NV;
                     strncpy( Data_TH.id_RFID_NV,Data_RFID_NV.id_RFID, sizeof(Data_RFID_NV.id_RFID));
                     printf("CHECK IN: Time: %ld - Kg: %f - RFID: %s - RFID NV: %s\n",timeCompareMode2,Data_TH.data_weight,Data_TH.id_RFID,Data_TH.id_RFID_NV);
                     xQueueSend( Queue_display, &Data_TH, xTicksToWait );
                     xQueueSend( Queue_mqtt, &Data_TH, xTicksToWait );
                     timeCompareMode2=10000;
-                    timeGetQueueRfidNV=0;
-                    _time_get_tam = 0;
+                    lastTimeGetQueueRFID_NV=0;
+                    lastTimeGetData_RoVaCan = 0;
                   }
                   else  {
                     xSemaphoreGive(xSignal_Display_checkdone);
-                    timeGetQueueRfidNV=0;
+                    lastTimeGetQueueRFID_NV=0;
                     printf("TIme out check rfid nv \n");
                   } 
               }
-              else if ((_time_get_tam >0)&&(xTaskGetTickCount()- _time_get_tam > time_cho_nhan_RFID_NV)){
+              else if ((lastTimeGetData_RoVaCan >0)&&(xTaskGetTickCount()- lastTimeGetData_RoVaCan > time_cho_nhan_RFID_NV)){
                  xSemaphoreGive(xResetRfidMaRo); // Gửi tín hiệu để reset mã rỗ
-                _time_get_tam=0;
+                lastTimeGetData_RoVaCan=0;
                 printf("Over time: Ma NV va \n");      
                 xSemaphoreGive(xSignal_Display_checkdone);
               }
@@ -133,9 +141,7 @@ void http_re( void * pvParameters ){
       timeScheduTaskCheck=xTaskGetTickCount();
     }
       
-    vTaskDelay(10);
-       //   vTaskDelay(5000); 
-   //   printf("Task CHECK StackHigh %d, Free Heap = %d\n",uxTaskGetStackHighWaterMark(NULL),ESP.getFreeHeap());    
+    vTaskDelay(10);  
     }
     vTaskDelete(NULL) ;
 }

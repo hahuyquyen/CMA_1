@@ -27,28 +27,24 @@ static uint8_t counter_wifi_disconnect= 0;
 static boolean status_wifi_connect_AP = true ; 
 static boolean status_mqtt_connect = false ; 
 uint8_t firstGetDataFromServer=0;
+
 /*
- * 
- */
-/*namespace PhanLoai {
-    enum PhanLoai: uint8_t { 
-      Not_Choose=0, 
-      Fil_IN=1, 
-      Fil_OUT=2, 
-      LANG_IN=3, 
-      LANG_OUT=4 
-    };
-}
-*/
 namespace state_Running_conf {
     enum state_Running: uint8_t { 
       Setting=0, 
       Running
     }state_Running;
 }
+
+
 struct setting_button{
   uint8_t state_select;
 }Status_setting;
+*/
+struct stateMachineConf{
+  uint8_t bottonSelect;
+  uint8_t deviceStatus;
+}stateMachine;
 
 struct variLcdUpdateConf{
   int numScroll;
@@ -59,6 +55,8 @@ struct variLcdUpdateConf{
   false,
   0
 };
+
+
 char cheDoInOutDis[3][30]={"Chưa Chọn","Đầu Vào","Đầu Ra"};
 struct giaiDoanCanConf{
   uint8_t cheDoInOut;
@@ -67,26 +65,17 @@ struct giaiDoanCanConf{
   uint8_t maGiaiDoan[10];
   char nameGiaiDoan[10][30];
 }giaiDoanCan;
+
 struct inforServerStruct{
-  //PhanLoai::PhanLoai PhanLoaiKV;
-  //uint8_t tongLoaiCa; 
   uint8_t tongNhaCC;   
   uint8_t tongThanhPham; 
   uint8_t userSelectNhaCC;
-  //uint8_t userSelectLoaiCa;
   uint8_t userSelectThanhPham;
- // uint16_t maLoaica[20];
   uint16_t maThanhPham[20];
   uint16_t maNhaCC[20];
-  uint8_t sttGdSoLo[20]; 
-  uint8_t sttGdThanhPham[20]; 
-//  char nameLoaiCa[20][80];
   char nameNhaCC[20][100];
   char nameThanhPham[20][100];
 }inforServer={
- // PhanLoai::Not_Choose,
-  0,
-  0,
   0,
   0,
   0,
@@ -97,16 +86,11 @@ struct inforServerStruct{
   0
 };
 
-/*static struct choose_nha_sx {
-
-} Nha_SX;*/
-/*
- * 
- */
 static struct MQTT_TOPIC {
   char dataAck[64]; 
   char configGetId[64]; 
 } MQTT_TOPIC; 
+
 static struct WiFiConfStruct {
   uint8_t format[4];
   char sta_ssid[32];
@@ -121,9 +105,7 @@ static struct WiFiConfStruct {
   char mqtt_user[64]; 
   char mqtt_pass[64]; 
   char mqtt_subto1[64]; 
-  char mqtt_subto2[64]; 
-  char mqtt_subto3[64];
-  char mqtt_choose_inout[5];
+ // char mqtt_choose_inout[5];
 } WiFiConf = {
   WIFI_CONF_FORMAT,
   "Bach Huu Phat",
@@ -137,10 +119,8 @@ static struct WiFiConfStruct {
   "0",
   "admin",
   "pass",
-  "x",
-  "x",
-  "x",
-  "IN"
+  "x"
+//  "IN"
 };
 
 
@@ -179,19 +159,14 @@ typedef struct Data_CAN{
   double data_can;
   unsigned long time_get;
 } Data_CAN;
+
+
 typedef struct Data_RFID{
   char id_RFID[25];
   char id_RFID_Old[25];
   unsigned long time_get;
 } Data_RFID;
-//char id_RFID_old[25];
-/*typedef struct Display{
-  uint8_t id;
-  char name_nv[50];
-  double cannang;
-  double tiencong;
-} display_NV;*/
- 
+
 
 /*
  * Web Server vÃ  MQTT

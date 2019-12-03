@@ -45,3 +45,11 @@
 #define kvFille 1
 #define kvSuaCa 2
 #define kvNotChoose 0
+
+#define stateChooseINOUT 0
+#define stateChooseKV 1
+#define stateChooseNhaCC 2
+#define stateChooseThanhPham 3
+
+#define deviceRunning 1
+#define deviceSetting 0

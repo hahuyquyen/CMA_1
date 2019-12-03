@@ -45,9 +45,6 @@ void setupWiFiConf(void);
 void setting_uart();
 void WiFiEvent(WiFiEvent_t event);
 size_t content_len;
-/*
- * WiFi.macAddress()
- */
 void printProgress(size_t prg, size_t sz) {
   printf("Progress: %d%%\n", (prg*100)/content_len);
 }
@@ -61,20 +58,14 @@ void khoiTaoGiaTri(){
     strlcpy(inforServer.nameThanhPham[0], ramChoDuLieu, sizeof(inforServer.nameThanhPham[0]));
     strlcpy(inforServer.nameNhaCC[0], ramChoDuLieu, sizeof(inforServer.nameNhaCC[0]));
     strlcpy(giaiDoanCan.nameGiaiDoan[0], ramChoDuLieu, sizeof(giaiDoanCan.nameGiaiDoan[0]));
-  //  strlcpy(inforServer.nameLoaiCa[0], ramChoDuLieu, sizeof(inforServer.nameLoaiCa[0]));
-    state_Running_conf::state_Running = state_Running_conf::Setting;
-    Status_setting.state_select = 0;
-  //  inforServer.PhanLoaiKV = PhanLoai::Not_Choose;
-  //  inforServer.userSelectLoaiCa = 0;
+    stateMachine.deviceStatus = deviceSetting;
+    stateMachine.bottonSelect = 0;
     inforServer.userSelectNhaCC = 0;
     inforServer.userSelectThanhPham = 0;
     inforServer.tongThanhPham = 0;
     inforServer.tongNhaCC = 0;
-   // inforServer.tongLoaiCa = 0;
-  //  inforServer.maLoaica[0]=0;
     inforServer.maNhaCC[0]=0;
     inforServer.maThanhPham[0]=0;
-
     giaiDoanCan.cheDoInOut=0;
     giaiDoanCan.tongGiaiDoan=0;
     giaiDoanCan.userSelecGiaiDoan=0;
@@ -96,7 +87,6 @@ void setup()
     xSignal_Display_checkdone = xSemaphoreCreateCounting( 2, 0 );
     xreset_id_nv = xSemaphoreCreateCounting( 2, 0 );
     xResetRfidMaRo = xSemaphoreCreateCounting( 2, 0 );
-
     EEPROM.begin(1024);
     WiFi.disconnect(true);
     if(!SPIFFS.begin(true)){printf("An Error has occurred while mounting SPIFFS\n");}
@@ -176,7 +166,6 @@ void setup()
   mqttClient.onPublish(onMqttPublish);
   mqttClient.setServer(WiFiConf.mqtt_server, atoi(WiFiConf.mqtt_port));       
   mqttClient.setCredentials(WiFiConf.mqtt_user,WiFiConf.mqtt_pass);      
-//  printf("END set \n");
   root_CMA = SD.open("/CMA");
 }
 /*
@@ -229,7 +218,7 @@ void loop()
   /*
    * Lịch gửi server yêu cầu config
    */
-  if ((status_mqtt_connect)&&(state_Running_conf::state_Running == state_Running_conf::Setting)){  
+  if ((status_mqtt_connect)&&(stateMachine.deviceStatus == deviceSetting)){  
     /*
      */
     if((xTaskGetTickCount() - timeFirstGetDataFromServer>5000)|| (timeFirstGetDataFromServer == 0)){
@@ -249,7 +238,7 @@ void checkSendMQTTConfig(){
         mqttClient.publish("/config", 0, true,buffer); 
       }*/
       if (inforServer.tongThanhPham == 0){
-        doc["t"]= 1 ;
+        doc["t"]= 3 ;
         serializeJson(doc, buffer);
         mqttClient.publish("/config", 0, true, buffer); 
       }
@@ -265,7 +254,7 @@ void checkSendMQTTConfig(){
         /*
          * lay thong tin cac nha cung cap
          */
-        doc["t"]= 3 ;
+        doc["t"]= 1 ;
         doc["d"]=giaiDoanCan.maGiaiDoan[giaiDoanCan.userSelecGiaiDoan];
         serializeJson(doc, buffer);
         mqttClient.publish("/config", 0, true, buffer); 

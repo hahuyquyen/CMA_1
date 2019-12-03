@@ -19,7 +19,7 @@ void TaskCAN( void * pvParameters ){
                   Data_CAN.time_get=xTaskGetTickCount();
                   if(can_data > 0.1){xQueueSend( Queue_can, &Data_CAN, xTicksToWait );}
                   }//
-                else if (xTaskGetTickCount() - timeScheduSendCan > 2000){
+                else if (xTaskGetTickCount() - timeScheduSendCan > 1000){
                   timeScheduSendCan=xTaskGetTickCount();
                   xQueueSend( Queue_can, &Data_CAN, xTicksToWait );
                   }
