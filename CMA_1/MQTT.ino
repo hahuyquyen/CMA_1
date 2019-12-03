@@ -33,7 +33,7 @@ void truyen_mqtt(){
       doc["x"] = giaiDoanCan.maGiaiDoan[giaiDoanCan.userSelecGiaiDoan];
       doc["b"] = datatruyen_mqtt.id_RFID;
       doc["e"] = datatruyen_mqtt.id_RFID_NV;
-      doc["s"] = (unsigned long) idDevice;      
+      doc["s"] = (unsigned long) stateMachine.idDevice;      
       doc["w"] = datatruyen_mqtt.data_weight;
       doc["t"] = now.unixtime();
       //doc["m"] = inforServer.maLoaica[inforServer.userSelectLoaiCa];
@@ -109,7 +109,7 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
             giaiDoanCan.maGiaiDoan[i+1]=jsonBuffer["d"][i]["i"].as<uint16_t>();
             strlcpy(giaiDoanCan.nameGiaiDoan[i+1], jsonBuffer["d"][i]["n"], sizeof(giaiDoanCan.nameGiaiDoan[i+1]));
           }
-          timeFirstGetDataFromServer = 0;
+          MQTT_lastTimeGetDataConfig = 0;
         }
          else if (jsonBuffer["t"].as<uint8_t>() == 3){
           strlcpy(inforServer.nameThanhPham[0], ramChuaChon, sizeof(inforServer.nameThanhPham[0]));
@@ -118,7 +118,7 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
             inforServer.maThanhPham[i+1]=jsonBuffer["d"][i]["i"].as<uint16_t>();
             strlcpy(inforServer.nameThanhPham[i+1], jsonBuffer["d"][i]["n"], sizeof(inforServer.nameThanhPham[i+1]));
           }
-          timeFirstGetDataFromServer = 0;
+          MQTT_lastTimeGetDataConfig = 0;
         }  
 
   }

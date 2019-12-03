@@ -25,7 +25,7 @@ void TaskRFID( void * pvParameters ){
     Data_RFID Data_rfid_nv;
     RFID nano; 
     const TickType_t xTicksToWait = pdMS_TO_TICKS(1);
-    unsigned long _time_counting_task_rfid = 0;
+    unsigned long TaskRFID_lastTimeSche = 0;
     int i =0;
     Serial2.begin(uart_rfid_baud_rate);
     nano.begin(Serial2); 
@@ -39,8 +39,8 @@ void TaskRFID( void * pvParameters ){
       /*
        * Chuyển task 24ms
        */
-                if (xTaskGetTickCount()-_time_counting_task_rfid > 2000){
-                    _time_counting_task_rfid = xTaskGetTickCount();
+                if (xTaskGetTickCount()-TaskRFID_lastTimeSche > 2000){
+                    TaskRFID_lastTimeSche = xTaskGetTickCount();
                     i=i+1; 
                   }
                   if (nano.check() == true){ 

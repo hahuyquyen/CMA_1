@@ -13,7 +13,7 @@ void http_re( void * pvParameters ){
     unsigned long lastTimeGetData_RoVaCan = 0;
     unsigned long timeCompareMode1=10000;
     unsigned long timeCompareMode2=10000;
-    unsigned long timeScheduTaskCheck=0;
+    unsigned long TaskCheck_lastTimeSche=0;
     double canDataOutOld = 0;
     for (;;){
 
@@ -50,7 +50,6 @@ void http_re( void * pvParameters ){
           if ((lastTimeGetQueueCan > lastTimeGetQueueRFID_Ro + 300)&&(lastTimeGetQueueRFID_Ro > 0)){ // chỉ nhận khi dữ liệu cân lớn hơn dữ liệu rfid 500 stick
                timeCompareMode1 = lastTimeGetQueueCan - lastTimeGetQueueRFID_Ro;
               if (timeCompareMode1 < time_2_lan_nhan_data){ // 2 dữ liệu phải nhỏ hơn thời gian cài đặt mới là 1 cặp đúng
-              //  if ((inforServer.PhanLoaiKV == PhanLoai::Fil_IN)||(inforServer.PhanLoaiKV == PhanLoai::Fil_OUT)){
                if (giaiDoanCan.maGiaiDoan[giaiDoanCan.userSelecGiaiDoan] == kvFille){
                     strncpy( Data_TH.id_RFID_NV,Data_RFID_NV.id_RFID, sizeof(Data_RFID_NV.id_RFID));
                     strncpy( Data_TH.id_RFID,"x", sizeof("x"));     
@@ -61,42 +60,30 @@ void http_re( void * pvParameters ){
                 }
                 Data_TH.data_weight=Data_CAN_TH.data_can;
                 boolean tt = true;
+                /*
+                 Kiem tra giai doan sua ca ngo ra, co can 2 lan
+                 Neu khac ro thi van can binh thuong
+                 neu cung ma ro trong 2 lần lien tiep phải khac so kg
+                 */
                 if ((giaiDoanCan.maGiaiDoan[giaiDoanCan.userSelecGiaiDoan] == kvSuaCa)&&(giaiDoanCan.cheDoInOut == cheDoOut)){
-               // if (inforServer.PhanLoaiKV == PhanLoai::LANG_OUT){
-                  /*
-                   * nêu khác mã rổ thì không cần check cân
-                   */
-                    tt = false;
+                  tt = false;
                   if (strcmp(Data_TH.id_RFID,idRFID_OLD) != 0){strncpy( idRFID_OLD,Data_TH.id_RFID, sizeof(Data_TH.id_RFID));if (Data_CAN_TH.data_can >0.5) tt = true;}
                   else {  
-                        double tam = Data_CAN_TH.data_can > canDataOutOld ?Data_CAN_TH.data_can - canDataOutOld :canDataOutOld - Data_CAN_TH.data_can ;
-                        if ((tam > 0.8)&&(Data_CAN_TH.data_can >0.5))tt = true;
-                        canDataOutOld=Data_CAN_TH.data_can;
-                  }
+                          double tam = Data_CAN_TH.data_can > canDataOutOld ?Data_CAN_TH.data_can - canDataOutOld :canDataOutOld - Data_CAN_TH.data_can ;
+                          if ((tam > 0.8)&&(Data_CAN_TH.data_can >0.5))tt = true;
+                          canDataOutOld=Data_CAN_TH.data_can;
+                    }
                 }
                 if(tt){
                     xQueueSend( Queue_display, &Data_TH, xTicksToWait );
-                    /*
-                     * Nếu là Phi le và lạng da ngõ ra thì ko cần mã NV nên sẽ truyền MQTT
-                     */
-                   
-                   // if ((inforServer.PhanLoaiKV == PhanLoai::Fil_IN)||(inforServer.PhanLoaiKV == PhanLoai::Fil_OUT)||(inforServer.PhanLoaiKV == PhanLoai::LANG_OUT)){       
-                   
-                   /* if ((giaiDoanCan.maGiaiDoan[giaiDoanCan.userSelecGiaiDoan] != kvSuaCa)||(giaiDoanCan.cheDoInOut == cheDoOut)){
-                        printf("CHECK OUT: Time: %ld - Kg: %f - RFID: %s \n",timeCompareMode1,Data_TH.data_weight,Data_TH.id_RFID);
-                        xQueueSend( Queue_mqtt, &Data_TH, xTicksToWait );
-                    }
-                    else xSemaphoreGive(xreset_id_nv);   */
-                    if ((giaiDoanCan.cheDoInOut == cheDoIN)&& (giaiDoanCan.maGiaiDoan[giaiDoanCan.userSelecGiaiDoan]  == kvSuaCa)) {   
+                    if ((giaiDoanCan.cheDoInOut == cheDoIN)&& (giaiDoanCan.maGiaiDoan[giaiDoanCan.userSelecGiaiDoan]  == kvSuaCa)) {   //Neu Sua Ca Ngo Vao thi reset ma Nhan vien
                       xSemaphoreGive(xreset_id_nv);  
                     }
-                    else {
+                    else { // nêu khong có check 2 lan thi gui mqtt
                         printf("CHECK OUT: Time: %ld - Kg: %f - RFID: %s \n",timeCompareMode1,Data_TH.data_weight,Data_TH.id_RFID);
                         xQueueSend( Queue_mqtt, &Data_TH, xTicksToWait );
-                       // xSemaphoreGive(xSignal_Display_check);  
                     }      
-                }
-              //  xSemaphoreGive(xSignal_Display_check);     
+                }   
                 timeCompareMode1 = 10000;
                 lastTimeGetQueueCan = 0;
                 lastTimeGetQueueRFID_Ro = 0;
@@ -137,8 +124,8 @@ void http_re( void * pvParameters ){
               }
           }
     }
-    if (xTaskGetTickCount()- timeScheduTaskCheck > 1000){
-      timeScheduTaskCheck=xTaskGetTickCount();
+    if (xTaskGetTickCount()- TaskCheck_lastTimeSche > 1000){
+      TaskCheck_lastTimeSche=xTaskGetTickCount();
     }
       
     vTaskDelay(10);  

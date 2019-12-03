@@ -53,8 +53,8 @@ void printProgress(size_t prg, size_t sz) {
  * Setup
  */
 void khoiTaoGiaTri(){
-    sprintf(MQTT_TOPIC.dataAck, "/data/ack/%lu", ( unsigned long )idDevice) ;
-    sprintf(MQTT_TOPIC.configGetId, "/config/%lu", ( unsigned long )idDevice) ;
+    sprintf(MQTT_TOPIC.dataAck, "/data/ack/%lu", ( unsigned long )stateMachine.idDevice) ;
+    sprintf(MQTT_TOPIC.configGetId, "/config/%lu", ( unsigned long )stateMachine.idDevice) ;
     strlcpy(inforServer.nameThanhPham[0], ramChoDuLieu, sizeof(inforServer.nameThanhPham[0]));
     strlcpy(inforServer.nameNhaCC[0], ramChoDuLieu, sizeof(inforServer.nameNhaCC[0]));
     strlcpy(giaiDoanCan.nameGiaiDoan[0], ramChoDuLieu, sizeof(giaiDoanCan.nameGiaiDoan[0]));
@@ -94,9 +94,9 @@ void setup()
     Serial.begin(115200);
     SDSPI.begin(14,27,13,15); ///SCK,MISO,MOSI,ss
     if(!SD.begin(15,SDSPI)){Serial.println("Card Mount Failed");    }
-    idDevice=EEPROM.readUInt(800);
+    stateMachine.idDevice=EEPROM.readUInt(800);
     Serial.print("ID Device : ");
-    Serial.println( idDevice);
+    Serial.println( stateMachine.idDevice);
     loadWiFiConf();
     khoiTaoGiaTri();
     if (! rtc.begin()) {Serial.println(F("Couldn't find RTC"));} 
@@ -193,23 +193,23 @@ void loop()
    */
   if(xQueueReceive( Queue_mqtt, &datatruyen_mqtt,  ( TickType_t ) 1 )== pdPASS ){
     truyen_mqtt();
-    timeCheckMQTT_SD=xTaskGetTickCount();
+    SD_lastTimeSendMQTT=xTaskGetTickCount();
   }
-  else if ((status_mqtt_connect)&&((xTaskGetTickCount() - timeCheckMQTT_SD >timeTruyenMQTT))){
+  else if ((status_mqtt_connect)&&((xTaskGetTickCount() - SD_lastTimeSendMQTT >timeTruyenMQTT))){
       /*
        * Check nếu có file còn lưu trong thu muc SD card thì đọc và gửi MQTT den server
        */
-       timeCheckMQTT_SD=xTaskGetTickCount();
+       SD_lastTimeSendMQTT=xTaskGetTickCount();
        if (statusGetAllSD == false){
            File file = root_CMA.openNextFile();
            if(file){ readFile(SD,file.name(),file.size());}
            else{  statusGetAllSD = true;
-                  timeEndReadSD=xTaskGetTickCount();
+                  SD_lastTimeReadEnd=xTaskGetTickCount();
                   root_CMA.close();
            }
       }
-      if((xTaskGetTickCount() - timeEndReadSD > 60000)&&(statusGetAllSD)){
-        timeEndReadSD = xTaskGetTickCount();
+      if((xTaskGetTickCount() - SD_lastTimeReadEnd > 60000)&&(statusGetAllSD)){
+        SD_lastTimeReadEnd = xTaskGetTickCount();
         statusGetAllSD = false;
         Serial.println("reboot SD");
               root_CMA = SD.open("/CMA");             
@@ -221,8 +221,8 @@ void loop()
   if ((status_mqtt_connect)&&(stateMachine.deviceStatus == deviceSetting)){  
     /*
      */
-    if((xTaskGetTickCount() - timeFirstGetDataFromServer>5000)|| (timeFirstGetDataFromServer == 0)){
-      timeFirstGetDataFromServer = xTaskGetTickCount();
+    if((xTaskGetTickCount() - MQTT_lastTimeGetDataConfig>5000)|| (MQTT_lastTimeGetDataConfig == 0)){
+      MQTT_lastTimeGetDataConfig = xTaskGetTickCount();
       checkSendMQTTConfig();
     }
   }
@@ -231,7 +231,7 @@ void loop()
 void checkSendMQTTConfig(){
       StaticJsonDocument<55> doc;
       char buffer[55];
-      doc["i"]= idDevice;
+      doc["i"]= stateMachine.idDevice;
       /*if (inforServer.tongLoaiCa == 0){
         doc["t"]= 1 ;
         serializeJson(doc, buffer);

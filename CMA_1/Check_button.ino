@@ -9,9 +9,6 @@ void onPressedPower() {
  if (xTaskGetTickCount() > 1000){digitalWrite(pinPower, LOW);}
 }
 void onPressed_left() {
-  //if ((stateMachine.bottonSelect == 0)&&(inforServer.PhanLoaiKV > 0)){ inforServer.PhanLoaiKV = static_cast<PhanLoai::PhanLoai>((inforServer.PhanLoaiKV - 1) % (PhanLoai::LANG_OUT+1));}
-  //else  if ((stateMachine.bottonSelect == 1)&&(inforServer.userSelectLoaiCa > 0)){ inforServer.userSelectLoaiCa = inforServer.userSelectLoaiCa - 1 ;}
- // if ((stateMachine.bottonSelect == 0)&&(inforServer.PhanLoaiKV > 0)){
   if ((stateMachine.bottonSelect == 0)&&(giaiDoanCan.cheDoInOut > 0)){
     giaiDoanCan.cheDoInOut = giaiDoanCan.cheDoInOut- 1;
      
