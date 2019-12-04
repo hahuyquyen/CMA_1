@@ -126,6 +126,8 @@ void LCD_thong_tin(uint8_t chedo_HT, Data_TH* Data_TH  , uint8_t daucham = 0) {
 void Display( void * pvParameters ) {
   boolean status_led = true;
   Data_TH Data_TH;
+  pinMode(pinBuzzer, OUTPUT);
+  pinMode(pinLedGreen, OUTPUT);
   unsigned long lastTimeBlinkLed = 0;
   unsigned long timeoutDisplay = 0;
   unsigned long timeoutLcdLangDaIn = 0;
@@ -140,6 +142,7 @@ void Display( void * pvParameters ) {
   variLcdUpdate.stateDisplayLCD = 1;
   uint8_t daucham_lcd = 0;
   u8g2.setAutoPageClear(1);
+  boolean statusBuzzer = false ; 
   for (;;) {
     /*
        30ms
@@ -151,24 +154,38 @@ void Display( void * pvParameters ) {
         if ((Data_TH.id_RFID_NV[0] == 'x') && (giaiDoanCan.cheDoInOut == cheDoIN)&& (giaiDoanCan.maGiaiDoan[giaiDoanCan.userSelecGiaiDoan]  == kvSuaCa)) {
         //  timeoutLcdLangDaIn = xTaskGetTickCount();
         Serial.println(" Da Nhan Ro va can GD1");
+        digitalWrite(pinLedGreen, HIGH);
         }
         else if ((giaiDoanCan.cheDoInOut == cheDoIN)&& (giaiDoanCan.maGiaiDoan[giaiDoanCan.userSelecGiaiDoan]  == kvSuaCa)){
           Serial.println(" Da Nhan du thong tin");
           timeoutDisplay = xTaskGetTickCount();
+          statusBuzzer = true ;
+          digitalWrite(pinBuzzer, statusBuzzer);
         }
-        else timeoutDisplay = xTaskGetTickCount();
+        else{ timeoutDisplay = xTaskGetTickCount();
+        statusBuzzer = true ;
+        digitalWrite(pinBuzzer, statusBuzzer);
+        }
+        
       }
      /* if (xSemaphoreTake(xSignal_Display_check, 1)) {
         timeoutDisplay = xTaskGetTickCount();
       }*/
       if (xSemaphoreTake(xSignal_Display_checkdone, 1)) { //Che do IN qua timeout se tat
         variLcdUpdate.stateDisplayLCD = 1;
-        digitalWrite(4, LOW);
+        statusBuzzer = false ;
+        digitalWrite(pinBuzzer, statusBuzzer);
+        digitalWrite(pinLedGreen, LOW);
         timeoutLcdLangDaIn = 0;
         timeoutDisplay = 0;
       }
+    if ((xTaskGetTickCount() - timeoutDisplay > 500) && (timeoutDisplay > 0 ) && (statusBuzzer)) {
+      statusBuzzer = false ;
+      digitalWrite(pinBuzzer, statusBuzzer);
+      digitalWrite(pinLedGreen, LOW);
+    }
     if ((xTaskGetTickCount() - timeoutDisplay > Time_check) && (timeoutDisplay > 0 )) {
-            digitalWrite(4, LOW);
+
             variLcdUpdate.stateDisplayLCD = 1;
             timeoutDisplay = 0;timeoutLcdLangDaIn = 0; 
      }

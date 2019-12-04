@@ -101,7 +101,7 @@ void setup()
     loadWiFiConf();
     khoiTaoGiaTri();
     if (! rtc.begin()) {Serial.println(F("Couldn't find RTC"));} 
-    if (rtc.lostPower()) { rtc.adjust(DateTime(2019, 11, 21,11, 20, 0));}
+    if (rtc.lostPower()) { Serial.println(F("Ghi Time"));rtc.adjust(DateTime(2019, 12, 4,13, 53, 0));}
 #ifdef using_sta
     wifi_connect(0,WIFI_STA,WiFiConf.sta_ssid,WiFiConf.sta_pwd,WiFiConf.ap_ssid);
 #else
