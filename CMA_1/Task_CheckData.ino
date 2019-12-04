@@ -67,7 +67,10 @@ void http_re( void * pvParameters ){
                  */
                 if ((giaiDoanCan.maGiaiDoan[giaiDoanCan.userSelecGiaiDoan] == kvSuaCa)&&(giaiDoanCan.cheDoInOut == cheDoOut)){
                   tt = false;
-                  if (strcmp(Data_TH.id_RFID,idRFID_OLD) != 0){strncpy( idRFID_OLD,Data_TH.id_RFID, sizeof(Data_TH.id_RFID));if (Data_CAN_TH.data_can >0.5) tt = true;}
+                  if (strcmp(Data_TH.id_RFID,idRFID_OLD) != 0){
+                    strncpy( idRFID_OLD,Data_TH.id_RFID, sizeof(Data_TH.id_RFID));if (Data_CAN_TH.data_can >0.5) tt = true;
+                    canDataOutOld=Data_CAN_TH.data_can;
+                 }
                   else {  
                           double tam = Data_CAN_TH.data_can > canDataOutOld ?Data_CAN_TH.data_can - canDataOutOld :canDataOutOld - Data_CAN_TH.data_can ;
                           if ((tam > 0.8)&&(Data_CAN_TH.data_can >0.5))tt = true;

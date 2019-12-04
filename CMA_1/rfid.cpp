@@ -107,7 +107,7 @@ void RFID::sendCommand(uint16_t timeOut, boolean waitForResponse)
   uint8_t opcode = msg[2]; 
   uint8_t crc = calculateCRC(&msg[0], messageLength+1); 
   msg[messageLength + 1] = crc;
-  while (_RFIDSERIAL->available()) _RFIDSERIAL->read();
+  while ( _RFIDSERIAL->available()) _RFIDSERIAL->read();
   for (uint8_t x = 0; x < messageLength + 2; x++) _RFIDSERIAL->write(msg[x]);
   if (waitForResponse == false)
   { _RFIDSERIAL->flush(); 
@@ -121,7 +121,7 @@ void RFID::sendCommand(uint16_t timeOut, boolean waitForResponse)
       msg[0] = ERROR_COMMAND_RESPONSE_TIMEOUT;
       return;
     }
-    vTaskDelay(10);
+    vTaskDelay(5);
   }
   messageLength = MAX_MSG_SIZE - 1; 
   uint8_t spot = 0;
@@ -132,14 +132,16 @@ void RFID::sendCommand(uint16_t timeOut, boolean waitForResponse)
       msg[0] = ERROR_COMMAND_RESPONSE_TIMEOUT;
       return;
     }
-    if (_RFIDSERIAL->available())
+    if ( _RFIDSERIAL->available())
     {
       msg[spot] = _RFIDSERIAL->read();
      // Serial.print(msg[spot],HEX);
     //  Serial.print(",");
       spot++;
       if (spot == 2) messageLength = msg[1] + 2; 
+      else if (spot == MAX_MSG_SIZE) {return;}
     }
+    vTaskDelay(1);
   }
   crc = calculateCRC(&msg[0], messageLength-1); 
   if (msg[messageLength - 1] != crc )
@@ -193,7 +195,7 @@ uint8_t RFID::readData(uint8_t bank, uint32_t address, uint8_t *dataRead, uint8_
 
 bool IRAM_ATTR RFID::check()
 {
-  while (_RFIDSERIAL->available())
+  if ( _RFIDSERIAL->available())
   { 
     uint8_t incomingData = _RFIDSERIAL->read();
    // Serial.print(incomingData,HEX);

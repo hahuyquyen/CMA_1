@@ -37,6 +37,7 @@ struct variLcdUpdateConf {
   int numScroll;
   boolean updateLCD ;
   uint8_t stateDisplayLCD;
+  boolean firstDisplay;
 } variLcdUpdate = {
   0,
   false,

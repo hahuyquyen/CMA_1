@@ -12,11 +12,14 @@
 
 
 
-const char* LCD_setting = "Cài Đặt TRƯỜNG";
+const char* LCD_setting = "Cài Đặt";
 void LCD_print_KV(uint8_t vitri = 48) {
-  u8g2.setCursor(5, vitri); u8g2.print(giaiDoanCan.nameGiaiDoan[giaiDoanCan.userSelecGiaiDoan]);
-  u8g2.setCursor(60 , vitri); u8g2.print(" - ");
-  u8g2.setCursor(66 , vitri); u8g2.print(cheDoInOutDis[giaiDoanCan.cheDoInOut]);
+  u8g2.setCursor(5, vitri); 
+  u8g2.print(giaiDoanCan.nameGiaiDoan[giaiDoanCan.userSelecGiaiDoan]);
+  u8g2.setCursor(60 , vitri);
+  u8g2.print(" - ");
+  u8g2.setCursor(66 , vitri); 
+  u8g2.print(cheDoInOutDis[giaiDoanCan.cheDoInOut]);
 }
 void hienthiSetting(char* dataDisplay = NULL, char* dataUserDisplay = NULL) {
   if (dataDisplay != NULL ) {
@@ -28,19 +31,19 @@ void hienthiSetting(char* dataDisplay = NULL, char* dataUserDisplay = NULL) {
   }
   if (u8g2.getUTF8Width(dataUserDisplay) > 128) {
     u8g2.drawUTF8(variLcdUpdate.numScroll, 52, dataUserDisplay);
-    variLcdUpdate.numScroll = variLcdUpdate.numScroll - 35 ;
+    variLcdUpdate.numScroll = variLcdUpdate.numScroll - 1 ;
     if (abs(variLcdUpdate.numScroll) > u8g2.getUTF8Width(dataUserDisplay))variLcdUpdate.numScroll = 0;
   }
   else u8g2.drawUTF8(((128 - (u8g2.getUTF8Width(dataUserDisplay))) / 2), 52, dataUserDisplay);
 }
-void hienthiRunning(char* dataUserDisplay) {
+/*void hienthiRunning(char* dataUserDisplay) {
   if (u8g2.getUTF8Width(dataUserDisplay) > 128) {
     u8g2.drawUTF8(variLcdUpdate.numScroll, 48, dataUserDisplay);
     variLcdUpdate.numScroll = variLcdUpdate.numScroll - 15 ;
     if (abs(variLcdUpdate.numScroll) > u8g2.getUTF8Width(dataUserDisplay))variLcdUpdate.numScroll = 0;
   }
   else u8g2.drawUTF8(((128 - (u8g2.getUTF8Width(dataUserDisplay))) / 2), 48, dataUserDisplay);
-}
+}*/
 void LCD_thong_tin(uint8_t chedo_HT, Data_TH* Data_TH  , uint8_t daucham = 0) {
   u8g2.clearBuffer();
   u8g2.setFont(u8g2_font_unifont_t_vietnamese2);
@@ -68,6 +71,7 @@ void LCD_thong_tin(uint8_t chedo_HT, Data_TH* Data_TH  , uint8_t daucham = 0) {
     LCD_print_KV(16);
     u8g2.setCursor(2, 32);
     u8g2.print(F("Chờ  "));
+    u8g2.setCursor(32, 32);
     switch (daucham) {
       case 0: u8g2.print(F("|")); break;
       case 1: u8g2.print(F("/")); break;
@@ -96,7 +100,6 @@ void LCD_thong_tin(uint8_t chedo_HT, Data_TH* Data_TH  , uint8_t daucham = 0) {
   }
   else if (chedo_HT == 4) {
     char stringdem[] = "Nhà Cup Cấp";
-  //  hienthiSetting(stringdem,"Cá Fillet Còn Da, Còn Mỡ, Dè 1Cm, Còn mỡ eo lưng, xử lý nhẹ");
     hienthiSetting(stringdem, inforServer.nameNhaCC[inforServer.userSelectNhaCC]);
   }
   else if (chedo_HT == 5) {
@@ -109,7 +112,6 @@ void LCD_thong_tin(uint8_t chedo_HT, Data_TH* Data_TH  , uint8_t daucham = 0) {
     u8g2.print(xacnhan);
     LCD_print_KV(32);
     u8g2.setCursor(2, 48);
-   // if ((inforServer.PhanLoaiKV == PhanLoai::Fil_IN ) || (inforServer.PhanLoaiKV == PhanLoai::LANG_IN )) {
    if (giaiDoanCan.cheDoInOut == cheDoIN) {
       hienthiSetting(NULL, inforServer.nameNhaCC[inforServer.userSelectNhaCC]);
     }
@@ -118,7 +120,7 @@ void LCD_thong_tin(uint8_t chedo_HT, Data_TH* Data_TH  , uint8_t daucham = 0) {
     }
   }
   u8g2.sendBuffer();
-}
+}                                                                              
 
 
 void Display( void * pvParameters ) {
@@ -131,12 +133,13 @@ void Display( void * pvParameters ) {
   uint16_t Time_blink = 1000;
   uint16_t Time_check = 2500;
   // SPI.setClockDivider( SPI_CLOCK_DIV32 );
-  u8g2.setBusClock(850000);
+  u8g2.setBusClock(900000);
   u8g2.begin();
   u8g2.enableUTF8Print();
   LCD_thong_tin(2, &Data_TH);
   variLcdUpdate.stateDisplayLCD = 1;
   uint8_t daucham_lcd = 0;
+  u8g2.setAutoPageClear(1);
   for (;;) {
     /*
        30ms
@@ -184,7 +187,7 @@ void Display( void * pvParameters ) {
           variLcdUpdate.stateDisplayLCD = 4;
           break;
         case 1:
-          if (xTaskGetTickCount() - lastBlinkLCD > 800) {
+          if (xTaskGetTickCount() - lastBlinkLCD > 150) {
             daucham_lcd ++ ;
             if (daucham_lcd > 3)daucham_lcd = 0;
             lastBlinkLCD = xTaskGetTickCount();
@@ -197,7 +200,7 @@ void Display( void * pvParameters ) {
         default: break;
       }
     }
-    else if ((xTaskGetTickCount() - lastBlinkLCD > 1000) || variLcdUpdate.updateLCD ) {
+    else if ((xTaskGetTickCount() - lastBlinkLCD > 100) || variLcdUpdate.updateLCD ) {
       variLcdUpdate.updateLCD = false;
       lastBlinkLCD = xTaskGetTickCount();
       LCD_thong_tin(stateMachine.bottonSelect + 2, &Data_TH, daucham_lcd);

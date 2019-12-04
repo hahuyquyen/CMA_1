@@ -10,10 +10,11 @@ void TaskCAN( void * pvParameters ){
     for (;;){
       if (Serial1.available()){ 
        uint8_t incomingData = Serial1.read();
+    //   Serial.print(incomingData,HEX );
        if ( incomingData == 0x3D){tam=0;}
        else if ( incomingData == 0x0D) {
         if(tach(&can_data)){
-        //  printf("CAN Nang : %f \n",can_data);
+           //printf("CAN Nang : %f \n",can_data);
                 if(can_data!=Data_CAN.data_can){
                   Data_CAN.data_can=can_data;
                   Data_CAN.time_get=xTaskGetTickCount();
