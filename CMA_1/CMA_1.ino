@@ -72,7 +72,7 @@ void khoiTaoGiaTri(){
     giaiDoanCan.maGiaiDoan[0]=0;
 }
 void setup()
-{       pinMode(pinPower, OUTPUT);
+{   pinMode(pinPower, OUTPUT);
     digitalWrite(pinPower, HIGH);
     Queue_can = xQueueCreate(5,sizeof(Data_CAN));
     Queue_RFID= xQueueCreate(5,sizeof(Data_RFID));

@@ -97,7 +97,7 @@ void LCD_thong_tin(uint8_t chedo_HT, Data_TH* Data_TH  , uint8_t daucham = 0) {
     hienthiSetting(stringdem, giaiDoanCan.nameGiaiDoan[giaiDoanCan.userSelecGiaiDoan]);
   }
   else if (chedo_HT == 4) {
-    char stringdem[] = "Nhà Cup Cấp";
+    char stringdem[] = "Nhà Cung Cấp";
     hienthiSetting(stringdem, inforServer.nameNhaCC[inforServer.userSelectNhaCC]);
   }
   else if (chedo_HT == 5) {

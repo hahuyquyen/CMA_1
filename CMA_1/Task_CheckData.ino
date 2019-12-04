@@ -13,7 +13,7 @@ void http_re( void * pvParameters ){
     unsigned long lastTimeGetData_RoVaCan = 0;
     unsigned long timeCompareMode1=10000;
     unsigned long timeCompareMode2=10000;
-    unsigned long TaskCheck_lastTimeSche=0;
+  //  unsigned long TaskCheck_lastTimeSche=0;
     double canDataOutOld = 0;
     for (;;){
 
@@ -28,17 +28,13 @@ void http_re( void * pvParameters ){
      * Nếu khu fille thì không nhận mã rỗ.
      */
     if(xQueueReceive( Queue_RFID, &Data_RFID_TH,  ( TickType_t ) 1 )== pdPASS ){
-      //if ((inforServer.PhanLoaiKV == PhanLoai::LANG_IN)||(inforServer.PhanLoaiKV == PhanLoai::LANG_OUT)){ 
-      if (giaiDoanCan.maGiaiDoan[giaiDoanCan.userSelecGiaiDoan] == kvSuaCa) {
-      lastTimeGetQueueRFID_Ro=xTaskGetTickCount();
-      }     
+      if (giaiDoanCan.maGiaiDoan[giaiDoanCan.userSelecGiaiDoan] == kvSuaCa) {lastTimeGetQueueRFID_Ro=xTaskGetTickCount();}     
     }
     /*
      * Nhận mã RFID
      * Nếu là khu Filler chỉ nhận mã rỗ thì swap time tới mã rỗ để khỏi viết lại code
      */
     if(xQueueReceive( Queue_RFID_NV, &Data_RFID_NV,  ( TickType_t ) 1 )== pdPASS ){
-           // if ((inforServer.PhanLoaiKV == PhanLoai::Fil_IN)||(inforServer.PhanLoaiKV == PhanLoai::Fil_OUT)){lastTimeGetQueueRFID_Ro=xTaskGetTickCount();}
             if (giaiDoanCan.maGiaiDoan[giaiDoanCan.userSelecGiaiDoan]==kvFille){lastTimeGetQueueRFID_Ro=xTaskGetTickCount();}
             else lastTimeGetQueueRFID_NV=xTaskGetTickCount();
     }
@@ -127,10 +123,10 @@ void http_re( void * pvParameters ){
               }
           }
     }
-    if (xTaskGetTickCount()- TaskCheck_lastTimeSche > 1000){
+  /*  if (xTaskGetTickCount()- TaskCheck_lastTimeSche > 1000){
       TaskCheck_lastTimeSche=xTaskGetTickCount();
     }
-      
+      */
     vTaskDelay(10);  
     }
     vTaskDelete(NULL) ;
