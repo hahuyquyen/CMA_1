@@ -11,8 +11,8 @@ void TaskCAN( void * pvParameters ){
       if (Serial1.available()){ 
        uint8_t incomingData = Serial1.read();
        
-       if ( incomingData == 0x3D){tam=0;}
-       else if ( incomingData == 0x0D) {
+       if ( incomingData == canStartByte){tam=0;}
+       else if ( incomingData == canStopByte) {
         if(tach(&can_data)){
                 if(can_data!=Data_CAN.data_can){
                   Data_CAN.data_can=can_data;
@@ -48,16 +48,16 @@ boolean tach(double* soky){
     Serial.print(uart_bien[j], HEX);Serial.print("-");
   }
   Serial.println("");*/
-  for (int j=0;j<sizeof(uart_bien);j++){ if (uart_bien[j] != 0x20){tam1=j;break;} }
-  for(int j=tam1;j<sizeof(uart_bien);j++){if(uart_bien[j] == 0x2E){hangtram=(j-tam1)-1;break;}}
+  for (int j=0;j<sizeof(uart_bien);j++){ if (uart_bien[j] != canNULLByte){tam1=j;break;} }
+  for(int j=tam1;j<sizeof(uart_bien);j++){if(uart_bien[j] == can_dau_phay){hangtram=(j-tam1)-1;break;}}
   for(int j=tam1;j<sizeof(uart_bien);j++){
                //   Serial.print(uart_bien[j],HEX);
                  // Serial.print(" ");
                   if ((uart_bien[j] == 0x41)||(uart_bien[j] == 0x40)||(uart_bien[j] == 0x48)||(uart_bien[j] == 0x44)||(uart_bien[j] == 0x45)){*soky=0; return false;break;}//Serial.println(" ");
                   //42 zero , 43 tare
                   if ((uart_bien[j] == 0x43)||(uart_bien[j] == 0x47)||(uart_bien[j] == 0x42)||(uart_bien[j] == 0x46)){*soky = *soky * soam;return true;break;} // so on dinh
-                  else if (uart_bien[j] == 0x2D){soam=-1;}
-                  else if (uart_bien[j] == 0x2E){hangtram=hangtram+1;}
+                  else if (uart_bien[j] == can_Minus){soam=-1;}
+                  else if (uart_bien[j] == can_dau_phay){hangtram=hangtram+1;}
                   else *soky+=(double)((uart_bien[j] - 48)*pow(10,hangtram-(j-tam1)));          
    }
    return false;
