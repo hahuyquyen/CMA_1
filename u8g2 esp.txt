@@ -1,0 +1,2 @@
+ 
+ets_delay_us(arg_int<=2?5:2); thay cho  delayMicroseconds(arg_int==0?0:1);
