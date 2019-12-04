@@ -77,9 +77,7 @@ void TaskRFID( void * pvParameters ){
                   if(xSemaphoreTake(xResetRfidMaRo, 1)){
                        strncpy( Data_rfid.id_RFID_Old,"", sizeof(""));
                   }
-                vTaskDelay(20);
-                     // vTaskDelay(5000); 
-     // printf("Task RFID StackHigh %d, Free Heap = %d\n",uxTaskGetStackHighWaterMark(NULL),ESP.getFreeHeap());    
+                vTaskDelay(10);  
     }
     vTaskDelete(NULL) ;
 }

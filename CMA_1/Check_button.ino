@@ -113,7 +113,7 @@ void Check_button( void * pvParameters ){
       buttonExit.read();
       buttonError.read();
       buttonPower.read();
-      vTaskDelay(25);     
+      vTaskDelay(50);     
     }
     vTaskDelete(NULL) ;
 }

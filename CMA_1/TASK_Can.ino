@@ -6,7 +6,7 @@ void TaskCAN( void * pvParameters ){
     static Data_CAN Data_CAN;
    // uint8_t _rfid_data[20];
     int tam=0;
-    unsigned long timeScheduSendCan=0;
+    unsigned long lastTimeSendCan=0;
     for (;;){
       if (Serial1.available()){ 
        uint8_t incomingData = Serial1.read();
@@ -14,21 +14,20 @@ void TaskCAN( void * pvParameters ){
        if ( incomingData == 0x3D){tam=0;}
        else if ( incomingData == 0x0D) {
         if(tach(&can_data)){
-           //printf("CAN Nang : %f \n",can_data);
                 if(can_data!=Data_CAN.data_can){
                   Data_CAN.data_can=can_data;
                   Data_CAN.time_get=xTaskGetTickCount();
                   if(can_data > 0.5){xQueueSend( Queue_can, &Data_CAN, xTicksToWait );}
-                  }//
-                else if (xTaskGetTickCount() - timeScheduSendCan > 1000){
-                  timeScheduSendCan=xTaskGetTickCount();
+                  }
+                else if (xTaskGetTickCount() - lastTimeSendCan > 1000){
+                  lastTimeSendCan=xTaskGetTickCount();
                   if(can_data > 0.5){xQueueSend( Queue_can, &Data_CAN, xTicksToWait );}
                   }
          }
        }
        else {uart_bien[tam++]=incomingData;if(tam>10)tam=0;}  
      }
-     vTaskDelay(25); 
+     vTaskDelay(15); 
      
     //  vTaskDelay(5000); 
     //  printf("Task CAN StackHigh %d, Free Heap = %d\n",uxTaskGetStackHighWaterMark(NULL),ESP.getFreeHeap());     

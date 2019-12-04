@@ -130,6 +130,7 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
      Khi Nhan duoc data server bao luu thanh cong goi tin thi sẽ xoa file luu trong sd card
      */
       if (!jsonBuffer.containsKey("i")) {return;}
+      else if (!jsonBuffer.containsKey("s")) {return;}
       uint32_t sttData = jsonBuffer["i"].as<uint32_t>();
       uint8_t statusSaveData = jsonBuffer["s"].as<uint8_t>();
       char textToWrite[ 16 ];

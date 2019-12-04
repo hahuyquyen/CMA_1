@@ -74,15 +74,15 @@ void khoiTaoGiaTri(){
 void setup()
 {   pinMode(pinPower, OUTPUT);
     digitalWrite(pinPower, HIGH);
-    Queue_can = xQueueCreate(5,sizeof(Data_CAN));
-    Queue_RFID= xQueueCreate(5,sizeof(Data_RFID));
-    Queue_RFID_NV= xQueueCreate(5,sizeof(Data_RFID));
-    Queue_mqtt = xQueueCreate(10,sizeof(Data_TH));
+    Queue_can = xQueueCreate(3,sizeof(Data_CAN));
+    Queue_RFID= xQueueCreate(3,sizeof(Data_RFID));
+    Queue_RFID_NV= xQueueCreate(3,sizeof(Data_RFID));
+    Queue_mqtt = xQueueCreate(5,sizeof(Data_TH));
     Queue_display = xQueueCreate(3,sizeof(Data_TH));
  //   Queue_can_interrup= xQueueCreate(3,sizeof(rfid_data));
     Queue_Time_blink= xQueueCreate(3,sizeof(uint16_t));
-    xCountingSemaphore = xSemaphoreCreateCounting( 10, 0 );
-    xSignal_FromRFID = xSemaphoreCreateCounting( 10, 0 );
+    xCountingSemaphore = xSemaphoreCreateCounting( 2, 0 );
+    xSignal_FromRFID = xSemaphoreCreateCounting( 2, 0 );
     xSignal_Display_check = xSemaphoreCreateCounting( 2, 0 );
     xSignal_Display_checkdone = xSemaphoreCreateCounting( 2, 0 );
     xreset_id_nv = xSemaphoreCreateCounting( 2, 0 );
@@ -93,6 +93,7 @@ void setup()
     if(!SPIFFS.begin(true)){printf("An Error has occurred while mounting SPIFFS\n");}
     Serial1.begin(9600, SERIAL_8N1, 26, 12); //12 tx 13 lÃ  rx(bau,se,rx,tx)
     Serial.begin(115200);
+    
     SDSPI.begin(14,27,13,15); ///SCK,MISO,MOSI,ss
     if(!SD.begin(15,SDSPI)){Serial.println("Card Mount Failed");    }
     stateMachine.idDevice=EEPROM.readUInt(800);
@@ -100,7 +101,7 @@ void setup()
     Serial.println( stateMachine.idDevice);
     loadWiFiConf();
     khoiTaoGiaTri();
-    if (! rtc.begin()) {Serial.println(F("Couldn't find RTC"));} 
+    if (! rtc.begin()) { Serial.println(F("Couldn't find RTC"));} 
     if (rtc.lostPower()) { Serial.println(F("Ghi Time"));rtc.adjust(DateTime(2019, 12, 4,13, 53, 0));}
 #ifdef using_sta
     wifi_connect(0,WIFI_STA,WiFiConf.sta_ssid,WiFiConf.sta_pwd,WiFiConf.ap_ssid);
@@ -231,7 +232,7 @@ void sendMQTTConfig(uint8_t loaiconfig = 0 , uint8_t maboxung = 0){
       char buffer[55];
       doc["i"]= stateMachine.idDevice;
       doc["t"]= loaiconfig ;
-      doc["d"]=maboxung;
+      doc["d"]= maboxung;
       serializeJson(doc, buffer);
       mqttClient.publish("/config", 0, true, buffer); 
 }
@@ -240,8 +241,8 @@ void checkSendMQTTConfig(){
       else if (giaiDoanCan.tongGiaiDoan == 0){sendMQTTConfig(2,0);}
       //Fix loi 01
       else if ((giaiDoanCan.userSelecGiaiDoan != 0)&&(inforServer.tongThanhPham == 0)&&(stateMachine.bottonSelect>1)){ // Chi gui yeu cau khi da chon khu vuc can và qua buoc chọn thành phảm
-         Serial.print("dsgfdgfs ");
-        Serial.println(giaiDoanCan.maGiaiDoan[giaiDoanCan.userSelecGiaiDoan]);
+         //Serial.print("dsgfdgfs ");
+       // Serial.println(giaiDoanCan.maGiaiDoan[giaiDoanCan.userSelecGiaiDoan]);
        sendMQTTConfig(3,giaiDoanCan.maGiaiDoan[giaiDoanCan.userSelecGiaiDoan]);
       }
 }
