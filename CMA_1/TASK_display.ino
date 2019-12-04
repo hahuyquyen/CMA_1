@@ -49,21 +49,19 @@ void LCD_thong_tin(uint8_t chedo_HT, Data_TH* Data_TH  , uint8_t daucham = 0) {
   u8g2.setFont(u8g2_font_unifont_t_vietnamese2);
   if (chedo_HT == 0) {
     char rfidDisplay[10];
-    u8g2.setCursor(0, 12);
-    u8g2.print(F("NV:"));
-     memcpy(rfidDisplay, & Data_TH->id_RFID_NV[16], 8);
-     rfidDisplay[9]='\0';
+    u8g2.setCursor(10, 16);
+    u8g2.print(F("NV: "));
+    memcpy(rfidDisplay, & Data_TH->id_RFID_NV[16], 8);
+    rfidDisplay[9]='\0';
     if (Data_TH->id_RFID_NV[0] == 'x'){ u8g2.print("x");}
     else u8g2.print(rfidDisplay);
-    u8g2.setCursor(0, 28);
-    u8g2.setFont(u8g2_font_unifont_t_vietnamese2);
-    u8g2.print(F("Rổ:"));
+    u8g2.setCursor(10, 32);
+    u8g2.print(F("Rổ: "));
     memcpy(rfidDisplay, & Data_TH->id_RFID[16], 8);
     rfidDisplay[9]='\0';
     if (Data_TH->id_RFID[0] == 'x'){u8g2.print("x");}
     else u8g2.print(rfidDisplay);
-    u8g2.setFont(u8g2_font_unifont_t_vietnamese2);
-    u8g2.setCursor(0, 44);
+    u8g2.setCursor(10, 48);
     u8g2.print(F("Kg:"));
     u8g2.print(Data_TH->data_weight);
   }
@@ -79,7 +77,7 @@ void LCD_thong_tin(uint8_t chedo_HT, Data_TH* Data_TH  , uint8_t daucham = 0) {
       case 3: u8g2.print(F("\\")); break;
       default: break;
     }
-    u8g2.setCursor(68, 32);
+    u8g2.setCursor(50, 32);
     u8g2.print(F("Kg:"));
     u8g2.print(can_data);
     u8g2.setCursor(2, 48);
@@ -130,7 +128,7 @@ void Display( void * pvParameters ) {
   pinMode(pinLedGreen, OUTPUT);
   unsigned long lastTimeBlinkLed = 0;
   unsigned long timeoutDisplay = 0;
-  unsigned long timeoutLcdLangDaIn = 0;
+//  unsigned long timeoutLcdLangDaIn = 0;
   unsigned long lastBlinkLCD = 0;
   uint16_t Time_blink = 1000;
   uint16_t Time_check = 2500;
@@ -176,7 +174,7 @@ void Display( void * pvParameters ) {
         statusBuzzer = false ;
         digitalWrite(pinBuzzer, statusBuzzer);
         digitalWrite(pinLedGreen, LOW);
-        timeoutLcdLangDaIn = 0;
+       // timeoutLcdLangDaIn = 0;
         timeoutDisplay = 0;
       }
     if ((xTaskGetTickCount() - timeoutDisplay > 500) && (timeoutDisplay > 0 ) && (statusBuzzer)) {
@@ -187,7 +185,8 @@ void Display( void * pvParameters ) {
     if ((xTaskGetTickCount() - timeoutDisplay > Time_check) && (timeoutDisplay > 0 )) {
 
             variLcdUpdate.stateDisplayLCD = 1;
-            timeoutDisplay = 0;timeoutLcdLangDaIn = 0; 
+            timeoutDisplay = 0;
+            //timeoutLcdLangDaIn = 0; 
      }
       xQueueReceive( Queue_Time_blink, &Time_blink,  ( TickType_t ) 1 );
       /*

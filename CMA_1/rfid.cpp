@@ -121,7 +121,7 @@ void RFID::sendCommand(uint16_t timeOut, boolean waitForResponse)
       msg[0] = ERROR_COMMAND_RESPONSE_TIMEOUT;
       return;
     }
-    vTaskDelay(5);
+    vTaskDelay(2);
   }
   messageLength = MAX_MSG_SIZE - 1; 
   uint8_t spot = 0;
@@ -135,8 +135,6 @@ void RFID::sendCommand(uint16_t timeOut, boolean waitForResponse)
     if ( _RFIDSERIAL->available())
     {
       msg[spot] = _RFIDSERIAL->read();
-     // Serial.print(msg[spot],HEX);
-    //  Serial.print(",");
       spot++;
       if (spot == 2) messageLength = msg[1] + 2; 
       else if (spot == MAX_MSG_SIZE) {return;}

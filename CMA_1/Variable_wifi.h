@@ -61,8 +61,8 @@ struct inforServerStruct {
   uint8_t userSelectThanhPham;
   uint16_t maThanhPham[20];
   uint16_t maNhaCC[20];
-  char nameNhaCC[20][100];
-  char nameThanhPham[20][100];
+  char nameNhaCC[20][120];
+  char nameThanhPham[20][120];
 } inforServer = {
   0,
   0,

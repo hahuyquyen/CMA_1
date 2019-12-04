@@ -73,8 +73,8 @@ void http_re( void * pvParameters ){
                  }
                   else {  
                           double tam = Data_CAN_TH.data_can > canDataOutOld ?Data_CAN_TH.data_can - canDataOutOld :canDataOutOld - Data_CAN_TH.data_can ;
-                          if ((tam > 0.8)&&(Data_CAN_TH.data_can >0.5))tt = true;
-                          canDataOutOld=Data_CAN_TH.data_can;
+                          if ((tam > 0.8)&&(Data_CAN_TH.data_can >0.5)){tt = true;}
+                          canDataOutOld=Data_CAN_TH.data_can;                   
                     }
                 }
                 if(tt){

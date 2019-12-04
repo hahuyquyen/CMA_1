@@ -67,9 +67,13 @@ void onMqttUnsubscribe(uint16_t packetId) {// printf("Unsubscribe acknowledged: 
 
 /*
 Set thanh pham 
-{"t":"3","l":"3","d":[{"i":"10","n":"Thanh Pham 1"},{"i":"11","n":"Thanh Pham 2"},{"i":"12","n":"Thanh Pham 3"}]}
+{"t":"3","l":"3","d":[{"i":"10","n":"Cá Semitrimmed ( Còn dè, Còn Mỡ, Còn thịt đỏ, bỏ đường chỉ hồng trên lưng)"},{"i":"11","n":"Thanh Pham 2"},{"i":"12","n":"Thanh Pham 3"}]}
 Set nha CC
-{"t":"1","l":"3","d":[{"i":"20","n":"Loai Ca 1"},{"i":"21","n":"Loai Ca 2"},{"i":"22","n":"Loai Ca 3"}]}
+00000002
+00000004
+00000001
+00000003
+
 Set Khu Vuc can
 {"t":"2","l":"2","d":[{"i":2,"n":"Sữa Cá"},{"i":1,"n":"Filler"}]}
 
