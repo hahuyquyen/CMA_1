@@ -1,12 +1,12 @@
 
 
 #define using_sta true
-#define BUF_SIZE_UART (125)
+//#define BUF_SIZE_UART (125)
 #define web_port 4999
 #define time_2_lan_nhan_data 5000
 #define time_cho_nhan_RFID_NV 8000
-#define time_out_set_rfid 1000
-#define timeTruyenMQTT 3000
+//#define time_out_set_rfid 1000
+#define timeTruyenMQTT 1000
 
 
 #define can_dau_cham 0x2C
@@ -14,7 +14,9 @@
 #define can_LF 0x0A
 #define can_CR 0x0D
 #define can_Minus 0x2D
-#define can_header_weight 0x30
+#define canStartByte 0x3D
+#define canStopByte 0x0D
+#define canNULLByte 0x20
 
 #define uart_can_num UART_NUM_0
 
@@ -37,3 +39,20 @@
 #define pinLedRed 5
 #define pinLedGreen 2
 #define pinAnalogPower 25
+
+#define cheDoIN 1
+#define cheDoOut 2
+#define cheDoNotChoose 0
+
+#define kvFille 1
+#define kvSuaCa 2
+#define kvNotChoose 0
+
+#define stateChooseINOUT 0
+#define stateChooseKV 1
+#define stateChooseNhaCC 2
+#define stateChooseThanhPham 3
+
+#define deviceRunning 1
+#define deviceSetting 0
+#define deviceError 2
