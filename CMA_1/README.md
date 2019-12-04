@@ -105,8 +105,8 @@
 
 ```json
 {
-    l: Số lượng record trong mảng d bên dưới,
-    d: [
+    "l": "Số lượng record trong mảng d bên dưới",
+    "d": [
         {
             "i": "Mã đối tượng (Dùng để gửi lên server trong gói tin)",
             "n": "Tên đối tượng (Dùng để hiển thị lên màn hình)"
@@ -115,7 +115,7 @@
             "i": "Mã đối tượng (Dùng để gửi lên server trong gói tin)",
             "n": "Tên đối tượng (Dùng để hiển thị lên màn hình)"
         },
-        ...
+       
     ]
 }
 ```
@@ -182,6 +182,7 @@
 
 ```json
 {
+	"t":1,
 	"l": 3,
 	"d": [
 		{
@@ -204,6 +205,7 @@
 
 ```json
 {
+	"t":2,
 	"l": 2,
 	"d": [
         {
@@ -221,7 +223,8 @@
 -   Trả lời cho **Thành phẩm** (`t = 3`) trong gói request
 
 ```json
-{
+{	
+	"t":3,
 	"l": 2,
 	"d": [
 		{
