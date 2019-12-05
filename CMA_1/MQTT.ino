@@ -36,7 +36,6 @@ void truyen_mqtt(){
       doc["s"] = (unsigned long) stateMachine.idDevice;      
       doc["w"] = datatruyen_mqtt.data_weight;
       doc["t"] = now.unixtime();
-      //doc["m"] = inforServer.maLoaica[inforServer.userSelectLoaiCa];
       doc["c"] = inforServer.nhaCC.arrayType[inforServer.nhaCC.userSelect];
       doc["p"] = inforServer.thanhPham.arrayType[inforServer.thanhPham.userSelect];
       char buffer[500];
@@ -68,7 +67,7 @@ void onMqttUnsubscribe(uint16_t packetId) {// printf("Unsubscribe acknowledged: 
 /*
 Set thanh pham 
 {"t":"3","l":"3","d":[{"i":"10","n":"Cá Semitrimmed ( Còn dè, Còn Mỡ, Còn thịt đỏ, bỏ đường chỉ hồng trên lưng)"},{"i":"11","n":"Thanh Pham 2"},{"i":"12","n":"Thanh Pham 3"}]}
-{"t":"1","l":"3","d":[{"i":"10","n":"Cá Semitrimmed"},{"i":"12","n":"Thanh Pham 3"}]}
+{"t":"1","l":"2","d":[{"i":"10","n":"Cá Semitrimmed"},{"i":"12","n":"Thanh Pham 3"}]}
 Set nha CC
 00000002
 00000004
@@ -76,7 +75,7 @@ Set nha CC
 00000003
 
 Set Khu Vuc can
-{"t":"2","l":"2","d":[{"i":2,"n":"Sữa Cá"},{"i":1,"n":"Filler"}]}
+{"t":"2","l":"2","d":[{"i":2,"n":"Sửa Cá"},{"i":1,"n":"Fillet"}]}
 
  */
 

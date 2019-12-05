@@ -121,7 +121,6 @@ static struct WiFiConfStruct {
   char mqtt_user[64];
   char mqtt_pass[64];
   char mqtt_subto1[64];
-  // char mqtt_choose_inout[5];
 } WiFiConf = {
   WIFI_CONF_FORMAT,
   "Bach Huu Phat",
@@ -158,19 +157,16 @@ typedef struct Data_TH {
   char id_RFID[25];
   char id_RFID_NV[25];
   double data_weight;
-  //uint32_t idControl;
 } Data_TH;
 
 typedef struct Data_CAN {
   double data_can;
-//  unsigned long time_get;
 } Data_CAN;
 
 
 typedef struct Data_RFID {
   char id_RFID[25];
   char id_RFID_Old[25];
-//  unsigned long time_get;
 } Data_RFID;
 
 

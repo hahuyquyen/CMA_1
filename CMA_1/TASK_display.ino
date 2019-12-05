@@ -48,22 +48,34 @@ void LCD_thong_tin(uint8_t chedo_HT, Data_TH* Data_TH  , uint8_t daucham = 0) {
   u8g2.clearBuffer();
   u8g2.setFont(u8g2_font_unifont_t_vietnamese2);
   if (chedo_HT == 0) {
+    
     char rfidDisplay[10];
-    u8g2.setCursor(10, 20);
-    u8g2.print(F("NV: "));
+    uint8_t vitri = 0;
+    
     memcpy(rfidDisplay, & Data_TH->id_RFID_NV[16], 8);
     rfidDisplay[9]='\0';
-    if (Data_TH->id_RFID_NV[0] == 'x'){ u8g2.print("x");}
-    else u8g2.print(rfidDisplay);
-    u8g2.setCursor(10, 40);
-    u8g2.print(F("Rổ: "));
+    if ((Data_TH->id_RFID_NV[0] == 'x')&&( getSttKhuVuc() ==  sttKvSuaCaIN )){
+      vitri = 18;
+      u8g2.setCursor(10, vitri);
+      u8g2.print(F("NV: x"));
+    }
+    else {
+      vitri = 18;
+      u8g2.setCursor(10, vitri);
+      u8g2.print(F("NV: "));
+      u8g2.print(rfidDisplay);
+    }
+    if (vitri == 18){vitri = 36;}
+    u8g2.setCursor(10, vitri);
     memcpy(rfidDisplay, & Data_TH->id_RFID[16], 8);
     rfidDisplay[9]='\0';
-    if (Data_TH->id_RFID[0] == 'x'){u8g2.print("x");}
-    else u8g2.print(rfidDisplay);
-    u8g2.setCursor(10, 60);
+    if (Data_TH->id_RFID[0] != 'x'){ u8g2.print(F("Rổ: "));u8g2.print(rfidDisplay);}
+    if (vitri == 18){vitri = 36;}
+    else if (vitri == 36){vitri = 54;}
+    u8g2.setCursor(10, vitri);
     u8g2.print(F("Kg: "));
     u8g2.print(Data_TH->data_weight);
+    
   }
   else if (chedo_HT == 1) {
     LCD_print_KV(16);
@@ -149,12 +161,14 @@ void Display( void * pvParameters ) {
       if (xQueueReceive( Queue_display, &Data_TH,  ( TickType_t ) 1 ) == pdPASS ) {
         variLcdUpdate.stateDisplayLCD = 0;
       //  if ((strcmp(Data_TH.id_RFID_NV, "x") != 0) && (inforServer.PhanLoaiKV == PhanLoai::LANG_IN )) { //if (inforServer.giaiDoan.cheDoInOut == cheDoIN) {
-        if ((Data_TH.id_RFID_NV[0] == 'x') && (inforServer.giaiDoan.cheDoInOut == cheDoIN)&& (inforServer.giaiDoan.arrayType[inforServer.giaiDoan.userSelect]  == kvSuaCa)) {
+        //if ((Data_TH.id_RFID_NV[0] == 'x') && (inforServer.giaiDoan.cheDoInOut == cheDoIN)&& (inforServer.giaiDoan.arrayType[inforServer.giaiDoan.userSelect]  == kvSuaCa)) {
+        if ((Data_TH.id_RFID_NV[0] == 'x') && (getSttKhuVuc() ==  sttKvSuaCaIN)) {
         //  timeoutLcdLangDaIn = xTaskGetTickCount();
-        Serial.println(" Da Nhan Ro va can GD1");
+        Serial.println("Data : Ro & Can KV Sua Ca - IN");
         digitalWrite(pinLedGreen, HIGH);
         }
-        else if ((inforServer.giaiDoan.cheDoInOut == cheDoIN)&& (inforServer.giaiDoan.arrayType[inforServer.giaiDoan.userSelect]  == kvSuaCa)){
+     //   else if ((inforServer.giaiDoan.cheDoInOut == cheDoIN)&& (inforServer.giaiDoan.arrayType[inforServer.giaiDoan.userSelect]  == kvSuaCa)){
+        else if (getSttKhuVuc() ==  sttKvSuaCaIN){
           Serial.println(" Da Nhan du thong tin");
           timeoutDisplay = xTaskGetTickCount();
           statusBuzzer = true ;

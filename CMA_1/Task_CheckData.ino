@@ -61,7 +61,8 @@ void http_re( void * pvParameters ){
                  Neu khac ro thi van can binh thuong
                  neu cung ma ro trong 2 lần lien tiep phải khac so kg
                  */
-                if ((inforServer.giaiDoan.arrayType[inforServer.giaiDoan.userSelect] == kvSuaCa)&&(inforServer.giaiDoan.cheDoInOut == cheDoOut)){
+              // if ((inforServer.giaiDoan.arrayType[inforServer.giaiDoan.userSelect] == kvSuaCa)&&(inforServer.giaiDoan.cheDoInOut == cheDoOut)){
+                if( getSttKhuVuc() ==  sttKvSuaCaOUT ){
                   tt = false;
                   if (strcmp(Data_TH.id_RFID,idRFID_OLD) != 0){
                     strncpy( idRFID_OLD,Data_TH.id_RFID, sizeof(Data_TH.id_RFID));if (Data_CAN_TH.data_can >0.5) tt = true;
@@ -94,9 +95,13 @@ void http_re( void * pvParameters ){
               printf("Over time: Ma Ro va Can \n");     
                 lastTimeGetQueueRFID_Ro=0;
                 xSemaphoreGive(xreset_id_nv);    
-                if ((inforServer.giaiDoan.arrayType[inforServer.giaiDoan.userSelect] != kvSuaCa)||(inforServer.giaiDoan.cheDoInOut == cheDoOut)){xSemaphoreGive(xSignal_Display_checkdone);}              
+              // if ((inforServer.giaiDoan.arrayType[inforServer.giaiDoan.userSelect] != kvSuaCa)||(inforServer.giaiDoan.cheDoInOut == cheDoOut)){
+                if( getSttKhuVuc() !=  sttKvSuaCaIN ){
+                  xSemaphoreGive(xSignal_Display_checkdone);
+                  }              
           }
-          if ((inforServer.giaiDoan.arrayType[inforServer.giaiDoan.userSelect] == kvSuaCa)&&(inforServer.giaiDoan.cheDoInOut == cheDoIN)){ 
+         // if ((inforServer.giaiDoan.arrayType[inforServer.giaiDoan.userSelect] == kvSuaCa)&&(inforServer.giaiDoan.cheDoInOut == cheDoIN)){ 
+             if( getSttKhuVuc() ==  sttKvSuaCaIN ){
               if ((lastTimeGetQueueRFID_NV > lastTimeGetData_RoVaCan)&& (lastTimeGetData_RoVaCan >0)){ 
                   timeCompareMode2 = lastTimeGetQueueRFID_NV - lastTimeGetData_RoVaCan;
                   if (timeCompareMode2 < time_cho_nhan_RFID_NV){

@@ -31,7 +31,7 @@ void TaskRFID( void * pvParameters ){
     nano.begin(Serial2); 
     nano.set_mode_timming(2,1000); // Set mode eprom 0x70, mode timming
     nano.set_timing_message(0x05,1000); //0x00 -> 0x64
-    nano.set_power(0x64,1000); // 00 -> 95
+    nano.set_power(0x34,1000); // 00 -> 95
     nano.set_out_mode(1,1000);
     nano.set_time_ner(0x05,1000); // tna so gui 1->255s
     nano.set_reset_reader(1000);
@@ -52,7 +52,8 @@ void TaskRFID( void * pvParameters ){
                                  * nếu là khu vực cân 2 lần thì sẽ lúc nào cũng gửi về
                                  */
                                // if (inforServer.PhanLoaiKV == PhanLoai::LANG_OUT){
-                                 if ((inforServer.giaiDoan.arrayType[inforServer.giaiDoan.userSelect] == kvSuaCa)&&(inforServer.giaiDoan.cheDoInOut == cheDoOut)){ 
+                               //  if ((inforServer.giaiDoan.arrayType[inforServer.giaiDoan.userSelect] == kvSuaCa)&&(inforServer.giaiDoan.cheDoInOut == cheDoOut)){
+                               if( getSttKhuVuc() ==  sttKvSuaCaOUT ){
                                     strncpy( Data_rfid.id_RFID_Old,Data_rfid.id_RFID, sizeof(Data_rfid.id_RFID));
                                     xQueueSend( Queue_RFID, &Data_rfid, xTicksToWait );
                                 }
