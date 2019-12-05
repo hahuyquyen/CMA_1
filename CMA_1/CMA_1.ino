@@ -209,7 +209,10 @@ void loop()
        SD_lastTimeSendMQTT=xTaskGetTickCount();
        if (statusGetAllSD == false){
            File file = root_CMA.openNextFile();
-           if(file){ readFile(SD,file.name(),file.size());}
+           if(file){
+            if(file.isDirectory()){Serial.print("  DIR : ");}
+            else readFile(SD,file.name(),file.size());
+          }
            else{  statusGetAllSD = true;
                   SD_lastTimeReadEnd=xTaskGetTickCount();
                   root_CMA.close();
