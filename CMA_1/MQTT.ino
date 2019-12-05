@@ -29,16 +29,15 @@ void connectToMqtt() {
 void truyen_mqtt(){
       DateTime now = rtc.now();
       StaticJsonDocument<500> doc;
-      doc["k"] = giaiDoanCan.cheDoInOut;
-      doc["x"] = giaiDoanCan.maGiaiDoan[giaiDoanCan.userSelecGiaiDoan];
+      doc["k"] = inforServer.giaiDoan.cheDoInOut;
+      doc["x"] = inforServer.giaiDoan.arrayType[inforServer.giaiDoan.userSelect];
       doc["b"] = datatruyen_mqtt.id_RFID;
       doc["e"] = datatruyen_mqtt.id_RFID_NV;
       doc["s"] = (unsigned long) stateMachine.idDevice;      
       doc["w"] = datatruyen_mqtt.data_weight;
       doc["t"] = now.unixtime();
-      //doc["m"] = inforServer.maLoaica[inforServer.userSelectLoaiCa];
-      doc["c"] = inforServer.maNhaCC[inforServer.userSelectNhaCC];
-      doc["p"] = inforServer.maThanhPham[inforServer.userSelectThanhPham];
+      doc["c"] = inforServer.nhaCC.arrayType[inforServer.nhaCC.userSelect];
+      doc["p"] = inforServer.thanhPham.arrayType[inforServer.thanhPham.userSelect];
       char buffer[500];
       serializeJson(doc, buffer);
       if (status_mqtt_connect){ mqttClient.publish("/data", 0, true, buffer);}
@@ -48,8 +47,8 @@ void truyen_mqtt(){
 }
 void onMqttConnect(bool sessionPresent) {
         status_mqtt_connect = true;
-        mqttClient.subscribe( mqttConfig.topicGetStatusACK,0 ); 
-        mqttClient.subscribe( mqttConfig.topicGetConfig,0 ); 
+        mqttClient.subscribe( inforServer.mqttConfig.topicGetStatusACK,0 ); 
+        mqttClient.subscribe( inforServer.mqttConfig.topicGetConfig,0 ); 
         if (WiFiConf.mqtt_subto1[0] != 'x'){mqttClient.subscribe( WiFiConf.mqtt_subto1,0 );}  //0,1,2 laf qos
 }
 
@@ -68,6 +67,7 @@ void onMqttUnsubscribe(uint16_t packetId) {// printf("Unsubscribe acknowledged: 
 /*
 Set thanh pham 
 {"t":"3","l":"3","d":[{"i":"10","n":"Cá Semitrimmed ( Còn dè, Còn Mỡ, Còn thịt đỏ, bỏ đường chỉ hồng trên lưng)"},{"i":"11","n":"Thanh Pham 2"},{"i":"12","n":"Thanh Pham 3"}]}
+{"t":"1","l":"2","d":[{"i":"10","n":"Cá Semitrimmed"},{"i":"12","n":"Thanh Pham 3"}]}
 Set nha CC
 00000002
 00000004
@@ -75,7 +75,7 @@ Set nha CC
 00000003
 
 Set Khu Vuc can
-{"t":"2","l":"2","d":[{"i":2,"n":"Sữa Cá"},{"i":1,"n":"Filler"}]}
+{"t":"2","l":"2","d":[{"i":2,"n":"Sửa Cá"},{"i":1,"n":"Fillet"}]}
 
  */
 
@@ -90,42 +90,43 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
   StaticJsonDocument<1500> jsonBuffer;
   DeserializationError error = deserializeJson(jsonBuffer,payload);
   if (error) Serial.println("error json");
-  else if ((strcmp(WiFiConf.mqtt_subto1,topic) == 0)||(strcmp(mqttConfig.topicGetConfig,topic) == 0)){
+  else if ((strcmp(WiFiConf.mqtt_subto1,topic) == 0)||(strcmp(inforServer.mqttConfig.topicGetConfig,topic) == 0)){
     /*
      Nhan thong tin server cai dat ca lam viec
      */
         if (!jsonBuffer.containsKey("t")) {return;}
         if (!jsonBuffer.containsKey("d")) {return;}
-        if (jsonBuffer["t"].as<uint8_t>() == 1){
-          
-           strlcpy(inforServer.nameNhaCC[0], ramChuaChon, sizeof(inforServer.nameNhaCC[0]));
-          inforServer.tongNhaCC=jsonBuffer["l"].as<uint8_t>();
-          for (int i=0;i<inforServer.tongNhaCC;i++){
-            inforServer.maNhaCC[i+1]=jsonBuffer["d"][i]["i"].as<uint16_t>();
-         //   inforServer.sttGdSoLo[i+1]=jsonBuffer["d"][i]["g"].as<uint8_t>();
-            strlcpy(inforServer.nameNhaCC[i+1], jsonBuffer["d"][i]["n"], sizeof(inforServer.nameNhaCC[i]));
+        if (jsonBuffer["t"].as<uint8_t>() == 1){   
+          strlcpy(inforServer.nhaCC.arrayName[0], ramChuaChon, sizeof(inforServer.nhaCC.arrayName[0]));
+          inforServer.nhaCC.total=jsonBuffer["l"].as<uint8_t>();
+          for (int i=0;i<inforServer.nhaCC.total;i++){
+            if (i == 15)break; //qua array cua data
+            inforServer.nhaCC.arrayType[i+1]=jsonBuffer["d"][i]["i"].as<uint16_t>();
+            strlcpy(inforServer.nhaCC.arrayName[i+1], jsonBuffer["d"][i]["n"], sizeof(inforServer.nhaCC.arrayName[i+1]));
           }  
         }
         else if (jsonBuffer["t"].as<uint8_t>() == 2){
-          strlcpy(giaiDoanCan.nameGiaiDoan[0], ramChuaChon, sizeof(giaiDoanCan.nameGiaiDoan[0]));
-          giaiDoanCan.tongGiaiDoan=jsonBuffer["l"].as<uint8_t>();
-          for (int i=0;i<giaiDoanCan.tongGiaiDoan;i++){
-            giaiDoanCan.maGiaiDoan[i+1]=jsonBuffer["d"][i]["i"].as<uint16_t>();
-            strlcpy(giaiDoanCan.nameGiaiDoan[i+1], jsonBuffer["d"][i]["n"], sizeof(giaiDoanCan.nameGiaiDoan[i+1]));
+          strlcpy(inforServer.giaiDoan.arrayName[0], ramChuaChon, sizeof(inforServer.giaiDoan.arrayName[0]));
+          inforServer.giaiDoan.total=jsonBuffer["l"].as<uint8_t>();
+          for (int i=0;i<inforServer.giaiDoan.total;i++){
+            if (i == 10)break; //qua array cua data
+            inforServer.giaiDoan.arrayType[i+1]=jsonBuffer["d"][i]["i"].as<uint16_t>();
+            strlcpy(inforServer.giaiDoan.arrayName[i+1], jsonBuffer["d"][i]["n"], sizeof(inforServer.giaiDoan.arrayName[i+1]));
           }
           MQTT_lastTimeGetDataConfig = 0;
         }
-         else if (jsonBuffer["t"].as<uint8_t>() == 3){
-          strlcpy(inforServer.nameThanhPham[0], ramChuaChon, sizeof(inforServer.nameThanhPham[0]));
-          inforServer.tongThanhPham=jsonBuffer["l"].as<uint8_t>();
-          for (int i=0;i<inforServer.tongThanhPham;i++){
-            inforServer.maThanhPham[i+1]=jsonBuffer["d"][i]["i"].as<uint16_t>();
-            strlcpy(inforServer.nameThanhPham[i+1], jsonBuffer["d"][i]["n"], sizeof(inforServer.nameThanhPham[i+1]));
+       else if (jsonBuffer["t"].as<uint8_t>() == 3){
+          strlcpy(inforServer.thanhPham.arrayName[0], ramChuaChon, sizeof(inforServer.thanhPham.arrayName[0]));
+          inforServer.thanhPham.total=jsonBuffer["l"].as<uint8_t>();
+          for (int i=0;i<inforServer.thanhPham.total;i++){
+            if (i == 15)break; //qua array cua data
+            inforServer.thanhPham.arrayType[i+1]=jsonBuffer["d"][i]["i"].as<uint16_t>();
+            strlcpy(inforServer.thanhPham.arrayName[i+1], jsonBuffer["d"][i]["n"], sizeof(inforServer.thanhPham.arrayName[i+1]));
           }
           MQTT_lastTimeGetDataConfig = 0;
         }  
   }
-  else if (strcmp(mqttConfig.topicGetStatusACK,topic) == 0){
+  else if (strcmp(inforServer.mqttConfig.topicGetStatusACK,topic) == 0){
     /*
      Khi Nhan duoc data server bao luu thanh cong goi tin thi sẽ xoa file luu trong sd card
      */

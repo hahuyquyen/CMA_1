@@ -18,9 +18,9 @@
 #define canStopByte 0x0D
 #define canNULLByte 0x20
 
-#define uart_can_num UART_NUM_0
+//#define uart_can_num UART_NUM_0
 
-#define uart_can_baud_rate 115200
+//#define uart_can_baud_rate 115200
 #define uart_rfid_baud_rate 9600
 #define time_out_display_data 5000
 
@@ -56,3 +56,8 @@
 #define deviceRunning 1
 #define deviceSetting 0
 #define deviceError 2
+
+#define sttKvFillerIN 1
+#define sttKvFillerOUT 2
+#define sttKvSuaCaIN 3
+#define sttKvSuaCaOUT 4

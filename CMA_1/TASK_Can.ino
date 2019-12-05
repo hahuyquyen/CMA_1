@@ -16,7 +16,7 @@ void TaskCAN( void * pvParameters ){
         if(tach(&can_data)){
                 if(can_data!=Data_CAN.data_can){
                   Data_CAN.data_can=can_data;
-                  Data_CAN.time_get=xTaskGetTickCount();
+                 // Data_CAN.time_get=xTaskGetTickCount();
                   if(can_data > 0.5){xQueueSend( Queue_can, &Data_CAN, xTicksToWait );}
                   }
                 else if (xTaskGetTickCount() - lastTimeSendCan > 1000){
@@ -44,17 +44,14 @@ boolean tach(double* soky){
   int hangtram=0;
   double soam= 1;
   *soky=0;
- /* for (int j=0;j<sizeof(uart_bien);j++){
+  /*for (int j=0;j<sizeof(uart_bien);j++){
     Serial.print(uart_bien[j], HEX);Serial.print("-");
   }
   Serial.println("");*/
   for (int j=0;j<sizeof(uart_bien);j++){ if (uart_bien[j] != canNULLByte){tam1=j;break;} }
   for(int j=tam1;j<sizeof(uart_bien);j++){if(uart_bien[j] == can_dau_phay){hangtram=(j-tam1)-1;break;}}
   for(int j=tam1;j<sizeof(uart_bien);j++){
-               //   Serial.print(uart_bien[j],HEX);
-                 // Serial.print(" ");
                   if ((uart_bien[j] == 0x41)||(uart_bien[j] == 0x40)||(uart_bien[j] == 0x48)||(uart_bien[j] == 0x44)||(uart_bien[j] == 0x45)){*soky=0; return false;break;}//Serial.println(" ");
-                  //42 zero , 43 tare
                   if ((uart_bien[j] == 0x43)||(uart_bien[j] == 0x47)||(uart_bien[j] == 0x42)||(uart_bien[j] == 0x46)){*soky = *soky * soam;return true;break;} // so on dinh
                   else if (uart_bien[j] == can_Minus){soam=-1;}
                   else if (uart_bien[j] == can_dau_phay){hangtram=hangtram+1;}
@@ -62,3 +59,12 @@ boolean tach(double* soky){
    }
    return false;
 }
+
+
+/*
+ r 00
+ u 10
+ b 9600
+ rs 00
+ H 1
+ */
