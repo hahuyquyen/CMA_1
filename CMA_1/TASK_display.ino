@@ -59,17 +59,15 @@ void LCD_thong_tin(uint8_t chedo_HT, Data_TH* Data_TH  , uint8_t daucham = 0) {
       u8g2.setCursor(10, vitri);
       u8g2.print(F("NV: x"));
     }
-    else {
+    else if (Data_TH->id_RFID_NV[0] != 'x'){
       vitri = 18;
       u8g2.setCursor(10, vitri);
       u8g2.print(F("NV: "));
       u8g2.print(rfidDisplay);
     }
-    if (vitri == 18){vitri = 36;}
-    u8g2.setCursor(10, vitri);
     memcpy(rfidDisplay, & Data_TH->id_RFID[16], 8);
     rfidDisplay[9]='\0';
-    if (Data_TH->id_RFID[0] != 'x'){ u8g2.print(F("Rổ: "));u8g2.print(rfidDisplay);}
+    if (Data_TH->id_RFID[0] != 'x'){if (vitri == 18){vitri = 36;} u8g2.setCursor(10, vitri);u8g2.print(F("Rổ: "));u8g2.print(rfidDisplay);}
     if (vitri == 18){vitri = 36;}
     else if (vitri == 36){vitri = 54;}
     u8g2.setCursor(10, vitri);
