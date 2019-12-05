@@ -13,7 +13,7 @@ Sữa
     }
     them dong free de xoa bo nho
 
-
+Sữaz thu viện thay delay(100) bằng 
  
  */
 
