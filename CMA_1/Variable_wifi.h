@@ -27,7 +27,7 @@ static boolean status_wifi_connect_AP = true ;
 static boolean status_mqtt_connect = false ;
 uint8_t firstGetDataFromServer = 0;
 
-struct stateMachineConf {
+static struct stateMachineConf {
   uint8_t bottonSelect;
   uint8_t deviceStatus;
   uint32_t idDevice;
@@ -45,16 +45,40 @@ struct variLcdUpdateConf {
 };
 
 
-char cheDoInOutDis[3][30] = {"Chưa Chọn", "Đầu Vào", "Đầu Ra"};
-struct giaiDoanCanConf {
+//char cheDoInOutDis[3][30] = {"Chưa Chọn", "Đầu Vào", "Đầu Ra"};
+/*static struct giaiDoanCanConf {
   uint8_t cheDoInOut;
   uint8_t tongGiaiDoan;
   uint8_t userSelecGiaiDoan;
   uint8_t maGiaiDoan[10];
   char nameGiaiDoan[10][30];
 } giaiDoanCan;
+*/
+static struct inforServerStruct {
+  char nameCheDoInOut[3][30] = {"Chưa Chọn", "Đầu Vào", "Đầu Ra"};
+  struct nhaCCConf{
+    uint8_t total = 0;
+    uint8_t userSelect;
+    uint16_t arrayType[20];
+    char arrayName[20][120];
+  }nhaCC;
+  struct thanhPhamConf{
+    uint8_t total;
+    uint8_t userSelect;
+    uint16_t arrayType[20];
+    char arrayName[20][120];
+  }thanhPham;
+  struct giaiDoanConf{
+      uint8_t cheDoInOut;
+      uint8_t total;
+      uint8_t userSelect;
+      uint8_t arrayType[10];
+      char arrayName[10][30];
+  }giaiDoan;
+} inforServer;
 
-struct inforServerStruct {
+/*
+static struct inforServerStruct {
   uint8_t tongNhaCC;
   uint8_t tongThanhPham;
   uint8_t userSelectNhaCC;
@@ -63,7 +87,7 @@ struct inforServerStruct {
   uint16_t maNhaCC[20];
   char nameNhaCC[20][120];
   char nameThanhPham[20][120];
-} inforServer = {
+} inforServer; = {
   0,
   0,
   0,
@@ -72,8 +96,7 @@ struct inforServerStruct {
   0,
   0,
   0
-};
-
+};*/
 static struct mqttConfigConf {
   char topicGetStatusACK[64];
   char topicGetConfig[64];

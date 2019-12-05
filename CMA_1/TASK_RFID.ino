@@ -52,7 +52,7 @@ void TaskRFID( void * pvParameters ){
                                  * nếu là khu vực cân 2 lần thì sẽ lúc nào cũng gửi về
                                  */
                                // if (inforServer.PhanLoaiKV == PhanLoai::LANG_OUT){
-                                 if ((giaiDoanCan.maGiaiDoan[giaiDoanCan.userSelecGiaiDoan] == kvSuaCa)&&(giaiDoanCan.cheDoInOut == cheDoOut)){ 
+                                 if ((inforServer.giaiDoan.arrayType[inforServer.giaiDoan.userSelect] == kvSuaCa)&&(inforServer.giaiDoan.cheDoInOut == cheDoOut)){ 
                                     strncpy( Data_rfid.id_RFID_Old,Data_rfid.id_RFID, sizeof(Data_rfid.id_RFID));
                                     xQueueSend( Queue_RFID, &Data_rfid, xTicksToWait );
                                 }

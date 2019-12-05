@@ -55,21 +55,21 @@ void printProgress(size_t prg, size_t sz) {
 void khoiTaoGiaTri(){
     sprintf(mqttConfig.topicGetStatusACK, "/data/ack/%lu", ( unsigned long )stateMachine.idDevice) ;
     sprintf(mqttConfig.topicGetConfig, "/config/%lu", ( unsigned long )stateMachine.idDevice) ;
-    strlcpy(inforServer.nameThanhPham[0], ramChoDuLieu, sizeof(inforServer.nameThanhPham[0]));
-    strlcpy(inforServer.nameNhaCC[0], ramChoDuLieu, sizeof(inforServer.nameNhaCC[0]));
-    strlcpy(giaiDoanCan.nameGiaiDoan[0], ramChoDuLieu, sizeof(giaiDoanCan.nameGiaiDoan[0]));
+    strlcpy(inforServer.thanhPham.arrayName[0], ramChoDuLieu, sizeof(inforServer.thanhPham.arrayName[0]));
+    strlcpy(inforServer.nhaCC.arrayName[0], ramChoDuLieu, sizeof(inforServer.nhaCC.arrayName[0]));
+    strlcpy(inforServer.giaiDoan.arrayName[0], ramChoDuLieu, sizeof(inforServer.giaiDoan.arrayName[0]));
     stateMachine.deviceStatus = deviceSetting;
     stateMachine.bottonSelect = 0;
-    inforServer.userSelectNhaCC = 0;
-    inforServer.userSelectThanhPham = 0;
-    inforServer.tongThanhPham = 0;
-    inforServer.tongNhaCC = 0;
-    inforServer.maNhaCC[0]=0;
-    inforServer.maThanhPham[0]=0;
-    giaiDoanCan.cheDoInOut=0;
-    giaiDoanCan.tongGiaiDoan=0;
-    giaiDoanCan.userSelecGiaiDoan=0;
-    giaiDoanCan.maGiaiDoan[0]=0;
+    inforServer.nhaCC.userSelect = 0;
+    inforServer.thanhPham.userSelect = 0;
+    inforServer.thanhPham.total = 0;
+    inforServer.nhaCC.total = 0;
+    inforServer.nhaCC.arrayType[0]=0;
+    inforServer.thanhPham.arrayType[0]=0;
+    inforServer.giaiDoan.cheDoInOut=0;
+    inforServer.giaiDoan.total=0;
+    inforServer.giaiDoan.userSelect=0;
+    inforServer.giaiDoan.arrayType[0]=0;
 }
 void setup()
 {   pinMode(pinPower, OUTPUT);
@@ -95,6 +95,7 @@ void setup()
     Serial.begin(115200);
     
     SDSPI.begin(14,27,13,15); ///SCK,MISO,MOSI,ss
+    
     if(!SD.begin(15,SDSPI)){Serial.println("Card Mount Failed");    }
     stateMachine.idDevice=EEPROM.readUInt(800);
     Serial.print("ID Device : ");
@@ -237,12 +238,12 @@ void sendMQTTConfig(uint8_t loaiconfig = 0 , uint8_t maboxung = 0){
       mqttClient.publish("/config", 0, true, buffer); 
 }
 void checkSendMQTTConfig(){
-      if(inforServer.tongNhaCC == 0){sendMQTTConfig(1,0);}
-      else if (giaiDoanCan.tongGiaiDoan == 0){sendMQTTConfig(2,0);}
+      if(inforServer.nhaCC.total == 0){sendMQTTConfig(1,0);}
+      else if (inforServer.giaiDoan.total == 0){sendMQTTConfig(2,0);}
       //Fix loi 01
-      else if ((giaiDoanCan.userSelecGiaiDoan != 0)&&(inforServer.tongThanhPham == 0)&&(stateMachine.bottonSelect>1)){ // Chi gui yeu cau khi da chon khu vuc can và qua buoc chọn thành phảm
+      else if ((inforServer.giaiDoan.userSelect != 0)&&(inforServer.thanhPham.total == 0)&&(stateMachine.bottonSelect>1)){ // Chi gui yeu cau khi da chon khu vuc can và qua buoc chọn thành phảm
          //Serial.print("dsgfdgfs ");
-       // Serial.println(giaiDoanCan.maGiaiDoan[giaiDoanCan.userSelecGiaiDoan]);
-       sendMQTTConfig(3,giaiDoanCan.maGiaiDoan[giaiDoanCan.userSelecGiaiDoan]);
+       // Serial.println(inforServer.giaiDoan.arrayType[inforServer.giaiDoan.userSelect]);
+       sendMQTTConfig(3,inforServer.giaiDoan.arrayType[inforServer.giaiDoan.userSelect]);
       }
 }

@@ -15,11 +15,11 @@
 const char* LCD_setting = "Cài Đặt";
 void LCD_print_KV(uint8_t vitri = 48) {
   u8g2.setCursor(5, vitri); 
-  u8g2.print(giaiDoanCan.nameGiaiDoan[giaiDoanCan.userSelecGiaiDoan]);
+  u8g2.print(inforServer.giaiDoan.arrayName[inforServer.giaiDoan.userSelect]);
   u8g2.setCursor(60 , vitri);
   u8g2.print(" - ");
   u8g2.setCursor(66 , vitri); 
-  u8g2.print(cheDoInOutDis[giaiDoanCan.cheDoInOut]);
+  u8g2.print(inforServer.nameCheDoInOut[inforServer.giaiDoan.cheDoInOut]);
 }
 void hienthiSetting(char* dataDisplay = NULL, char* dataUserDisplay = NULL) {
   if (dataDisplay != NULL ) {
@@ -81,28 +81,28 @@ void LCD_thong_tin(uint8_t chedo_HT, Data_TH* Data_TH  , uint8_t daucham = 0) {
     u8g2.print(F("Kg: "));
     u8g2.print(can_data);
     u8g2.setCursor(2, 48);
-    if (giaiDoanCan.cheDoInOut == cheDoIN) {
-      hienthiSetting(NULL, inforServer.nameNhaCC[inforServer.userSelectNhaCC]);
+    if (inforServer.giaiDoan.cheDoInOut == cheDoIN) {
+      hienthiSetting(NULL, inforServer.nhaCC.arrayName[inforServer.nhaCC.userSelect]);
     }
     else {
-      hienthiSetting(NULL, inforServer.nameThanhPham[inforServer.userSelectThanhPham]);
+      hienthiSetting(NULL, inforServer.thanhPham.arrayName[inforServer.thanhPham.userSelect]);
     }
   }
   else if (chedo_HT == 2) {
     char stringdem[] = "Chế Độ";
-    hienthiSetting(stringdem, cheDoInOutDis[giaiDoanCan.cheDoInOut]);
+    hienthiSetting(stringdem, inforServer.nameCheDoInOut[inforServer.giaiDoan.cheDoInOut]);
   }
   else if (chedo_HT == 3) {
     char stringdem[] = "KHU VỰC CÂN";
-    hienthiSetting(stringdem, giaiDoanCan.nameGiaiDoan[giaiDoanCan.userSelecGiaiDoan]);
+    hienthiSetting(stringdem, inforServer.giaiDoan.arrayName[inforServer.giaiDoan.userSelect]);
   }
   else if (chedo_HT == 4) {
     char stringdem[] = "Nhà Cung Cấp";
-    hienthiSetting(stringdem, inforServer.nameNhaCC[inforServer.userSelectNhaCC]);
+    hienthiSetting(stringdem, inforServer.nhaCC.arrayName[inforServer.nhaCC.userSelect]);
   }
   else if (chedo_HT == 5) {
     char stringdem[] = "Loại Thành Phẩm";
-    hienthiSetting(stringdem, inforServer.nameThanhPham[inforServer.userSelectThanhPham]);
+    hienthiSetting(stringdem, inforServer.thanhPham.arrayName[inforServer.thanhPham.userSelect]);
   }
   else if (chedo_HT == 6) {
     char xacnhan[] = "Xác Nhận";
@@ -110,11 +110,11 @@ void LCD_thong_tin(uint8_t chedo_HT, Data_TH* Data_TH  , uint8_t daucham = 0) {
     u8g2.print(xacnhan);
     LCD_print_KV(32);
     u8g2.setCursor(2, 48);
-   if (giaiDoanCan.cheDoInOut == cheDoIN) {
-      hienthiSetting(NULL, inforServer.nameNhaCC[inforServer.userSelectNhaCC]);
+   if (inforServer.giaiDoan.cheDoInOut == cheDoIN) {
+      hienthiSetting(NULL, inforServer.nhaCC.arrayName[inforServer.nhaCC.userSelect]);
     }
     else {
-      hienthiSetting(NULL, inforServer.nameThanhPham[inforServer.userSelectThanhPham]);
+      hienthiSetting(NULL, inforServer.thanhPham.arrayName[inforServer.thanhPham.userSelect]);
     }
   }
   u8g2.sendBuffer();
@@ -148,13 +148,13 @@ void Display( void * pvParameters ) {
     if (stateMachine.deviceStatus == deviceRunning) {
       if (xQueueReceive( Queue_display, &Data_TH,  ( TickType_t ) 1 ) == pdPASS ) {
         variLcdUpdate.stateDisplayLCD = 0;
-      //  if ((strcmp(Data_TH.id_RFID_NV, "x") != 0) && (inforServer.PhanLoaiKV == PhanLoai::LANG_IN )) { //if (giaiDoanCan.cheDoInOut == cheDoIN) {
-        if ((Data_TH.id_RFID_NV[0] == 'x') && (giaiDoanCan.cheDoInOut == cheDoIN)&& (giaiDoanCan.maGiaiDoan[giaiDoanCan.userSelecGiaiDoan]  == kvSuaCa)) {
+      //  if ((strcmp(Data_TH.id_RFID_NV, "x") != 0) && (inforServer.PhanLoaiKV == PhanLoai::LANG_IN )) { //if (inforServer.giaiDoan.cheDoInOut == cheDoIN) {
+        if ((Data_TH.id_RFID_NV[0] == 'x') && (inforServer.giaiDoan.cheDoInOut == cheDoIN)&& (inforServer.giaiDoan.arrayType[inforServer.giaiDoan.userSelect]  == kvSuaCa)) {
         //  timeoutLcdLangDaIn = xTaskGetTickCount();
         Serial.println(" Da Nhan Ro va can GD1");
         digitalWrite(pinLedGreen, HIGH);
         }
-        else if ((giaiDoanCan.cheDoInOut == cheDoIN)&& (giaiDoanCan.maGiaiDoan[giaiDoanCan.userSelecGiaiDoan]  == kvSuaCa)){
+        else if ((inforServer.giaiDoan.cheDoInOut == cheDoIN)&& (inforServer.giaiDoan.arrayType[inforServer.giaiDoan.userSelect]  == kvSuaCa)){
           Serial.println(" Da Nhan du thong tin");
           timeoutDisplay = xTaskGetTickCount();
           statusBuzzer = true ;

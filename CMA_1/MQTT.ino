@@ -29,16 +29,16 @@ void connectToMqtt() {
 void truyen_mqtt(){
       DateTime now = rtc.now();
       StaticJsonDocument<500> doc;
-      doc["k"] = giaiDoanCan.cheDoInOut;
-      doc["x"] = giaiDoanCan.maGiaiDoan[giaiDoanCan.userSelecGiaiDoan];
+      doc["k"] = inforServer.giaiDoan.cheDoInOut;
+      doc["x"] = inforServer.giaiDoan.arrayType[inforServer.giaiDoan.userSelect];
       doc["b"] = datatruyen_mqtt.id_RFID;
       doc["e"] = datatruyen_mqtt.id_RFID_NV;
       doc["s"] = (unsigned long) stateMachine.idDevice;      
       doc["w"] = datatruyen_mqtt.data_weight;
       doc["t"] = now.unixtime();
       //doc["m"] = inforServer.maLoaica[inforServer.userSelectLoaiCa];
-      doc["c"] = inforServer.maNhaCC[inforServer.userSelectNhaCC];
-      doc["p"] = inforServer.maThanhPham[inforServer.userSelectThanhPham];
+      doc["c"] = inforServer.nhaCC.arrayType[inforServer.nhaCC.userSelect];
+      doc["p"] = inforServer.thanhPham.arrayType[inforServer.thanhPham.userSelect];
       char buffer[500];
       serializeJson(doc, buffer);
       if (status_mqtt_connect){ mqttClient.publish("/data", 0, true, buffer);}
@@ -98,29 +98,29 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
         if (!jsonBuffer.containsKey("d")) {return;}
         if (jsonBuffer["t"].as<uint8_t>() == 1){
           
-           strlcpy(inforServer.nameNhaCC[0], ramChuaChon, sizeof(inforServer.nameNhaCC[0]));
-          inforServer.tongNhaCC=jsonBuffer["l"].as<uint8_t>();
-          for (int i=0;i<inforServer.tongNhaCC;i++){
-            inforServer.maNhaCC[i+1]=jsonBuffer["d"][i]["i"].as<uint16_t>();
+           strlcpy(inforServer.nhaCC.arrayName[0], ramChuaChon, sizeof(inforServer.nhaCC.arrayName[0]));
+          inforServer.nhaCC.total=jsonBuffer["l"].as<uint8_t>();
+          for (int i=0;i<inforServer.nhaCC.total;i++){
+            inforServer.nhaCC.arrayType[i+1]=jsonBuffer["d"][i]["i"].as<uint16_t>();
          //   inforServer.sttGdSoLo[i+1]=jsonBuffer["d"][i]["g"].as<uint8_t>();
-            strlcpy(inforServer.nameNhaCC[i+1], jsonBuffer["d"][i]["n"], sizeof(inforServer.nameNhaCC[i]));
+            strlcpy(inforServer.nhaCC.arrayName[i+1], jsonBuffer["d"][i]["n"], sizeof(inforServer.nhaCC.arrayName[i]));
           }  
         }
         else if (jsonBuffer["t"].as<uint8_t>() == 2){
-          strlcpy(giaiDoanCan.nameGiaiDoan[0], ramChuaChon, sizeof(giaiDoanCan.nameGiaiDoan[0]));
-          giaiDoanCan.tongGiaiDoan=jsonBuffer["l"].as<uint8_t>();
-          for (int i=0;i<giaiDoanCan.tongGiaiDoan;i++){
-            giaiDoanCan.maGiaiDoan[i+1]=jsonBuffer["d"][i]["i"].as<uint16_t>();
-            strlcpy(giaiDoanCan.nameGiaiDoan[i+1], jsonBuffer["d"][i]["n"], sizeof(giaiDoanCan.nameGiaiDoan[i+1]));
+          strlcpy(inforServer.giaiDoan.arrayName[0], ramChuaChon, sizeof(inforServer.giaiDoan.arrayName[0]));
+          inforServer.giaiDoan.total=jsonBuffer["l"].as<uint8_t>();
+          for (int i=0;i<inforServer.giaiDoan.total;i++){
+            inforServer.giaiDoan.arrayType[i+1]=jsonBuffer["d"][i]["i"].as<uint16_t>();
+            strlcpy(inforServer.giaiDoan.arrayName[i+1], jsonBuffer["d"][i]["n"], sizeof(inforServer.giaiDoan.arrayName[i+1]));
           }
           MQTT_lastTimeGetDataConfig = 0;
         }
          else if (jsonBuffer["t"].as<uint8_t>() == 3){
-          strlcpy(inforServer.nameThanhPham[0], ramChuaChon, sizeof(inforServer.nameThanhPham[0]));
-          inforServer.tongThanhPham=jsonBuffer["l"].as<uint8_t>();
-          for (int i=0;i<inforServer.tongThanhPham;i++){
-            inforServer.maThanhPham[i+1]=jsonBuffer["d"][i]["i"].as<uint16_t>();
-            strlcpy(inforServer.nameThanhPham[i+1], jsonBuffer["d"][i]["n"], sizeof(inforServer.nameThanhPham[i+1]));
+          strlcpy(inforServer.thanhPham.arrayName[0], ramChuaChon, sizeof(inforServer.thanhPham.arrayName[0]));
+          inforServer.thanhPham.total=jsonBuffer["l"].as<uint8_t>();
+          for (int i=0;i<inforServer.thanhPham.total;i++){
+            inforServer.thanhPham.arrayType[i+1]=jsonBuffer["d"][i]["i"].as<uint16_t>();
+            strlcpy(inforServer.thanhPham.arrayName[i+1], jsonBuffer["d"][i]["n"], sizeof(inforServer.thanhPham.arrayName[i+1]));
           }
           MQTT_lastTimeGetDataConfig = 0;
         }  
