@@ -25,12 +25,33 @@ unsigned long MQTT_lastTimeGetDataConfig = 0;
 static uint8_t counter_wifi_disconnect = 0;
 static boolean status_wifi_connect_AP = true ;
 static boolean status_mqtt_connect = false ;
-uint8_t firstGetDataFromServer = 0;
+//uint8_t firstGetDataFromServer = 0;
+
+struct timeServerConf{
+    unsigned long sdReadEnd = 0;
+    unsigned long sdSendMQTT = 0;
+    unsigned long mqttGetDataConf = 0;
+    void updateTime(unsigned long* timeUpdate){
+     *timeUpdate =  xTaskGetTickCount();
+    }
+}lastTimeServer;
+
+
 
 static struct stateMachineConf {
   uint8_t bottonSelect;
   uint8_t deviceStatus;
   uint32_t idDevice;
+  
+  void getIdControl(){
+    this->idDevice=EEPROM.readUInt(800);
+  }
+  
+  void setIdControl(){
+    EEPROM.writeUInt(800, this->idDevice);
+    EEPROM.commit();
+  }
+  
 } stateMachine;
 
 struct variLcdUpdateConf {
@@ -43,31 +64,23 @@ struct variLcdUpdateConf {
   false,
   0
 };
-
-
-//char cheDoInOutDis[3][30] = {"Chưa Chọn", "Đầu Vào", "Đầu Ra"};
-/*static struct giaiDoanCanConf {
-  uint8_t cheDoInOut;
-  uint8_t tongGiaiDoan;
-  uint8_t userSelecGiaiDoan;
-  uint8_t maGiaiDoan[10];
-  char nameGiaiDoan[10][30];
-} giaiDoanCan;
-*/
 static struct inforServerStruct {
   char nameCheDoInOut[3][30] = {"Chưa Chọn", "Đầu Vào", "Đầu Ra"};
+  
   struct nhaCCConf{
     uint8_t total = 0;
     uint8_t userSelect;
-    uint16_t arrayType[20];
-    char arrayName[20][120];
+    uint16_t arrayType[15];
+    char arrayName[15][120];
   }nhaCC;
+  
   struct thanhPhamConf{
     uint8_t total;
     uint8_t userSelect;
-    uint16_t arrayType[20];
-    char arrayName[20][120];
+    uint16_t arrayType[15];
+    char arrayName[15][120];
   }thanhPham;
+  
   struct giaiDoanConf{
       uint8_t cheDoInOut;
       uint8_t total;
@@ -75,32 +88,24 @@ static struct inforServerStruct {
       uint8_t arrayType[10];
       char arrayName[10][30];
   }giaiDoan;
+  
+  struct mqttConfigConf{
+      char topicGetStatusACK[25];
+      char topicGetConfig[25];
+      void setTopicACK(unsigned long id_device){
+        sprintf(topicGetStatusACK, "/data/ack/%lu", id_device) ;
+      }
+     void setTopicGetConfig(unsigned long id_device){
+        sprintf(this->topicGetConfig, "/config/%lu", id_device) ;
+      }
+  }mqttConfig;
+  
+  void changeData(boolean chedo, uint8_t* userSelect, uint8_t totaldata=0){
+    if (chedo) { *userSelect = (*userSelect > (totaldata - 1)) ? 0 : (*userSelect + 1);}
+    else *userSelect = *userSelect - 1;
+  }
+  
 } inforServer;
-
-/*
-static struct inforServerStruct {
-  uint8_t tongNhaCC;
-  uint8_t tongThanhPham;
-  uint8_t userSelectNhaCC;
-  uint8_t userSelectThanhPham;
-  uint16_t maThanhPham[20];
-  uint16_t maNhaCC[20];
-  char nameNhaCC[20][120];
-  char nameThanhPham[20][120];
-} inforServer; = {
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0
-};*/
-static struct mqttConfigConf {
-  char topicGetStatusACK[64];
-  char topicGetConfig[64];
-} mqttConfig;
 
 static struct WiFiConfStruct {
   uint8_t format[4];
@@ -145,7 +150,6 @@ QueueHandle_t Queue_RFID;
 QueueHandle_t Queue_RFID_NV;
 QueueHandle_t Queue_mqtt;
 QueueHandle_t Queue_display;
-//QueueHandle_t Queue_can_interrup;
 QueueHandle_t Queue_Time_blink;
 /****************************
     Struct Data
@@ -154,19 +158,19 @@ typedef struct Data_TH {
   char id_RFID[25];
   char id_RFID_NV[25];
   double data_weight;
-  uint32_t idControl;
+  //uint32_t idControl;
 } Data_TH;
 
 typedef struct Data_CAN {
   double data_can;
-  unsigned long time_get;
+//  unsigned long time_get;
 } Data_CAN;
 
 
 typedef struct Data_RFID {
   char id_RFID[25];
   char id_RFID_Old[25];
-  unsigned long time_get;
+//  unsigned long time_get;
 } Data_RFID;
 
 

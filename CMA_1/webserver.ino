@@ -127,8 +127,7 @@ void setupWiFiConf(void) {
     if (request->hasParam("id", true)) {
       Serial.println(request->getParam("id", true)->value());
       stateMachine.idDevice = strtoul(request->getParam("id", true)->value().c_str(), NULL, 10);
-      EEPROM.writeUInt(800, stateMachine.idDevice);
-      EEPROM.commit();
+      stateMachine.setIdControl();
     }
     request->send(200, F("text/plain"), F("OK ...."));
   });

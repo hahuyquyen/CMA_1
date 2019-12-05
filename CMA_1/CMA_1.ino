@@ -53,8 +53,11 @@ void printProgress(size_t prg, size_t sz) {
  * Setup
  */
 void khoiTaoGiaTri(){
-    sprintf(mqttConfig.topicGetStatusACK, "/data/ack/%lu", ( unsigned long )stateMachine.idDevice) ;
-    sprintf(mqttConfig.topicGetConfig, "/config/%lu", ( unsigned long )stateMachine.idDevice) ;
+   // sprintf(mqttConfig.topicGetStatusACK, "/data/ack/%lu", ( unsigned long )stateMachine.idDevice) ;
+    //sprintf(mqttConfig.topicGetConfig, "/config/%lu", ( unsigned long )stateMachine.idDevice) ;
+    inforServer.mqttConfig.setTopicACK(( unsigned long )stateMachine.idDevice);
+    inforServer.mqttConfig.setTopicGetConfig(( unsigned long )stateMachine.idDevice);
+    Serial.println(inforServer.mqttConfig.topicGetStatusACK); Serial.println(inforServer.mqttConfig.topicGetConfig);
     strlcpy(inforServer.thanhPham.arrayName[0], ramChoDuLieu, sizeof(inforServer.thanhPham.arrayName[0]));
     strlcpy(inforServer.nhaCC.arrayName[0], ramChoDuLieu, sizeof(inforServer.nhaCC.arrayName[0]));
     strlcpy(inforServer.giaiDoan.arrayName[0], ramChoDuLieu, sizeof(inforServer.giaiDoan.arrayName[0]));
@@ -97,7 +100,8 @@ void setup()
     SDSPI.begin(14,27,13,15); ///SCK,MISO,MOSI,ss
     
     if(!SD.begin(15,SDSPI)){Serial.println("Card Mount Failed");    }
-    stateMachine.idDevice=EEPROM.readUInt(800);
+
+    stateMachine.getIdControl();
     Serial.print("ID Device : ");
     Serial.println( stateMachine.idDevice);
     loadWiFiConf();

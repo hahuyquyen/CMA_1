@@ -48,8 +48,8 @@ void truyen_mqtt(){
 }
 void onMqttConnect(bool sessionPresent) {
         status_mqtt_connect = true;
-        mqttClient.subscribe( mqttConfig.topicGetStatusACK,0 ); 
-        mqttClient.subscribe( mqttConfig.topicGetConfig,0 ); 
+        mqttClient.subscribe( inforServer.mqttConfig.topicGetStatusACK,0 ); 
+        mqttClient.subscribe( inforServer.mqttConfig.topicGetConfig,0 ); 
         if (WiFiConf.mqtt_subto1[0] != 'x'){mqttClient.subscribe( WiFiConf.mqtt_subto1,0 );}  //0,1,2 laf qos
 }
 
@@ -68,6 +68,7 @@ void onMqttUnsubscribe(uint16_t packetId) {// printf("Unsubscribe acknowledged: 
 /*
 Set thanh pham 
 {"t":"3","l":"3","d":[{"i":"10","n":"Cá Semitrimmed ( Còn dè, Còn Mỡ, Còn thịt đỏ, bỏ đường chỉ hồng trên lưng)"},{"i":"11","n":"Thanh Pham 2"},{"i":"12","n":"Thanh Pham 3"}]}
+{"t":"1","l":"3","d":[{"i":"10","n":"Cá Semitrimmed"},{"i":"12","n":"Thanh Pham 3"}]}
 Set nha CC
 00000002
 00000004
@@ -90,42 +91,43 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
   StaticJsonDocument<1500> jsonBuffer;
   DeserializationError error = deserializeJson(jsonBuffer,payload);
   if (error) Serial.println("error json");
-  else if ((strcmp(WiFiConf.mqtt_subto1,topic) == 0)||(strcmp(mqttConfig.topicGetConfig,topic) == 0)){
+  else if ((strcmp(WiFiConf.mqtt_subto1,topic) == 0)||(strcmp(inforServer.mqttConfig.topicGetConfig,topic) == 0)){
     /*
      Nhan thong tin server cai dat ca lam viec
      */
         if (!jsonBuffer.containsKey("t")) {return;}
         if (!jsonBuffer.containsKey("d")) {return;}
-        if (jsonBuffer["t"].as<uint8_t>() == 1){
-          
-           strlcpy(inforServer.nhaCC.arrayName[0], ramChuaChon, sizeof(inforServer.nhaCC.arrayName[0]));
+        if (jsonBuffer["t"].as<uint8_t>() == 1){   
+          strlcpy(inforServer.nhaCC.arrayName[0], ramChuaChon, sizeof(inforServer.nhaCC.arrayName[0]));
           inforServer.nhaCC.total=jsonBuffer["l"].as<uint8_t>();
           for (int i=0;i<inforServer.nhaCC.total;i++){
+            if (i == 15)break; //qua array cua data
             inforServer.nhaCC.arrayType[i+1]=jsonBuffer["d"][i]["i"].as<uint16_t>();
-         //   inforServer.sttGdSoLo[i+1]=jsonBuffer["d"][i]["g"].as<uint8_t>();
-            strlcpy(inforServer.nhaCC.arrayName[i+1], jsonBuffer["d"][i]["n"], sizeof(inforServer.nhaCC.arrayName[i]));
+            strlcpy(inforServer.nhaCC.arrayName[i+1], jsonBuffer["d"][i]["n"], sizeof(inforServer.nhaCC.arrayName[i+1]));
           }  
         }
         else if (jsonBuffer["t"].as<uint8_t>() == 2){
           strlcpy(inforServer.giaiDoan.arrayName[0], ramChuaChon, sizeof(inforServer.giaiDoan.arrayName[0]));
           inforServer.giaiDoan.total=jsonBuffer["l"].as<uint8_t>();
           for (int i=0;i<inforServer.giaiDoan.total;i++){
+            if (i == 10)break; //qua array cua data
             inforServer.giaiDoan.arrayType[i+1]=jsonBuffer["d"][i]["i"].as<uint16_t>();
             strlcpy(inforServer.giaiDoan.arrayName[i+1], jsonBuffer["d"][i]["n"], sizeof(inforServer.giaiDoan.arrayName[i+1]));
           }
           MQTT_lastTimeGetDataConfig = 0;
         }
-         else if (jsonBuffer["t"].as<uint8_t>() == 3){
+       else if (jsonBuffer["t"].as<uint8_t>() == 3){
           strlcpy(inforServer.thanhPham.arrayName[0], ramChuaChon, sizeof(inforServer.thanhPham.arrayName[0]));
           inforServer.thanhPham.total=jsonBuffer["l"].as<uint8_t>();
           for (int i=0;i<inforServer.thanhPham.total;i++){
+            if (i == 15)break; //qua array cua data
             inforServer.thanhPham.arrayType[i+1]=jsonBuffer["d"][i]["i"].as<uint16_t>();
             strlcpy(inforServer.thanhPham.arrayName[i+1], jsonBuffer["d"][i]["n"], sizeof(inforServer.thanhPham.arrayName[i+1]));
           }
           MQTT_lastTimeGetDataConfig = 0;
         }  
   }
-  else if (strcmp(mqttConfig.topicGetStatusACK,topic) == 0){
+  else if (strcmp(inforServer.mqttConfig.topicGetStatusACK,topic) == 0){
     /*
      Khi Nhan duoc data server bao luu thanh cong goi tin thi sẽ xoa file luu trong sd card
      */

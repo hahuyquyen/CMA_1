@@ -31,7 +31,7 @@ void TaskRFID( void * pvParameters ){
     nano.begin(Serial2); 
     nano.set_mode_timming(2,1000); // Set mode eprom 0x70, mode timming
     nano.set_timing_message(0x05,1000); //0x00 -> 0x64
-    nano.set_power(0x10,1000); // 00 -> 96
+    nano.set_power(0x64,1000); // 00 -> 95
     nano.set_out_mode(1,1000);
     nano.set_time_ner(0x05,1000); // tna so gui 1->255s
     nano.set_reset_reader(1000);

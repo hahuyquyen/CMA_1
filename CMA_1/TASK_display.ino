@@ -231,7 +231,8 @@ void printDebugHeap() {
   if (xTaskGetTickCount() - getTimeSendHeapDebug > 15000) {
     DateTime now = rtc.now();
     getTimeSendHeapDebug = xTaskGetTickCount();
-    printf("Time 1/1/1970 = %lu ,StackHigh %d, Free Heap = %d\n", (unsigned long )now.unixtime(), uxTaskGetStackHighWaterMark(NULL), ESP.getFreeHeap());
+    Serial.print (getSttKhuVuc());
+    printf(" Khu vuc %c , Time 1/1/1970 = %lu ,StackHigh %d, Free Heap = %d\n", getSttKhuVuc(),(unsigned long )now.unixtime(), uxTaskGetStackHighWaterMark(NULL), ESP.getFreeHeap());
   }
 }
 /*
