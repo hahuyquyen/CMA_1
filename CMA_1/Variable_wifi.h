@@ -6,22 +6,19 @@
 
 const char ramChoDuLieu[] = "Chờ Dữ Liệu"; // dung can lây FPSTR(ramChoDuLieu) và strlcpy_P  tiet kiem RAM cho heap memory
 const char ramChuaChon[] = "Chưa Chọn";
-const char htmlPortMQTT[] PROGMEM = "PortMQTT"; // dung can lây FPSTR(htmlPortMQTT) và strlcpy_P  tiet kiem RAM cho heap memory
-
-
-
 const uint8_t wifi_conf_format[] = WIFI_CONF_FORMAT;
-
-unsigned long MQTT_lastTimeGetDataConfig = 0;
-static uint8_t counter_wifi_disconnect = 0;
-static boolean status_wifi_connect_AP = true ;
-static boolean status_mqtt_connect = false ;  
-unsigned long  timeTruyenMQTT = 1000;
-
 struct statusPeripheralConf{
+    struct mqttConf{
+      unsigned long lastTimeGetDataConfig; 
+      unsigned long  timeTruyenMQTT;
+      boolean statusMqttConnect ;  
+    }mqtt={0,1000,false};
     struct wifiConf{
-      boolean ApConnect;
-    }wifi ={false};
+      boolean ApConnect; 
+      unsigned long lastTimeConnect;
+      uint8_t counterWifiDisconnect;
+      boolean statusConnectAP ;
+    }wifi ={false,0,0,true};
     struct rtcConf{
       boolean statusConnect;
     }RTC={false};    
@@ -43,7 +40,9 @@ struct timeServerConf{
 }lastTimeServer;
 
 
-
+/////////////////////////////////////////////////////////////
+///// Data status Button nhan           //////////////////////
+////////////////////////////////////////////////////////////
 static struct stateMachineConf {
   uint8_t bottonSelect;
   uint8_t deviceStatus;
@@ -58,7 +57,9 @@ static struct stateMachineConf {
     EEPROM.commit();
   }
 } stateMachine;
-
+/////////////////////////////////////////////////////////////
+///// Data trang thai LCD           //////////////////////
+////////////////////////////////////////////////////////////
 struct variLcdUpdateConf {
   int numScroll;
   boolean updateLCD ;
@@ -69,7 +70,9 @@ struct variLcdUpdateConf {
   false,
   0
 };
-
+/////////////////////////////////////////////////////////////
+///// Data luu du lieu nhan tu server //////////////////////
+////////////////////////////////////////////////////////////
 static struct inforServerStruct {
   char nameCheDoInOut[3][30] = {"Chưa Chọn", "Đầu Vào", "Đầu Ra"};
   
@@ -105,17 +108,15 @@ static struct inforServerStruct {
         sprintf(this->topicGetConfig, "/config/%lu", id_device) ;
       }
   }mqttConfig;
-  void copyData(char* des,const char* source, size_t  sizeCopy){
-   // memset(des, '\0', sizeCopy);
-    strlcpy(des, source, sizeCopy);
-  }
   void changeData(boolean chedo, uint8_t* userSelect, uint8_t totaldata=0){
     if (chedo) { *userSelect = (*userSelect > (totaldata - 1)) ? 0 : (*userSelect + 1);}
     else *userSelect = *userSelect - 1;
   }
   
 } inforServer;
-
+/////////////////////////////////////////////////////////////
+///// Data wifi, server mqtt           //////////////////////
+////////////////////////////////////////////////////////////
 static struct WiFiConfStruct {
   uint8_t format[4];
   char sta_ssid[32];
@@ -145,7 +146,9 @@ static struct WiFiConfStruct {
   "pass",
   "x"
 };
-
+/////////////////////////////////////////////////////////////
+///// Data Queue  FreeRTOS          //////////////////////
+////////////////////////////////////////////////////////////
 
 SemaphoreHandle_t xCountingSemaphore;
 SemaphoreHandle_t xSignal_FromRFID;
@@ -159,20 +162,23 @@ QueueHandle_t Queue_RFID_NV;
 QueueHandle_t Queue_mqtt;
 QueueHandle_t Queue_display;
 QueueHandle_t Queue_Time_blink;
-/****************************
-    Struct Data
- ***************************/
+/////////////////////////////////////////////////////////////
+///// Data Tong Hop Task Checkdata           //////////////////////
+////////////////////////////////////////////////////////////
 typedef struct Data_TH {
   char id_RFID[25];
   char id_RFID_NV[25];
   double data_weight;
 } Data_TH;
-
+/////////////////////////////////////////////////////////////
+///// Data Can DJ28SS           //////////////////////
+////////////////////////////////////////////////////////////
 typedef struct Data_CAN {
   double data_can;
 } Data_CAN;
-
-
+/////////////////////////////////////////////////////////////
+///// Data RFID           //////////////////////
+////////////////////////////////////////////////////////////
 typedef struct Data_RFID {
   char id_RFID[25];
   char id_RFID_Old[25];

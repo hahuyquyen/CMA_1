@@ -20,6 +20,9 @@ void IRAM_ATTR array_to_string(byte* array, unsigned int len, char* buffer)
     }
     buffer[len*2] = '\0';
 }
+//////////////////////////////////////////////////////////////////
+////// Task doc du lieu tu RFID  ////////////////////////////
+//////////////////////////////////////////////////////////////////
 void TaskRFID( void * pvParameters ){
     static byte myEPC[12]; 
     static byte myEPClength;
@@ -29,7 +32,7 @@ void TaskRFID( void * pvParameters ){
     const TickType_t xTicksToWait = pdMS_TO_TICKS(1);
     unsigned long TaskRFID_lastTimeSche = 0;
     int i =0;
-    Serial2.begin(uart_rfid_baud_rate);
+    Serial2.begin(9600);
     nano.begin(Serial2); 
     nano.set_mode_timming(2,1000); // Set mode eprom 0x70, mode timming
     nano.set_timing_message(0x05,1000); //0x00 -> 0x64

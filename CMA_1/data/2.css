@@ -32,7 +32,10 @@ body {
   padding-bottom: 85px;
   background: #f5f7f7;
 }
-
+fieldset { 
+  border:2px 
+  solid green 
+  }
 #w{ margin:0 auto; width:800px; background: #fff; padding:10px;}
 
 h1 {

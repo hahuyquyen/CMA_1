@@ -2,11 +2,10 @@
 #define WIFI_CONF_START 0
 
 #define using_sta true
-//#define BUF_SIZE_UART (125)
+
 #define web_port 4999
 #define time_2_lan_nhan_data 5000
 #define time_cho_nhan_RFID_NV 8000
-//#define time_out_set_rfid 1000
 
 
 #define can_dau_cham 0x2C
@@ -18,11 +17,8 @@
 #define canStopByte 0x0D
 #define canNULLByte 0x20
 
-//#define uart_can_num UART_NUM_0
-
-//#define uart_can_baud_rate 115200
-#define uart_rfid_baud_rate 9600
-#define time_out_display_data 5000
+//#define uart_rfid_baud_rate 9600
+//#define time_out_display_data 5000
 
 #define MaRo_RFID 0xE2
 #define MaNV_RFID 0x00
@@ -53,9 +49,10 @@
 #define stateChooseNhaCC 2
 #define stateChooseThanhPham 3
 
-#define deviceRunning 1
 #define deviceSetting 0
+#define deviceRunning 1
 #define deviceError 2
+#define deviceLowPower 3
 
 #define sttKvFillerIN 1
 #define sttKvFillerOUT 2
