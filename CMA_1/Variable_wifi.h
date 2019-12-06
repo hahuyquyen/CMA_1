@@ -19,13 +19,24 @@ const uint8_t wifi_conf_format[] = WIFI_CONF_FORMAT;
 static byte myEPC[12]; 
 static byte myEPClength;
 boolean statusGetAllSD = false;
-unsigned long SD_lastTimeReadEnd = 0;
-unsigned long SD_lastTimeSendMQTT = 0;
+//unsigned long SD_lastTimeReadEnd = 0;
+//unsigned long SD_lastTimeSendMQTT = 0;
 unsigned long MQTT_lastTimeGetDataConfig = 0;
 static uint8_t counter_wifi_disconnect = 0;
 static boolean status_wifi_connect_AP = true ;
 static boolean status_mqtt_connect = false ;
 //uint8_t firstGetDataFromServer = 0;
+
+struct statusPeripheralConf{
+    struct rtcConf{
+      boolean statusConnect;
+    }RTC={false};    
+    struct sdCardConf{
+      unsigned long lastTimeReadEnd;
+      unsigned long lastTimeSendMQTT;
+      boolean statusConnect;
+    }sdCard={0,0,false};
+}statusPeripheral;
 
 struct timeServerConf{
     unsigned long sdReadEnd = 0;

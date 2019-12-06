@@ -1,4 +1,6 @@
-
+uint8_t getSttKhuVuc(){
+  
+}
 
 void wifiOnDisconnect(WiFiEventInfo_t info)
 { uint16_t* time_blink = (uint16_t*)malloc(sizeof(uint16_t));

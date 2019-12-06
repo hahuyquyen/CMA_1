@@ -200,23 +200,26 @@ void loop()
    */
   if(xQueueReceive( Queue_mqtt, &datatruyen_mqtt,  ( TickType_t ) 1 )== pdPASS ){
     truyen_mqtt();
-    SD_lastTimeSendMQTT=xTaskGetTickCount();
+    statusPeripheral.sdCard.lastTimeSendMQTT=xTaskGetTickCount();
   }
-  else if ((status_mqtt_connect)&&((xTaskGetTickCount() - SD_lastTimeSendMQTT >timeTruyenMQTT))){
+  else if ((status_mqtt_connect)&&((xTaskGetTickCount() - statusPeripheral.sdCard.lastTimeSendMQTT >timeTruyenMQTT))){
       /*
        * Check nếu có file còn lưu trong thu muc SD card thì đọc và gửi MQTT den server
        */
-       SD_lastTimeSendMQTT=xTaskGetTickCount();
+       statusPeripheral.sdCard.lastTimeSendMQTT=xTaskGetTickCount();
        if (statusGetAllSD == false){
            File file = root_CMA.openNextFile();
-           if(file){ readFile(SD,file.name(),file.size());}
+           if(file){
+            if(file.isDirectory()){Serial.print("  DIR : ");}
+            else readFile(SD,file.name(),file.size());
+          }
            else{  statusGetAllSD = true;
-                  SD_lastTimeReadEnd=xTaskGetTickCount();
+                  statusPeripheral.sdCard.lastTimeReadEnd=xTaskGetTickCount();
                   root_CMA.close();
            }
       }
-      if((xTaskGetTickCount() - SD_lastTimeReadEnd > 60000)&&(statusGetAllSD)){
-        SD_lastTimeReadEnd = xTaskGetTickCount();
+      if((xTaskGetTickCount() - statusPeripheral.sdCard.lastTimeReadEnd > 60000)&&(statusGetAllSD)){
+        statusPeripheral.sdCard.lastTimeReadEnd = xTaskGetTickCount();
         statusGetAllSD = false;
         Serial.println("reboot SD");
               root_CMA = SD.open("/CMA");             

@@ -1,3 +1,24 @@
+/*
+SD.end()
+SD.begin() 
+de khoi dong lai the SD Cars.
+
+Thu vien khi khoi dong lại bo nho cap phát khong bị xoa boi ham free() nen mât bộ nhớ
+
+
+Sữa 
+ if (card->base_path) {
+        err = esp_vfs_fat_unregister_path(card->base_path);
+        free(card->base_path);
+    }
+    them dong free de xoa bo nho
+
+Sữaz thu viện thay delay(100) bằng 
+ 
+ */
+
+
+
 void deleteFile(fs::FS &fs, const char * path){fs.remove(path);}
 
 void readFile(fs::FS &fs, const char * path,uint32_t len){
