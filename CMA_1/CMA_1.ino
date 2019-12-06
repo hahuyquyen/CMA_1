@@ -58,9 +58,9 @@ void khoiTaoGiaTri(){
     inforServer.mqttConfig.setTopicACK(( unsigned long )stateMachine.idDevice);
     inforServer.mqttConfig.setTopicGetConfig(( unsigned long )stateMachine.idDevice);
     //Serial.println(inforServer.mqttConfig.topicGetStatusACK); Serial.println(inforServer.mqttConfig.topicGetConfig);
-    inforServer.copyData(inforServer.thanhPham.arrayName[0], ramChoDuLieu);
-    inforServer.copyData(inforServer.nhaCC.arrayName[0], ramChoDuLieu);
-    inforServer.copyData(inforServer.giaiDoan.arrayName[0], ramChoDuLieu);
+    inforServer.copyData(inforServer.thanhPham.arrayName[0], ramChoDuLieu,sizeof(inforServer.thanhPham.arrayName[0]));
+    inforServer.copyData(inforServer.nhaCC.arrayName[0], ramChoDuLieu, sizeof(inforServer.nhaCC.arrayName[0]));
+    inforServer.copyData(inforServer.giaiDoan.arrayName[0], ramChoDuLieu,sizeof(inforServer.giaiDoan.arrayName[0]));
    // strlcpy(inforServer.thanhPham.arrayName[0], ramChoDuLieu, sizeof(inforServer.thanhPham.arrayName[0]));
    // strlcpy(inforServer.nhaCC.arrayName[0], ramChoDuLieu, sizeof(inforServer.nhaCC.arrayName[0]));
    // strlcpy(inforServer.giaiDoan.arrayName[0], ramChoDuLieu, sizeof(inforServer.giaiDoan.arrayName[0]));

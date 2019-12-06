@@ -4,7 +4,7 @@
 
 */
 
-char ramChoDuLieu[] = "Chờ Dữ Liệu"; // dung can lây FPSTR(ramChoDuLieu) và strlcpy_P  tiet kiem RAM cho heap memory
+const char ramChoDuLieu[] = "Chờ Dữ Liệu"; // dung can lây FPSTR(ramChoDuLieu) và strlcpy_P  tiet kiem RAM cho heap memory
 const char ramChuaChon[] = "Chưa Chọn";
 const char htmlPortMQTT[] PROGMEM = "PortMQTT"; // dung can lây FPSTR(htmlPortMQTT) và strlcpy_P  tiet kiem RAM cho heap memory
 
@@ -105,8 +105,9 @@ static struct inforServerStruct {
         sprintf(this->topicGetConfig, "/config/%lu", id_device) ;
       }
   }mqttConfig;
-  void copyData(char* des,char* source){
-    strlcpy(des, source, sizeof(des));
+  void copyData(char* des,const char* source, size_t  sizeCopy){
+   // memset(des, '\0', sizeCopy);
+    strlcpy(des, source, sizeCopy);
   }
   void changeData(boolean chedo, uint8_t* userSelect, uint8_t totaldata=0){
     if (chedo) { *userSelect = (*userSelect > (totaldata - 1)) ? 0 : (*userSelect + 1);}
