@@ -1,12 +1,16 @@
 
 
-void wifiOnDisconnect()
+void wifiOnDisconnect(WiFiEventInfo_t info)
 { uint16_t* time_blink = (uint16_t*)malloc(sizeof(uint16_t));
   *time_blink = 200;
   xQueueSend(Queue_Time_blink, time_blink, (TickType_t) 1);
   free(time_blink);
   xTimerStop(mqttReconnectTimer, 0); // tat tu dong ket noi mqtt
   status_wifi_connect_AP = false ;
+   if (info.disconnected.reason == 6) {
+      Serial.println("NOT_AUTHED reconnect");
+      WiFi.reconnect();
+    }
 }
 void wifigotip()
 {
@@ -49,6 +53,7 @@ void parseBytes1(const char* str, char sep, int address, int maxBytes, int base)
 }
 
 void wifi_connect(byte _mode, wifi_mode_t wifi_mode, char *ssid, char *password, char *ap_ssid) {
+  WiFi.disconnect(true);///
   WiFi.mode(wifi_mode);
   if (_mode == 0) {
     WiFi.begin(ssid, password); //mode STA

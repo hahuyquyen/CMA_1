@@ -116,7 +116,7 @@ void setup()
     wifi_staticip(WiFiConf.sta_ip,WiFiConf.sta_gateway,WiFiConf.sta_subnet);   
     WiFi.onEvent(WiFiEvent);
     WiFi.onEvent([](WiFiEvent_t event, WiFiEventInfo_t info){
-        wifiOnDisconnect();
+        wifiOnDisconnect(info);
     }, WiFiEvent_t::SYSTEM_EVENT_STA_DISCONNECTED);
     WiFi.onEvent([](WiFiEvent_t event, WiFiEventInfo_t info){
         wifigotip();
