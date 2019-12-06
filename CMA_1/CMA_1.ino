@@ -253,8 +253,7 @@ void loop()
         Serial.println("reboot SD");
         root_CMA = SD.open("/CMA");   
         if(!root_CMA){statusPeripheral.sdCard.statusConnect = false;}          
-       }    
-       
+      }        
   }
 //////////////////////////////////////////////////////////////////
 ////// lasttime yêu cau server tra data ////////////////////////////
