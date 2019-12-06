@@ -1,4 +1,5 @@
-
+#define WIFI_CONF_FORMAT {0, 0, 0, 1}
+#define WIFI_CONF_START 0
 
 #define using_sta true
 //#define BUF_SIZE_UART (125)
@@ -6,7 +7,6 @@
 #define time_2_lan_nhan_data 5000
 #define time_cho_nhan_RFID_NV 8000
 //#define time_out_set_rfid 1000
-#define timeTruyenMQTT 1000
 
 
 #define can_dau_cham 0x2C

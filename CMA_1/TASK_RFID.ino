@@ -21,6 +21,8 @@ void IRAM_ATTR array_to_string(byte* array, unsigned int len, char* buffer)
     buffer[len*2] = '\0';
 }
 void TaskRFID( void * pvParameters ){
+    static byte myEPC[12]; 
+    static byte myEPClength;
     Data_RFID Data_rfid;
     Data_RFID Data_rfid_nv;
     RFID nano; 

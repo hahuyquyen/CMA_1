@@ -1,6 +1,4 @@
-uint8_t getSttKhuVuc(){
-  
-}
+
 
 void wifiOnDisconnect(WiFiEventInfo_t info)
 { uint16_t* time_blink = (uint16_t*)malloc(sizeof(uint16_t));
@@ -12,10 +10,18 @@ void wifiOnDisconnect(WiFiEventInfo_t info)
    if (info.disconnected.reason == 6) {
       Serial.println("NOT_AUTHED reconnect");
       WiFi.reconnect();
-    }
+   }
+   else if (info.disconnected.reason == 8) {
+      Serial.println("assoc leave");
+      wifi_connect(0, WIFI_STA,WiFiConf.sta_ssid,WiFiConf.sta_pwd,WiFiConf.ap_ssid);
+   }
 }
 void wifigotip()
 {
+  if (statusPeripheral.wifi.ApConnect){
+    wifi_connect(0, WIFI_STA,WiFiConf.sta_ssid,WiFiConf.sta_pwd,WiFiConf.ap_ssid);
+    return;
+  }
   status_wifi_connect_AP = true;
   counter_wifi_disconnect = 0;
   WiFi.softAPdisconnect(true);
@@ -58,13 +64,16 @@ void wifi_connect(byte _mode, wifi_mode_t wifi_mode, char *ssid, char *password,
   WiFi.disconnect(true);///
   WiFi.mode(wifi_mode);
   if (_mode == 0) {
+    statusPeripheral.wifi.ApConnect = false;
     WiFi.begin(ssid, password); //mode STA
   }
   else   if (_mode == 1) {
+    statusPeripheral.wifi.ApConnect = true;
     WiFi.softAP(ap_ssid, "12345678"); //mode AP
   }
   else {
     WiFi.begin(ssid, password);
+    statusPeripheral.wifi.ApConnect = true;
     WiFi.softAP(ap_ssid, "12345678");
   }
 }

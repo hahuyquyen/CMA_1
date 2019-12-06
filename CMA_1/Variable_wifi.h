@@ -4,30 +4,24 @@
 
 */
 
-const char ramChoDuLieu[] = "Chờ Dữ Liệu"; // dung can lây FPSTR(ramChoDuLieu) và strlcpy_P  tiet kiem RAM cho heap memory
+char ramChoDuLieu[] = "Chờ Dữ Liệu"; // dung can lây FPSTR(ramChoDuLieu) và strlcpy_P  tiet kiem RAM cho heap memory
 const char ramChuaChon[] = "Chưa Chọn";
 const char htmlPortMQTT[] PROGMEM = "PortMQTT"; // dung can lây FPSTR(htmlPortMQTT) và strlcpy_P  tiet kiem RAM cho heap memory
-//const char khuVucFilletRa[] PROGMEM ="FILLET-Đầu Ra"; // FPSTR(khuVucFilletRa)
 
 
 
-#define WIFI_CONF_FORMAT {0, 0, 0, 1}
 const uint8_t wifi_conf_format[] = WIFI_CONF_FORMAT;
-#define WIFI_CONF_START 0
 
-//uint8_t rfid_data[20];
-static byte myEPC[12]; 
-static byte myEPClength;
-boolean statusGetAllSD = false;
-//unsigned long SD_lastTimeReadEnd = 0;
-//unsigned long SD_lastTimeSendMQTT = 0;
 unsigned long MQTT_lastTimeGetDataConfig = 0;
 static uint8_t counter_wifi_disconnect = 0;
 static boolean status_wifi_connect_AP = true ;
-static boolean status_mqtt_connect = false ;
-//uint8_t firstGetDataFromServer = 0;
+static boolean status_mqtt_connect = false ;  
+unsigned long  timeTruyenMQTT = 1000;
 
 struct statusPeripheralConf{
+    struct wifiConf{
+      boolean ApConnect;
+    }wifi ={false};
     struct rtcConf{
       boolean statusConnect;
     }RTC={false};    
@@ -35,7 +29,8 @@ struct statusPeripheralConf{
       unsigned long lastTimeReadEnd;
       unsigned long lastTimeSendMQTT;
       boolean statusConnect;
-    }sdCard={0,0,false};
+      boolean statusGetAllFile;
+    }sdCard={0,0,false,false};
 }statusPeripheral;
 
 struct timeServerConf{
@@ -62,7 +57,6 @@ static struct stateMachineConf {
     EEPROM.writeUInt(800, this->idDevice);
     EEPROM.commit();
   }
-  
 } stateMachine;
 
 struct variLcdUpdateConf {
@@ -75,6 +69,7 @@ struct variLcdUpdateConf {
   false,
   0
 };
+
 static struct inforServerStruct {
   char nameCheDoInOut[3][30] = {"Chưa Chọn", "Đầu Vào", "Đầu Ra"};
   
@@ -104,13 +99,15 @@ static struct inforServerStruct {
       char topicGetStatusACK[25];
       char topicGetConfig[25];
       void setTopicACK(unsigned long id_device){
-        sprintf(topicGetStatusACK, "/data/ack/%lu", id_device) ;
+        sprintf(this->topicGetStatusACK, "/data/ack/%lu", id_device) ;
       }
      void setTopicGetConfig(unsigned long id_device){
         sprintf(this->topicGetConfig, "/config/%lu", id_device) ;
       }
   }mqttConfig;
-  
+  void copyData(char* des,char* source){
+    strlcpy(des, source, sizeof(des));
+  }
   void changeData(boolean chedo, uint8_t* userSelect, uint8_t totaldata=0){
     if (chedo) { *userSelect = (*userSelect > (totaldata - 1)) ? 0 : (*userSelect + 1);}
     else *userSelect = *userSelect - 1;
