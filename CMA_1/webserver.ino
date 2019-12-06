@@ -1,8 +1,6 @@
-/*
-   930926 bytes (47%)
-   930418
-*/
-
+//////////////////////////////////////////////////////////////////
+////// Truyen tham so Html ////////////////////////////
+//////////////////////////////////////////////////////////////////
 String processor( const String& var) {
   char __dataFileName[sizeof(var)];
   var.toCharArray(__dataFileName, sizeof(__dataFileName));
@@ -59,16 +57,6 @@ void handleDoUpdate(AsyncWebServerRequest *request, const String& filename, size
       Update.printError(Serial);
     }
   }
-  /*   if (!index) {
-       writeEvent("INFO", "updt", "Firmware update started", filename.c_str());
-       Update.runAsync(true);
-       if (!Update.begin((ESP.getFreeSketchSpace() - 0x1000) & 0xFFFFF000)) {
-         writeEvent("ERRO", "updt", "Not enough space to update","");
-         #ifdef DEBUG
-         Update.printError(Serial);
-         #endif
-       }
-     }*/
   if (Update.write(data, len) != len) {
     Update.printError(Serial);
   }
@@ -86,7 +74,9 @@ void handleDoUpdate(AsyncWebServerRequest *request, const String& filename, size
   }
 }
 
-
+//////////////////////////////////////////////////////////////////
+////// Cai dat Html ////////////////////////////
+//////////////////////////////////////////////////////////////////
 void setupWiFiConf(void) {
   server.on("/2.css", HTTP_GET, [](AsyncWebServerRequest * request) {
     request->send(SPIFFS, "/2.css", F("text/css"));
@@ -133,10 +123,10 @@ void setupWiFiConf(void) {
   });
   server.on("/set_mqtt_conf", HTTP_POST, [](AsyncWebServerRequest * request) {
     if (request->hasParam(F("ServerMQTT"), true)) {
-      request->getParam("ServerMQTT", true)->value().toCharArray(WiFiConf.mqtt_server, sizeof(WiFiConf.mqtt_server));
+      request->getParam(F("ServerMQTT"), true)->value().toCharArray(WiFiConf.mqtt_server, sizeof(WiFiConf.mqtt_server));
     }
-    if (request->hasParam(FPSTR(htmlPortMQTT), true)) {
-      request->getParam(FPSTR(htmlPortMQTT), true)->value().toCharArray(WiFiConf.mqtt_port, sizeof(WiFiConf.mqtt_port));
+    if (request->hasParam(F("PortMQTT"), true)) {
+      request->getParam(F("PortMQTT"), true)->value().toCharArray(WiFiConf.mqtt_port, sizeof(WiFiConf.mqtt_port));
     }
     if (request->hasParam(F("USERMQTT"), true)) {
       request->getParam(F("USERMQTT"), true)->value().toCharArray(WiFiConf.mqtt_user, sizeof(WiFiConf.mqtt_user));
@@ -147,8 +137,6 @@ void setupWiFiConf(void) {
     if (request->hasParam(F("SUBTopic1"), true)) {
       request->getParam(F("SUBTopic1"), true)->value().toCharArray(WiFiConf.mqtt_subto1, sizeof(WiFiConf.mqtt_subto1));
     }
-    //  if (request->hasParam(F("SUBTopic2"), true)) {request->getParam(F("SUBTopic2"), true)->value().toCharArray(WiFiConf.mqtt_subto2, sizeof(WiFiConf.mqtt_subto2));}
-    // if (request->hasParam(F("SUBTopic3"), true)) {request->getParam(F("SUBTopic3"), true)->value().toCharArray(WiFiConf.mqtt_subto3, sizeof(WiFiConf.mqtt_subto3));}
     saveWiFiConf();
     request->send(200, F("text/plain"), F("OK"));
   });

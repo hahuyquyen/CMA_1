@@ -18,11 +18,14 @@ extern "C" {
 #include "RTClib.h"
 #include <SPI.h>
 
+// RTC
 RTC_DS3231 rtc;
+//LCD
+U8G2_ST7920_128X64_F_HW_SPI u8g2(U8G2_R0,/*CS=*/ U8X8_PIN_NONE,/*CS=*/ U8X8_PIN_NONE);
+//SD CArd
 SPIClass SDSPI(HSPI);
-U8G2_ST7920_128X64_F_HW_SPI u8g2(U8G2_R0,/*CS=*/ U8X8_PIN_NONE,/*CS=*/ U8X8_PIN_NONE);// 
-
 File root_CMA ;
+// MQTT and server
 AsyncMqttClient mqttClient;
 TimerHandle_t mqttReconnectTimer;
 AsyncWebServer server(web_port);
@@ -30,37 +33,38 @@ WiFiClient espClient;
 
 //display_NV Display_NV;
 Data_TH datatruyen_mqtt; 
-//static intr_handle_t handle_console_uart1;
-//static void IRAM_ATTR uart1_intr_handle(void *arg);
+
 void TaskRFID( void * pvParameters );
 void TaskCAN( void * pvParameters );
 void Display( void * pvParameters );
 void http_re( void * pvParameters );
 void callback_mqtt(char* topic, byte* payload, unsigned int length) ;
-boolean reconnect_mqtt();
-bool loadWiFiConf();
-void wifi_staticip(char *ip_in, char* gateway_in, char* subnet_in);
-void wifi_connect(byte _mode = 0 ,wifi_mode_t wifi_mode = WIFI_AP,char *ssid = (char *)"",char *password = (char *)"",char *ap_ssid = (char *)"ESP AP");
-void setupWiFiConf(void);
-void setting_uart();
-void WiFiEvent(WiFiEvent_t event);
+//boolean reconnect_mqtt();
+//bool loadWiFiConf();
+//void wifi_staticip(char *ip_in, char* gateway_in, char* subnet_in);
+//void wifi_connect(byte _mode = 0 ,wifi_mode_t wifi_mode = WIFI_AP,char *ssid = (char *)"",char *password = (char *)"",char *ap_ssid = (char *)"ESP AP");
+//void setupWiFiConf(void);
+//void setting_uart();
+//void WiFiEvent(WiFiEvent_t event);
 size_t content_len;
 void printProgress(size_t prg, size_t sz) {
   printf("Progress: %d%%\n", (prg*100)/content_len);
 }
 
-/*
- * Setup
- */
+//////////////////////////////////////////////////////////////////
+////// Khoi tao gia trị mac dinh ////////////////////////////
+//////////////////////////////////////////////////////////////////
 void khoiTaoGiaTri(){
-   // sprintf(mqttConfig.topicGetStatusACK, "/data/ack/%lu", ( unsigned long )stateMachine.idDevice) ;
-    //sprintf(mqttConfig.topicGetConfig, "/config/%lu", ( unsigned long )stateMachine.idDevice) ;
     inforServer.mqttConfig.setTopicACK(( unsigned long )stateMachine.idDevice);
     inforServer.mqttConfig.setTopicGetConfig(( unsigned long )stateMachine.idDevice);
     Serial.println(inforServer.mqttConfig.topicGetStatusACK); Serial.println(inforServer.mqttConfig.topicGetConfig);
+   // inforServer.copyData(inforServer.thanhPham.arrayName[0], ramChoDuLieu);
+   // inforServer.copyData(inforServer.nhaCC.arrayName[0], ramChoDuLieu);
+   // inforServer.copyData(inforServer.giaiDoan.arrayName[0], ramChoDuLieu);
     strlcpy(inforServer.thanhPham.arrayName[0], ramChoDuLieu, sizeof(inforServer.thanhPham.arrayName[0]));
     strlcpy(inforServer.nhaCC.arrayName[0], ramChoDuLieu, sizeof(inforServer.nhaCC.arrayName[0]));
     strlcpy(inforServer.giaiDoan.arrayName[0], ramChoDuLieu, sizeof(inforServer.giaiDoan.arrayName[0]));
+    
     stateMachine.deviceStatus = deviceSetting;
     stateMachine.bottonSelect = 0;
     inforServer.nhaCC.userSelect = 0;
@@ -73,10 +77,16 @@ void khoiTaoGiaTri(){
     inforServer.giaiDoan.total=0;
     inforServer.giaiDoan.userSelect=0;
     inforServer.giaiDoan.arrayType[0]=0;
+ //   statusPeripheral.sdCard.statusConnect = false;
 }
 void setup()
 {   pinMode(pinPower, OUTPUT);
     digitalWrite(pinPower, HIGH);
+    Serial.begin(115200);
+    Serial.println(statusPeripheral.wifi.statusConnectAP);
+    Serial.println(statusPeripheral.mqtt.statusMqttConnect);
+    Serial.println(statusPeripheral.mqtt.statusMqttConnect);
+    Serial.println(statusPeripheral.mqtt.timeTruyenMQTT);
     Queue_can = xQueueCreate(3,sizeof(Data_CAN));
     Queue_RFID= xQueueCreate(3,sizeof(Data_RFID));
     Queue_RFID_NV= xQueueCreate(3,sizeof(Data_RFID));
@@ -90,24 +100,28 @@ void setup()
     xSignal_Display_checkdone = xSemaphoreCreateCounting( 2, 0 );
     xreset_id_nv = xSemaphoreCreateCounting( 2, 0 );
     xResetRfidMaRo = xSemaphoreCreateCounting( 2, 0 );
+        //Get ID device
     EEPROM.begin(1024);
-    WiFi.disconnect(true);
-    WiFi.setSleep(false);
-    if(!SPIFFS.begin(true)){printf("An Error has occurred while mounting SPIFFS\n");}
-    Serial1.begin(9600, SERIAL_8N1, 26, 12); //12 tx 13 lÃ  rx(bau,se,rx,tx)
-    Serial.begin(115200);
-    
-    SDSPI.begin(14,27,13,15); ///SCK,MISO,MOSI,ss
-    
-    if(!SD.begin(15,SDSPI)){Serial.println("Card Mount Failed");    }
-
     stateMachine.getIdControl();
     Serial.print("ID Device : ");
     Serial.println( stateMachine.idDevice);
+    // Doc Eprom va khoi tao gia tri
+    
     loadWiFiConf();
     khoiTaoGiaTri();
+    if(!SPIFFS.begin(true)){printf("An Error has occurred while mounting SPIFFS\n");}
+    //SD CArd
+    SDSPI.begin(14,27,13,15); ///SCK,MISO,MOSI,ss
+    if(!SD.begin(15,SDSPI,6000000)){Serial.println("Card Mount Failed");}
+    else {statusPeripheral.sdCard.statusConnect = true;Serial.println("SD card OK");}
+
+
+    //RTC
     if (! rtc.begin()) { Serial.println(F("Couldn't find RTC"));} 
     if (rtc.lostPower()) { Serial.println(F("Ghi Time"));rtc.adjust(DateTime(2019, 12, 4,13, 53, 0));}
+    //Wifi
+  // WiFi.disconnect(true);
+   // WiFi.setSleep(false);
 #ifdef using_sta
     wifi_connect(0,WIFI_STA,WiFiConf.sta_ssid,WiFiConf.sta_pwd,WiFiConf.ap_ssid);
 #else
@@ -116,7 +130,7 @@ void setup()
     wifi_staticip(WiFiConf.sta_ip,WiFiConf.sta_gateway,WiFiConf.sta_subnet);   
     WiFi.onEvent(WiFiEvent);
     WiFi.onEvent([](WiFiEvent_t event, WiFiEventInfo_t info){
-        wifiOnDisconnect();
+        wifiOnDisconnect(info);
     }, WiFiEvent_t::SYSTEM_EVENT_STA_DISCONNECTED);
     WiFi.onEvent([](WiFiEvent_t event, WiFiEventInfo_t info){
         wifigotip();
@@ -124,6 +138,7 @@ void setup()
     setupWiFiConf();
     server.begin();
     Update.onProgress(printProgress);
+    //Free RTOS
     xTaskCreatePinnedToCore(
                         TaskRFID,   /* Function to implement the task */
                         "TaskRFID", /* Name of the task */
@@ -163,7 +178,9 @@ void setup()
                         NULL,       /* Task input parameter */
                         11,          /* Priority of the task */
                         NULL,       /* Task handle. */
-                        0);  /* Core where the task should run */                             
+                        0);  /* Core where the task should run */        
+
+  //MQTT                                           
   mqttReconnectTimer = xTimerCreate("mqttTimer", pdMS_TO_TICKS(2000), pdFALSE, (void*)0, reinterpret_cast<TimerCallbackFunction_t>(connectToMqtt));
   mqttClient.onConnect(onMqttConnect);
   mqttClient.onDisconnect(onMqttDisconnect);
@@ -180,18 +197,18 @@ void setup()
  */
 void loop()
 {  
-  vTaskDelay(10);
-  if (status_wifi_connect_AP == false){
-    if (counter_wifi_disconnect == 30){
-      vTaskDelay(500);
+  vTaskDelay(30);
+  if (statusPeripheral.wifi.statusConnectAP == false){
+    if ((statusPeripheral.wifi.counterWifiDisconnect == 15)&&( xTaskGetTickCount() - statusPeripheral.wifi.lastTimeConnect >500)){
+      statusPeripheral.wifi.lastTimeConnect = xTaskGetTickCount();
       WiFi.disconnect(true);
-      printf("Chuyen\n");
+      printf("Wifi 2 che do: AP va STA\n");
       wifi_connect(2, WIFI_AP_STA, WiFiConf.sta_ssid, WiFiConf.sta_pwd,(char *)"esp32");
-      counter_wifi_disconnect++;
+      statusPeripheral.wifi.counterWifiDisconnect ++; 
     }
-    else if (counter_wifi_disconnect < 30) {
-        vTaskDelay(1000);
-        counter_wifi_disconnect = counter_wifi_disconnect + 1;
+    else if ((statusPeripheral.wifi.counterWifiDisconnect < 15)&&( xTaskGetTickCount() - statusPeripheral.wifi.lastTimeConnect > 5000)) {
+        statusPeripheral.wifi.lastTimeConnect = xTaskGetTickCount();
+        statusPeripheral.wifi.counterWifiDisconnect = statusPeripheral.wifi.counterWifiDisconnect + 1;
         wifi_connect(0, WIFI_STA,WiFiConf.sta_ssid,WiFiConf.sta_pwd,WiFiConf.ap_ssid);
     }
   }
@@ -200,37 +217,51 @@ void loop()
    */
   if(xQueueReceive( Queue_mqtt, &datatruyen_mqtt,  ( TickType_t ) 1 )== pdPASS ){
     truyen_mqtt();
-    SD_lastTimeSendMQTT=xTaskGetTickCount();
+    statusPeripheral.sdCard.lastTimeSendMQTT=xTaskGetTickCount();
   }
-  else if ((status_mqtt_connect)&&((xTaskGetTickCount() - SD_lastTimeSendMQTT >timeTruyenMQTT))){
+  else if ((statusPeripheral.mqtt.statusMqttConnect)&&((xTaskGetTickCount() - statusPeripheral.sdCard.lastTimeSendMQTT >statusPeripheral.mqtt.timeTruyenMQTT))){
       /*
        * Check nếu có file còn lưu trong thu muc SD card thì đọc và gửi MQTT den server
        */
-       SD_lastTimeSendMQTT=xTaskGetTickCount();
-       if (statusGetAllSD == false){
+       statusPeripheral.sdCard.lastTimeSendMQTT=xTaskGetTickCount();      
+       // reconnect SD card   
+       if (statusPeripheral.sdCard.statusConnect == false){
+          Serial.println(" Reinit SD Card");
+          if (statusPeripheral.mqtt.timeTruyenMQTT == 1000){root_CMA.close();}
+          SD.end() ;
+          delay(200);
+          if(!SD.begin(15,SDSPI,6000000)){Serial.println("Card Mount Failed");  statusPeripheral.mqtt.timeTruyenMQTT = 3000;  }
+          else {statusPeripheral.sdCard.statusConnect = true;statusPeripheral.mqtt.timeTruyenMQTT = 1000;}
+       }
+       // open next file
+       else if (statusPeripheral.sdCard.statusGetAllFile == false){
            File file = root_CMA.openNextFile();
            if(file){
             if(file.isDirectory()){Serial.print("  DIR : ");}
             else readFile(SD,file.name(),file.size());
           }
-           else{  statusGetAllSD = true;
-                  SD_lastTimeReadEnd=xTaskGetTickCount();
+           else{  
                   root_CMA.close();
+                  statusPeripheral.sdCard.statusGetAllFile = true;
+                  statusPeripheral.sdCard.lastTimeReadEnd=xTaskGetTickCount();
            }
       }
-      if((xTaskGetTickCount() - SD_lastTimeReadEnd > 60000)&&(statusGetAllSD)){
-        SD_lastTimeReadEnd = xTaskGetTickCount();
-        statusGetAllSD = false;
+      // Neu da mo het thi cho 60s va mo lai và check folder
+      else if((xTaskGetTickCount() - statusPeripheral.sdCard.lastTimeReadEnd > 60000)&&(statusPeripheral.sdCard.statusGetAllFile)){
+        statusPeripheral.sdCard.lastTimeReadEnd = xTaskGetTickCount();
+        statusPeripheral.sdCard.statusGetAllFile = false;
         Serial.println("reboot SD");
-              root_CMA = SD.open("/CMA");             
+        root_CMA = SD.open("/CMA");   
+        if(!root_CMA){statusPeripheral.sdCard.statusConnect = false;}          
        }    
+       
   }
-  /*
-   * Lịch gửi server yêu cầu config
-   */
-  if ((status_mqtt_connect)&&(stateMachine.deviceStatus == deviceSetting)){  
-    if((xTaskGetTickCount() - MQTT_lastTimeGetDataConfig>1000)|| (MQTT_lastTimeGetDataConfig == 0)){
-      MQTT_lastTimeGetDataConfig = xTaskGetTickCount();
+//////////////////////////////////////////////////////////////////
+////// lasttime yêu cau server tra data ////////////////////////////
+//////////////////////////////////////////////////////////////////
+  if ((statusPeripheral.mqtt.statusMqttConnect)&&(stateMachine.deviceStatus == deviceSetting)){  
+    if((xTaskGetTickCount() - statusPeripheral.mqtt.lastTimeGetDataConfig > 1000)|| (statusPeripheral.mqtt.lastTimeGetDataConfig == 0)){
+      statusPeripheral.mqtt.lastTimeGetDataConfig = xTaskGetTickCount();
       checkSendMQTTConfig();
     }
   }
@@ -245,12 +276,14 @@ void sendMQTTConfig(uint8_t loaiconfig = 0 , uint8_t maboxung = 0){
       mqttClient.publish("/config", 0, true, buffer); 
 }
 void checkSendMQTTConfig(){
-      if(inforServer.nhaCC.total == 0){sendMQTTConfig(1,0);}
-      else if (inforServer.giaiDoan.total == 0){sendMQTTConfig(2,0);}
+      if(inforServer.nhaCC.total == 0){
+        sendMQTTConfig(1,0);
+        }
+      else if (inforServer.giaiDoan.total == 0){
+        sendMQTTConfig(2,0);
+      }
       //Fix loi 01
       else if ((inforServer.giaiDoan.userSelect != 0)&&(inforServer.thanhPham.total == 0)&&(stateMachine.bottonSelect>1)){ // Chi gui yeu cau khi da chon khu vuc can và qua buoc chọn thành phảm
-         //Serial.print("dsgfdgfs ");
-       // Serial.println(inforServer.giaiDoan.arrayType[inforServer.giaiDoan.userSelect]);
        sendMQTTConfig(3,inforServer.giaiDoan.arrayType[inforServer.giaiDoan.userSelect]);
       }
 }

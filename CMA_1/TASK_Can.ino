@@ -1,10 +1,12 @@
-uint8_t uart_bien[11];
-double can_data=0;
-//double can_data_old=0;
+static uint8_t uart_bien[11];
+static double can_data=0;
+//////////////////////////////////////////////////////////////////
+////// Task doc du lieu tu can DI28SS ////////////////////////////
+//////////////////////////////////////////////////////////////////
 void TaskCAN( void * pvParameters ){    
     const TickType_t xTicksToWait = pdMS_TO_TICKS(1);
+    Serial1.begin(9600, SERIAL_8N1, 26, 12); //12 tx 13 lÃ  rx(bau,se,rx,tx)
     static Data_CAN Data_CAN;
-   // uint8_t _rfid_data[20];
     int tam=0;
     unsigned long lastTimeSendCan=0;
     for (;;){
@@ -16,13 +18,12 @@ void TaskCAN( void * pvParameters ){
         if(tach(&can_data)){
                 if(can_data!=Data_CAN.data_can){
                   Data_CAN.data_can=can_data;
-                 // Data_CAN.time_get=xTaskGetTickCount();
                   if(can_data > 0.5){xQueueSend( Queue_can, &Data_CAN, xTicksToWait );}
-                  }
+                }
                 else if (xTaskGetTickCount() - lastTimeSendCan > 1000){
                   lastTimeSendCan=xTaskGetTickCount();
                   if(can_data > 0.5){xQueueSend( Queue_can, &Data_CAN, xTicksToWait );}
-                  }
+                }
          }
        }
        else {uart_bien[tam++]=incomingData;if(tam>10)tam=0;}  
@@ -38,7 +39,9 @@ void TaskCAN( void * pvParameters ){
     }
     vTaskDelete(NULL) ;
 }
-
+//////////////////////////////////////////////////////////////////
+////// Task so KG tu Data ////////////////////////////
+//////////////////////////////////////////////////////////////////
 boolean tach(double* soky){
   int tam1=0;
   int hangtram=0;

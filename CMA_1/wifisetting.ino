@@ -1,20 +1,45 @@
-uint8_t getSttKhuVuc(){
-  
-}
+/*
+ Trang ma loi wifi
 
-void wifiOnDisconnect()
+ https://demo-dijiudu.readthedocs.io/en/latest/api-guides/wifi.html
+ [AsyncTCP.cpp:953] _poll(): 0x3ffe16e0 != 0x3ffe2678
+ */
+//////////////////////////////////////////////////////////////////
+////// even wifi mat ket noi ////////////////////////////
+//////////////////////////////////////////////////////////////////
+void wifiOnDisconnect(WiFiEventInfo_t info)
 { uint16_t* time_blink = (uint16_t*)malloc(sizeof(uint16_t));
   *time_blink = 200;
   xQueueSend(Queue_Time_blink, time_blink, (TickType_t) 1);
   free(time_blink);
   xTimerStop(mqttReconnectTimer, 0); // tat tu dong ket noi mqtt
-  status_wifi_connect_AP = false ;
+  statusPeripheral.wifi.statusConnectAP = false ;
+   if (info.disconnected.reason == 6) {
+      Serial.println("NOT_AUTHED reconnect");
+      WiFi.reconnect();
+   }
+   else if (info.disconnected.reason == 8) {
+      Serial.println("assoc leave");
+      wifi_connect(0, WIFI_STA,WiFiConf.sta_ssid,WiFiConf.sta_pwd,WiFiConf.ap_ssid);
+   }
+   /*
+    * reason 201 la no AP found
+    */
 }
+//////////////////////////////////////////////////////////////////
+////// Event wifi nhan IP ////////////////////////////
+//////////////////////////////////////////////////////////////////
 void wifigotip()
 {
-  status_wifi_connect_AP = true;
-  counter_wifi_disconnect = 0;
-  WiFi.softAPdisconnect(true);
+  if (statusPeripheral.wifi.ApConnect){
+    //WiFi.disconnect(true);
+    WiFi.softAPdisconnect();
+    wifi_connect(0, WIFI_STA,WiFiConf.sta_ssid,WiFiConf.sta_pwd,WiFiConf.ap_ssid);
+    return;
+  }
+  statusPeripheral.wifi.statusConnectAP = true;
+  statusPeripheral.wifi.counterWifiDisconnect = 0;
+  //
   printf("Wifi %s\n", WiFi.localIP().toString().c_str());
   uint16_t* time_blink = (uint16_t*)malloc(sizeof(uint16_t));
   *time_blink = 2000;
@@ -22,6 +47,9 @@ void wifigotip()
   free(time_blink);
   connectToMqtt();
 }
+//////////////////////////////////////////////////////////////////
+////// event trang thai wifi ////////////////////////////
+//////////////////////////////////////////////////////////////////
 void WiFiEvent(WiFiEvent_t event)
 {
   switch (event) {
@@ -36,7 +64,9 @@ void WiFiEvent(WiFiEvent_t event)
     default: break;
   }
 }
-
+//////////////////////////////////////////////////////////////////
+////// stach data ip ////////////////////////////
+//////////////////////////////////////////////////////////////////
 void parseBytes1(const char* str, char sep, int address, int maxBytes, int base) {
   for (int i = 0; i < maxBytes; i++) {
     if (address == 1) local_IP[i] = strtoul(str, NULL, base);  
@@ -49,20 +79,29 @@ void parseBytes1(const char* str, char sep, int address, int maxBytes, int base)
     str++;                               
   }
 }
-
+//////////////////////////////////////////////////////////////////
+////// Cai dat che do wifi ////////////////////////////
+//////////////////////////////////////////////////////////////////
 void wifi_connect(byte _mode, wifi_mode_t wifi_mode, char *ssid, char *password, char *ap_ssid) {
+  WiFi.disconnect(true);///
   WiFi.mode(wifi_mode);
   if (_mode == 0) {
+    statusPeripheral.wifi.ApConnect = false;
     WiFi.begin(ssid, password); //mode STA
   }
   else   if (_mode == 1) {
+    statusPeripheral.wifi.ApConnect = true;
     WiFi.softAP(ap_ssid, "12345678"); //mode AP
   }
   else {
     WiFi.begin(ssid, password);
+    statusPeripheral.wifi.ApConnect = true;
     WiFi.softAP(ap_ssid, "12345678");
   }
 }
+//////////////////////////////////////////////////////////////////
+////// Cai dat static ip cho wifi  ////////////////////////////
+//////////////////////////////////////////////////////////////////
 void wifi_staticip(char *ip_in, char* gateway_in, char* subnet_in) {
   //if (atoi(WiFiConf.choose_dhcp) == 0){
   parseBytes1(ip_in, '.', 1, 4, 10);

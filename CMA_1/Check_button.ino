@@ -5,9 +5,15 @@ EasyButton button_ok(button_ok_pin,80,true);
 EasyButton buttonExit(buttonExitPin,80,true);
 EasyButton buttonError(buttonErrorPin,80,true);
 EasyButton buttonPower(pinReadPower,1000,true);
+//////////////////////////////////////////////////////////////////
+////// Button POWER ///////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////
 void onPressedPower() {
  if (xTaskGetTickCount() > 1000){digitalWrite(pinPower, LOW);}
 }
+//////////////////////////////////////////////////////////////////
+////// Button LEFT ///////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////
 void onPressed_left() {
   if ((stateMachine.bottonSelect == 0)&&(inforServer.giaiDoan.cheDoInOut > 0)){inforServer.changeData(false,&inforServer.giaiDoan.cheDoInOut);}
   else if ((stateMachine.bottonSelect == 1)&&(inforServer.giaiDoan.userSelect > 0)){inforServer.changeData(false,&inforServer.giaiDoan.userSelect);}
@@ -16,6 +22,9 @@ void onPressed_left() {
   variLcdUpdate.numScroll = 0;
   variLcdUpdate.updateLCD = true;
 }
+//////////////////////////////////////////////////////////////////
+////// Button RIGHT ///////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////
 void onPressed_right() {
  /* if (stateMachine.bottonSelect == 0){ inforServer.giaiDoan.cheDoInOut = (inforServer.giaiDoan.cheDoInOut > 1) ? 0 : (inforServer.giaiDoan.cheDoInOut + 1);}
   else if ((stateMachine.bottonSelect == 1)&&(inforServer.giaiDoan.total > 0)){ inforServer.giaiDoan.userSelect = (inforServer.giaiDoan.userSelect > (inforServer.giaiDoan.total-1)) ? 0 : (inforServer.giaiDoan.userSelect + 1);}
@@ -28,6 +37,9 @@ void onPressed_right() {
   variLcdUpdate.numScroll = 0;
   variLcdUpdate.updateLCD = true;
 }
+//////////////////////////////////////////////////////////////////
+////// Button OK ///////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////
 void onPressed_ok() {
   if ((stateMachine.bottonSelect == 0)&& (inforServer.giaiDoan.cheDoInOut == 0)) return;
   else if ((stateMachine.bottonSelect == 1)&& (inforServer.giaiDoan.userSelect == 0)) return;
@@ -39,14 +51,23 @@ void onPressed_ok() {
   variLcdUpdate.numScroll = 0;
   variLcdUpdate.updateLCD = true;
 }
+//////////////////////////////////////////////////////////////////
+////// Button EXit ///////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////
 void onPressedExit() {
   stateMachine.bottonSelect = 0 ;
  stateMachine.deviceStatus = deviceSetting;
   Serial.println("onPressed_vitri");
 }
+//////////////////////////////////////////////////////////////////
+////// Button Error ///////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////
 void onPressedError() {
 Serial.println("onPressed");
 }
+//////////////////////////////////////////////////////////////////
+////// Task Check Button /////////////////////////////////////////
+//////////////////////////////////////////////////////////////////
 void Check_button( void * pvParameters ){    
     button_left.begin();
     button_right.begin();
