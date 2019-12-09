@@ -110,8 +110,9 @@ void setupWiFiConf(void) {
       request->getParam(F("button"), true)->value().toCharArray(WiFiConf.choose_dhcp, sizeof(WiFiConf.choose_dhcp));
     }
     //if (request->hasParam(F("chooseinout"), true)) {request->getParam(F("chooseinout"), true)->value().toCharArray(WiFiConf.mqtt_choose_inout, sizeof(WiFiConf.mqtt_choose_inout));}
-    saveWiFiConf();
-    request->send(200, F("text/plain"), F("OK BABY"));
+    if (saveWiFiConf())request->send(200, F("text/plain"), F("OK BABY"));
+    else request->send(200, F("text/plain"), F("Fail Save EEPROM"));
+    
   });
   server.on("/set_id", HTTP_POST, [](AsyncWebServerRequest * request) {
     if (request->hasParam("id", true)) {

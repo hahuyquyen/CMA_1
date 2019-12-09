@@ -1,6 +1,7 @@
+
 extern "C" {
-  #include "freertos/FreeRTOS.h"
-  #include "freertos/timers.h"
+    #include "freertos/FreeRTOS.h"
+    #include "freertos/timers.h"
 }
 #include <Arduino.h>
 #include "FS.h"
@@ -17,6 +18,8 @@ extern "C" {
 #include "SD.h"
 #include "RTClib.h"
 #include <SPI.h>
+#include <EasyButton.h>
+
 
 // RTC
 RTC_DS3231 rtc;
@@ -112,7 +115,7 @@ void setup()
     if(!SPIFFS.begin(true)){printf("An Error has occurred while mounting SPIFFS\n");}
     //SD CArd
     SDSPI.begin(14,27,13,15); ///SCK,MISO,MOSI,ss
-    if(!SD.begin(15,SDSPI,6000000)){Serial.println("Card Mount Failed");}
+    if(!SD.begin(15,SDSPI,10000000)){Serial.println("Card Mount Failed");}
     else {statusPeripheral.sdCard.statusConnect = true;Serial.println("SD card OK");}
 
 

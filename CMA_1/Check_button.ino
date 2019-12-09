@@ -1,4 +1,3 @@
-#include <EasyButton.h>
 EasyButton button_left(button_left_pin,80,true);
 EasyButton button_right(button_right_pin,80,true);
 EasyButton button_ok(button_ok_pin,80,true);

@@ -17,11 +17,11 @@ bool loadWiFiConf() {
 //////////////////////////////////////////////////////////////////
 ////// Load Data eprom //////////////////////////////////////
 //////////////////////////////////////////////////////////////////
-void saveWiFiConf(void) {
+bool saveWiFiConf(void) {
   for (unsigned int t = 0; t < sizeof(WiFiConf); t++) {
     EEPROM.write(WIFI_CONF_START + t, *((char*)&WiFiConf + t));
   }
-  EEPROM.commit();
+  return EEPROM.commit();
 }
 
 /*
