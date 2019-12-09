@@ -278,7 +278,12 @@ void loop()
        else if (statusPeripheral.sdCard.statusGetAllFile == false){
            File file = root_CMA.openNextFile();
            if(file){
-            if(!file.isDirectory()){ readFile(SD,file.name(),file.size());}
+            if(!file.isDirectory()){
+              if (file.name()[0] == 'O'){//delete
+                deleteFile(SD,file.name());
+              }
+              else readFile(SD,file.name(),file.size());
+              }
           }
            else{  
                   root_CMA.close();
@@ -287,7 +292,7 @@ void loop()
            }
       }
       // Neu da mo het thi cho 60s va mo lai và check folder
-      else if((xTaskGetTickCount() - statusPeripheral.sdCard.lastTimeReadEnd > 60000)&&(statusPeripheral.sdCard.statusGetAllFile)){
+      else if((xTaskGetTickCount() - statusPeripheral.sdCard.lastTimeReadEnd > 30*60000)&&(statusPeripheral.sdCard.statusGetAllFile)){ //30 phut moi mo lai va 
         statusPeripheral.sdCard.lastTimeReadEnd = xTaskGetTickCount();
         statusPeripheral.sdCard.statusGetAllFile = false;
         

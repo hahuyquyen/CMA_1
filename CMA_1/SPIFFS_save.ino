@@ -23,6 +23,26 @@ Sữaz thu viện thay delay(100) bằng
 
 void deleteFile(fs::FS &fs, const char * path){fs.remove(path);}
 //////////////////////////////////////////////////////////////////
+////// rename //////////////////////////////////////
+//////////////////////////////////////////////////////////////////
+
+void renameFiles(fs::FS &fs, const char * path1){
+    char textToWrite[ 18 ];
+    sprintf(textToWrite,"O_%s", path1);
+#ifdef debug_UART    
+    Serial.printf("Renaming file %s to %s\n", path1,textToWrite);
+#endif
+    if (fs.rename(path1, textToWrite)) {
+#ifdef debug_UART          
+        Serial.println("File renamed");
+#endif
+    } else {
+#ifdef debug_UART    
+        Serial.println("Rename failed");
+#endif
+    }
+}
+//////////////////////////////////////////////////////////////////
 ////// Read SD and send MQTT //////////////////////////////////////
 //////////////////////////////////////////////////////////////////
 void readFile(fs::FS &fs, const char * path,uint32_t len){

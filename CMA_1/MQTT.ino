@@ -86,7 +86,7 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
   DeserializationError error = deserializeJson(jsonBuffer,payload);
   if (error) {
 #ifdef debug_UART    
-  Serial.println("error js"};
+  Serial.println("error js");
 #endif
   }
   else if ((strcmp(WiFiConf.mqtt_subto1,topic) == 0)||(strcmp(inforServer.mqttConfig.topicGetConfig,topic) == 0)){
@@ -135,7 +135,8 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
       uint8_t statusSaveData = jsonBuffer["s"].as<uint8_t>();
       char textToWrite[ 16 ];
       sprintf(textToWrite,"/CMA/%lu", ( unsigned long )sttData);
-      if (statusSaveData == 1)deleteFile(SD,textToWrite);
+     // if (statusSaveData == 1)deleteFile(SD,textToWrite); Thay doi tu delete toi rename.
+      if (statusSaveData == 1)renameFiles(SD,textToWrite);
   }
 }
 //////////////////////////////////////////////////////////////////
