@@ -51,7 +51,9 @@ void callback_mqtt(char* topic, byte* payload, unsigned int length) ;
 //void WiFiEvent(WiFiEvent_t event);
 size_t content_len;
 void printProgress(size_t prg, size_t sz) {
+#ifdef debug_UART
   printf("Progress: %d%%\n", (prg*100)/content_len);
+#endif
 }
 
 //////////////////////////////////////////////////////////////////
@@ -60,7 +62,9 @@ void printProgress(size_t prg, size_t sz) {
 void khoiTaoGiaTri(){
     inforServer.mqttConfig.setTopicACK(( unsigned long )stateMachine.idDevice);
     inforServer.mqttConfig.setTopicGetConfig(( unsigned long )stateMachine.idDevice);
+#ifdef debug_UART
     Serial.println(inforServer.mqttConfig.topicGetStatusACK); Serial.println(inforServer.mqttConfig.topicGetConfig);
+#endif
    // inforServer.copyData(inforServer.thanhPham.arrayName[0], ramChoDuLieu);
    // inforServer.copyData(inforServer.nhaCC.arrayName[0], ramChoDuLieu);
    // inforServer.copyData(inforServer.giaiDoan.arrayName[0], ramChoDuLieu);
@@ -86,10 +90,10 @@ void setup()
 {   pinMode(pinPower, OUTPUT);
     digitalWrite(pinPower, HIGH);
     Serial.begin(115200);
-    Serial.println(statusPeripheral.wifi.statusConnectAP);
+   /* Serial.println(statusPeripheral.wifi.statusConnectAP);
     Serial.println(statusPeripheral.mqtt.statusMqttConnect);
     Serial.println(statusPeripheral.mqtt.statusMqttConnect);
-    Serial.println(statusPeripheral.mqtt.timeTruyenMQTT);
+    Serial.println(statusPeripheral.mqtt.timeTruyenMQTT);*/
     Queue_can = xQueueCreate(3,sizeof(Data_CAN));
     Queue_RFID= xQueueCreate(3,sizeof(Data_RFID));
     Queue_RFID_NV= xQueueCreate(3,sizeof(Data_RFID));
@@ -106,23 +110,48 @@ void setup()
         //Get ID device
     EEPROM.begin(1024);
     stateMachine.getIdControl();
+#ifdef debug_UART
     Serial.print("ID Device : ");
     Serial.println( stateMachine.idDevice);
+#endif
     // Doc Eprom va khoi tao gia tri
     
     loadWiFiConf();
     khoiTaoGiaTri();
-    if(!SPIFFS.begin(true)){printf("An Error has occurred while mounting SPIFFS\n");}
+    if(!SPIFFS.begin(true)){
+#ifdef debug_UART
+      printf("An Error has occurred while mounting SPIFFS\n");
+#endif
+      }
     //SD CArd
     SDSPI.begin(14,27,13,15); ///SCK,MISO,MOSI,ss
-    if(!SD.begin(15,SDSPI,10000000)){Serial.println("Card Mount Failed");}
-    else {statusPeripheral.sdCard.statusConnect = true;Serial.println("SD card OK");}
+    if(!SD.begin(15,SDSPI,10000000)){
+#ifdef debug_UART
+      Serial.println("Card Mount Failed");
+#endif 
+      }
+    else {
+      statusPeripheral.sdCard.statusConnect = true;
+#ifdef debug_UART
+      Serial.println("SD card OK");
+#endif
+      }
 
 
     //RTC
-    if (! rtc.begin()) { Serial.println(F("Couldn't find RTC"));} 
-    if (rtc.lostPower()) { Serial.println(F("Ghi Time"));rtc.adjust(DateTime(2019, 12, 4,13, 53, 0));}
+    if (! rtc.begin()) { 
+#ifdef debug_UART      
+      Serial.println(F("Couldn't find RTC"));
+#endif
+      } 
+    if (rtc.lostPower()) { 
+#ifdef debug_UART      
+      Serial.println(F("Ghi Time"));
+#endif
+      rtc.adjust(DateTime(2019, 12, 4,13, 53, 0));
+      }
     //Wifi
+    
   // WiFi.disconnect(true);
    // WiFi.setSleep(false);
 #ifdef using_sta
@@ -205,9 +234,11 @@ void loop()
     if ((statusPeripheral.wifi.counterWifiDisconnect == 15)&&( xTaskGetTickCount() - statusPeripheral.wifi.lastTimeConnect >500)){
       statusPeripheral.wifi.lastTimeConnect = xTaskGetTickCount();
       WiFi.disconnect(true);
-      printf("Wifi 2 che do: AP va STA\n");
       wifi_connect(2, WIFI_AP_STA, WiFiConf.sta_ssid, WiFiConf.sta_pwd,(char *)"esp32");
       statusPeripheral.wifi.counterWifiDisconnect ++; 
+#ifdef debug_UART
+      printf("Wifi 2 che do: AP va STA\n");
+#endif  
     }
     else if ((statusPeripheral.wifi.counterWifiDisconnect < 15)&&( xTaskGetTickCount() - statusPeripheral.wifi.lastTimeConnect > 5000)) {
         statusPeripheral.wifi.lastTimeConnect = xTaskGetTickCount();
@@ -229,19 +260,25 @@ void loop()
        statusPeripheral.sdCard.lastTimeSendMQTT=xTaskGetTickCount();      
        // reconnect SD card   
        if (statusPeripheral.sdCard.statusConnect == false){
-          Serial.println(" Reinit SD Card");
           if (statusPeripheral.mqtt.timeTruyenMQTT == 1000){root_CMA.close();}
           SD.end() ;
           delay(200);
-          if(!SD.begin(15,SDSPI,6000000)){Serial.println("Card Mount Failed");  statusPeripheral.mqtt.timeTruyenMQTT = 3000;  }
+          if(!SD.begin(15,SDSPI,6000000)){
+#ifdef debug_UART
+            Serial.println("Card Mount Failed");  
+#endif
+            statusPeripheral.mqtt.timeTruyenMQTT = 3000; 
+            }
           else {statusPeripheral.sdCard.statusConnect = true;statusPeripheral.mqtt.timeTruyenMQTT = 1000;}
+#ifdef debug_UART
+        Serial.println(" Reinit SD Card");
+#endif  
        }
        // open next file
        else if (statusPeripheral.sdCard.statusGetAllFile == false){
            File file = root_CMA.openNextFile();
            if(file){
-            if(file.isDirectory()){Serial.print("  DIR : ");}
-            else readFile(SD,file.name(),file.size());
+            if(!file.isDirectory()){ readFile(SD,file.name(),file.size());}
           }
            else{  
                   root_CMA.close();
@@ -253,9 +290,12 @@ void loop()
       else if((xTaskGetTickCount() - statusPeripheral.sdCard.lastTimeReadEnd > 60000)&&(statusPeripheral.sdCard.statusGetAllFile)){
         statusPeripheral.sdCard.lastTimeReadEnd = xTaskGetTickCount();
         statusPeripheral.sdCard.statusGetAllFile = false;
-        Serial.println("reboot SD");
+        
         root_CMA = SD.open("/CMA");   
-        if(!root_CMA){statusPeripheral.sdCard.statusConnect = false;}          
+        if(!root_CMA){statusPeripheral.sdCard.statusConnect = false;}
+#ifdef debug_UART
+        Serial.println("Read Folder SD CATRĐ");
+#endif          
        }    
        
   }

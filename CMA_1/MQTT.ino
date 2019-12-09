@@ -77,13 +77,18 @@ Set Khu Vuc can
 ////// GET MQTT ///////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////
 void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties properties, size_t len, size_t index, size_t total) {
-  
+#ifdef debug_UART  
   printf("MQTT GET: %s \n",topic);
   //printf("QOS: %c \n", properties.qos);
   printf("noi dung: %s \n", payload);
+#endif
   StaticJsonDocument<1500> jsonBuffer;
   DeserializationError error = deserializeJson(jsonBuffer,payload);
-  if (error) Serial.println("error json");
+  if (error) {
+#ifdef debug_UART    
+  Serial.println("error js"};
+#endif
+  }
   else if ((strcmp(WiFiConf.mqtt_subto1,topic) == 0)||(strcmp(inforServer.mqttConfig.topicGetConfig,topic) == 0)){
     /*
      Nhan thong tin server cai dat ca lam viec

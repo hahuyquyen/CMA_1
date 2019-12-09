@@ -116,7 +116,9 @@ void setupWiFiConf(void) {
   });
   server.on("/set_id", HTTP_POST, [](AsyncWebServerRequest * request) {
     if (request->hasParam("id", true)) {
+#ifdef debug_UART 
       Serial.println(request->getParam("id", true)->value());
+#endif
       stateMachine.idDevice = strtoul(request->getParam("id", true)->value().c_str(), NULL, 10);
       stateMachine.setIdControl();
     }

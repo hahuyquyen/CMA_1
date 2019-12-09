@@ -15,11 +15,15 @@ void wifiOnDisconnect(WiFiEventInfo_t info)
   xTimerStop(mqttReconnectTimer, 0); // tat tu dong ket noi mqtt
   statusPeripheral.wifi.statusConnectAP = false ;
    if (info.disconnected.reason == 6) {
+#ifdef debug_UART
       Serial.println("NOT_AUTHED reconnect");
+#endif
       WiFi.reconnect();
    }
    else if (info.disconnected.reason == 8) {
+#ifdef debug_UART
       Serial.println("assoc leave");
+#endif
       wifi_connect(0, WIFI_STA,WiFiConf.sta_ssid,WiFiConf.sta_pwd,WiFiConf.ap_ssid);
    }
    /*
@@ -39,8 +43,9 @@ void wifigotip()
   }
   statusPeripheral.wifi.statusConnectAP = true;
   statusPeripheral.wifi.counterWifiDisconnect = 0;
-  //
+#ifdef debug_UART
   printf("Wifi %s\n", WiFi.localIP().toString().c_str());
+#endif
   uint16_t* time_blink = (uint16_t*)malloc(sizeof(uint16_t));
   *time_blink = 2000;
   xQueueSend(Queue_Time_blink, time_blink, (TickType_t) 1);
