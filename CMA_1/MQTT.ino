@@ -41,10 +41,11 @@ void truyen_mqtt(){
       doc["p"] = inforServer.thanhPham.arrayType[inforServer.thanhPham.userSelect];
       char buffer[500];
       serializeJson(doc, buffer);
-      if (statusPeripheral.mqtt.statusMqttConnect){ mqttClient.publish("/data", 0, true, buffer);}
       char textToWrite[ 16 ];
       sprintf(textToWrite,"/CMA/%lu", ( unsigned long )now.unixtime());
       writeFile(SD, textToWrite, buffer);
+      if (statusPeripheral.mqtt.statusMqttConnect){ mqttClient.publish("/data", 0, true, buffer);}
+     
 }
 //////////////////////////////////////////////////////////////////
 ////// Setting MQTT ///////////////////////////////////////////////

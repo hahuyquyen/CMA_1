@@ -138,8 +138,9 @@ void setupWiFiConf(void) {
     if (request->hasParam(F("SUBTopic1"), true)) {
       request->getParam(F("SUBTopic1"), true)->value().toCharArray(WiFiConf.mqtt_subto1, sizeof(WiFiConf.mqtt_subto1));
     }
-    saveWiFiConf();
-    request->send(200, F("text/plain"), F("OK"));
+     if (saveWiFiConf())request->send(200, F("text/plain"), F("OK BABY"));
+    else request->send(200, F("text/plain"), F("Fail Save EEPROM"));
+  //  request->send(200, F("text/plain"), F("OK"));
   });
 
   server.on("/firmware", HTTP_GET, [](AsyncWebServerRequest * request) {
