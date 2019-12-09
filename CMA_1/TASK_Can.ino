@@ -28,8 +28,8 @@ void TaskCAN( void * pvParameters ){
        }
        else {uart_bien[tam++]=incomingData;if(tam>10)tam=0;}  
      }
-     vTaskDelay(15); 
-     
+    // vTaskDelay(15); 
+     vTaskDelayUntil(xTaskGetTickCount(),50);
     //  vTaskDelay(5000); 
     //  printf("Task CAN StackHigh %d, Free Heap = %d\n",uxTaskGetStackHighWaterMark(NULL),ESP.getFreeHeap());     
       /*

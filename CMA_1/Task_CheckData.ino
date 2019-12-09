@@ -143,7 +143,8 @@ void http_re( void * pvParameters ){
       TaskCheck_lastTimeSche=xTaskGetTickCount();
     }
       */
-    vTaskDelay(10);  
+      vTaskDelayUntil(xTaskGetTickCount(),30);
+    //vTaskDelay(25);  
     }
     vTaskDelete(NULL) ;
 }
