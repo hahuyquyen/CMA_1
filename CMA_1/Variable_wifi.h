@@ -7,6 +7,7 @@
 const char ramChoDuLieu[] = "Chờ Dữ Liệu"; // dung can lây FPSTR(ramChoDuLieu) và strlcpy_P  tiet kiem RAM cho heap memory
 const char ramChuaChon[] = "Chưa Chọn";
 const uint8_t wifi_conf_format[] = WIFI_CONF_FORMAT;
+
 struct statusPeripheralConf{
     struct mqttConf{
       unsigned long lastTimeGetDataConfig; 

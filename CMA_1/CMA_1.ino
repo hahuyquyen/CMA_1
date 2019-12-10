@@ -1,6 +1,7 @@
 
 extern "C" {
-    #include "freertos/FreeRTOS.h"
+
+#include "freertos/FreeRTOS.h"
     #include "freertos/timers.h"
 }
 #include <Arduino.h>
@@ -120,6 +121,7 @@ void setup()
     khoiTaoGiaTri();
     if(!SPIFFS.begin(true)){
 #ifdef debug_UART
+
       printf("An Error has occurred while mounting SPIFFS\n");
 #endif
       }

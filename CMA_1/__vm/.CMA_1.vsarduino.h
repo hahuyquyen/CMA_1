@@ -15,6 +15,7 @@
 #define _VSARDUINO_H_
 #define __ESP32_esp32__
 #define __ESP32_ESP32__
+#define _VMDEBUG 1
 #define ESP_PLATFORM
 #define HAVE_CONFIG_H
 #define GCC_NOT_5_2_0 0
@@ -107,7 +108,6 @@ typedef long pthread_cond_t;
 #define noInterrupts() cli()
 
 #include "CMA_1.ino"
-#include "Check_button.ino"
 #include "MQTT.ino"
 #include "SPIFFS_save.ino"
 #include "SaveData.ino"
