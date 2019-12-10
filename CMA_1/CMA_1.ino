@@ -298,13 +298,13 @@ void loop()
         statusPeripheral.sdCard.statusGetAllFile = false;
         
         root_CMA = SD.open("/CMA");   
+
         if(!root_CMA){statusPeripheral.sdCard.statusConnect = false;}
 #ifdef debug_UART
         Serial.println("Read Folder SD CATRĐ");
 #endif          
        }    
        
-  }
 //////////////////////////////////////////////////////////////////
 ////// lasttime yêu cau server tra data ////////////////////////////
 //////////////////////////////////////////////////////////////////
