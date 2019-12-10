@@ -1,4 +1,3 @@
-#include <EasyButton.h>
 EasyButton button_left(button_left_pin,80,true);
 EasyButton button_right(button_right_pin,80,true);
 EasyButton button_ok(button_ok_pin,80,true);
@@ -57,13 +56,17 @@ void onPressed_ok() {
 void onPressedExit() {
   stateMachine.bottonSelect = 0 ;
  stateMachine.deviceStatus = deviceSetting;
+#ifdef debug_UART
   Serial.println("onPressed_vitri");
+#endif
 }
 //////////////////////////////////////////////////////////////////
 ////// Button Error ///////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////
 void onPressedError() {
-Serial.println("onPressed");
+#ifdef debug_UART
+  Serial.println("onPressed");
+#endif
 }
 //////////////////////////////////////////////////////////////////
 ////// Task Check Button /////////////////////////////////////////
@@ -90,7 +93,8 @@ void Check_button( void * pvParameters ){
       buttonExit.read();
       buttonError.read();
       buttonPower.read();
-      vTaskDelay(30);     
+      vTaskDelayUntil(xTaskGetTickCount(),50);
+     // vTaskDelay(30);     
     }
     vTaskDelete(NULL) ;
 }

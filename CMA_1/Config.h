@@ -1,3 +1,4 @@
+#define debug_UART true
 #define WIFI_CONF_FORMAT {0, 0, 0, 1}
 #define WIFI_CONF_START 0
 

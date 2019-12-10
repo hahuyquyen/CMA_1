@@ -41,10 +41,11 @@ void truyen_mqtt(){
       doc["p"] = inforServer.thanhPham.arrayType[inforServer.thanhPham.userSelect];
       char buffer[500];
       serializeJson(doc, buffer);
-      if (statusPeripheral.mqtt.statusMqttConnect){ mqttClient.publish("/data", 0, true, buffer);}
       char textToWrite[ 16 ];
       sprintf(textToWrite,"/CMA/%lu", ( unsigned long )now.unixtime());
       writeFile(SD, textToWrite, buffer);
+      if (statusPeripheral.mqtt.statusMqttConnect){ mqttClient.publish("/data", 0, true, buffer);}
+     
 }
 //////////////////////////////////////////////////////////////////
 ////// Setting MQTT ///////////////////////////////////////////////
@@ -76,13 +77,16 @@ Set Khu Vuc can
 ////// GET MQTT ///////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////
 void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties properties, size_t len, size_t index, size_t total) {
-  
-  printf("MQTT GET: %s \n",topic);
-  //printf("QOS: %c \n", properties.qos);
-  printf("noi dung: %s \n", payload);
+#ifdef debug_UART  
+  printf("MQTT: %s ,ND: %s \n",topic, payload);
+#endif
   StaticJsonDocument<1500> jsonBuffer;
   DeserializationError error = deserializeJson(jsonBuffer,payload);
-  if (error) Serial.println("error json");
+  if (error) {
+#ifdef debug_UART    
+  Serial.println("error js");
+#endif
+  }
   else if ((strcmp(WiFiConf.mqtt_subto1,topic) == 0)||(strcmp(inforServer.mqttConfig.topicGetConfig,topic) == 0)){
     /*
      Nhan thong tin server cai dat ca lam viec
@@ -129,7 +133,8 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
       uint8_t statusSaveData = jsonBuffer["s"].as<uint8_t>();
       char textToWrite[ 16 ];
       sprintf(textToWrite,"/CMA/%lu", ( unsigned long )sttData);
-      if (statusSaveData == 1)deleteFile(SD,textToWrite);
+     // if (statusSaveData == 1)deleteFile(SD,textToWrite); Thay doi tu delete toi rename.
+      if (statusSaveData == 1)renameFiles(SD,textToWrite);
   }
 }
 //////////////////////////////////////////////////////////////////

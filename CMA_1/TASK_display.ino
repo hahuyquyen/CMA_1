@@ -162,11 +162,15 @@ void Display( void * pvParameters ) {
             if (xQueueReceive( Queue_display, &Data_TH,  ( TickType_t ) 1 ) == pdPASS ) {
                 variLcdUpdate.stateDisplayLCD = 0;
                 if ((Data_TH.id_RFID_NV[0] == 'x') && (getSttKhuVuc() ==  sttKvSuaCaIN)) {
+#ifdef debug_UART
                 Serial.println("Data : Ro & Can KV Sua Ca - IN");
+#endif
                 digitalWrite(pinLedGreen, HIGH);
                 }
                 else if (getSttKhuVuc() ==  sttKvSuaCaIN){
+#ifdef debug_UART
                   Serial.println(" Da Nhan du thong tin");
+#endif
                   timeoutDisplay = xTaskGetTickCount();
                   statusBuzzer = true ;
                   digitalWrite(pinBuzzer, statusBuzzer);
@@ -237,7 +241,8 @@ void Display( void * pvParameters ) {
       default : break;
     }
     printDebugHeap();
-    vTaskDelay(20);
+    vTaskDelayUntil(xTaskGetTickCount(),50);
+   // vTaskDelay(20);
   }
   vTaskDelete(NULL) ;
 }
@@ -245,10 +250,12 @@ void Display( void * pvParameters ) {
 unsigned long getTimeSendHeapDebug = 0;
 void printDebugHeap() {
   if (xTaskGetTickCount() - getTimeSendHeapDebug > 15000) {
-    DateTime now = rtc.now();
     getTimeSendHeapDebug = xTaskGetTickCount();
+#ifdef debug_UART
+    DateTime now = rtc.now(); 
     Serial.print (getSttKhuVuc());
     printf("%lu , %d, Heap %d\n",(unsigned long )now.unixtime(), uxTaskGetStackHighWaterMark(NULL), ESP.getFreeHeap());
+#endif
   }
 }
 /*
