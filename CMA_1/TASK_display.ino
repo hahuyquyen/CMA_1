@@ -241,7 +241,8 @@ void Display( void * pvParameters ) {
       default : break;
     }
     printDebugHeap();
-    vTaskDelay(20);
+    vTaskDelayUntil(xTaskGetTickCount(),50);
+   // vTaskDelay(20);
   }
   vTaskDelete(NULL) ;
 }

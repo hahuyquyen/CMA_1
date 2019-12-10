@@ -172,7 +172,39 @@ void setup()
     setupWiFiConf();
     server.begin();
     Update.onProgress(printProgress);
-    //Free RTOS
+    //Free RTOS      
+  xTaskCreatePinnedToCore(
+                        Check_button,   /* Function to implement the task */
+                        "Check_button", /* Name of the task */
+                        3072,      /* Stack size in words */
+                        NULL,       /* Task input parameter */
+                        11,          /* Priority of the task */
+                        NULL,       /* Task handle. */
+                        0);  /* Core where the task should run */     
+    xTaskCreatePinnedToCore(
+                        Display,   /* Function to implement the task */
+                        "Display", /* Name of the task */
+                        8192,      /* Stack size in words */
+                        NULL,       /* Task input parameter */
+                        12,          /* Priority of the task */
+                        NULL,       /* Task handle. */
+                        1);  /* Core where the task should run */      
+    xTaskCreatePinnedToCore(
+                        TaskCAN,   /* Function to implement the task */
+                        "TaskCAN", /* Name of the task */
+                        3072,      /* Stack size in words */
+                        NULL,       /* Task input parameter */
+                        13,          /* Priority of the task */
+                        NULL,       /* Task handle. */
+                        0);  /* Core where the task should run */
+    xTaskCreatePinnedToCore(
+                        http_re,   /* Function to implement the task */
+                        "http_re", /* Name of the task */
+                        4096,      /* Stack size in words */
+                        NULL,       /* Task input parameter */
+                        14,          /* Priority of the task */
+                        NULL,       /* Task handle. */
+                        0);  /* Core where the task should run */                                                 
     xTaskCreatePinnedToCore(
                         TaskRFID,   /* Function to implement the task */
                         "TaskRFID", /* Name of the task */
@@ -181,39 +213,6 @@ void setup()
                         15,          /* Priority of the task */
                         NULL,       /* Task handle. */
                         1);  /* Core where the task should run */
-    xTaskCreatePinnedToCore(
-                        TaskCAN,   /* Function to implement the task */
-                        "TaskCAN", /* Name of the task */
-                        3072,      /* Stack size in words */
-                        NULL,       /* Task input parameter */
-                        14,          /* Priority of the task */
-                        NULL,       /* Task handle. */
-                        0);  /* Core where the task should run */
-    xTaskCreatePinnedToCore(
-                        Display,   /* Function to implement the task */
-                        "Display", /* Name of the task */
-                        8192,      /* Stack size in words */
-                        NULL,       /* Task input parameter */
-                        12,          /* Priority of the task */
-                        NULL,       /* Task handle. */
-                        1);  /* Core where the task should run */   
-    xTaskCreatePinnedToCore(
-                        http_re,   /* Function to implement the task */
-                        "http_re", /* Name of the task */
-                        4096,      /* Stack size in words */
-                        NULL,       /* Task input parameter */
-                        13,          /* Priority of the task */
-                        NULL,       /* Task handle. */
-                        0);  /* Core where the task should run */       
-  xTaskCreatePinnedToCore(
-                        Check_button,   /* Function to implement the task */
-                        "Check_button", /* Name of the task */
-                        3072,      /* Stack size in words */
-                        NULL,       /* Task input parameter */
-                        11,          /* Priority of the task */
-                        NULL,       /* Task handle. */
-                        0);  /* Core where the task should run */        
-
   //MQTT                                           
   mqttReconnectTimer = xTimerCreate("mqttTimer", pdMS_TO_TICKS(2000), pdFALSE, (void*)0, reinterpret_cast<TimerCallbackFunction_t>(connectToMqtt));
   mqttClient.onConnect(onMqttConnect);
@@ -280,7 +279,12 @@ void loop()
        else if (statusPeripheral.sdCard.statusGetAllFile == false){
            File file = root_CMA.openNextFile();
            if(file){
-            if(!file.isDirectory()){ readFile(SD,file.name(),file.size());}
+            if(!file.isDirectory()){
+              if (file.name()[0] == 'O'){//delete
+                deleteFile(SD,file.name());
+              }
+              else readFile(SD,file.name(),file.size());
+              }
           }
            else{  
                   root_CMA.close();
@@ -289,7 +293,7 @@ void loop()
            }
       }
       // Neu da mo het thi cho 60s va mo lai và check folder
-      else if((xTaskGetTickCount() - statusPeripheral.sdCard.lastTimeReadEnd > 60000)&&(statusPeripheral.sdCard.statusGetAllFile)){
+      else if((xTaskGetTickCount() - statusPeripheral.sdCard.lastTimeReadEnd > 30*60000)&&(statusPeripheral.sdCard.statusGetAllFile)){ //30 phut moi mo lai va 
         statusPeripheral.sdCard.lastTimeReadEnd = xTaskGetTickCount();
         statusPeripheral.sdCard.statusGetAllFile = false;
         
