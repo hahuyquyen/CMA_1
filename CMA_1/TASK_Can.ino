@@ -9,6 +9,10 @@ void TaskCAN( void * pvParameters ){
     static Data_CAN Data_CAN;
     int tam=0;
     unsigned long lastTimeSendCan=0;
+    TickType_t xLastWakeTime;
+ xLastWakeTime = xTaskGetTickCount();
+     // Initialise the xLastWakeTime variable with the current time.
+     
     for (;;){
       if (Serial1.available()){ 
        uint8_t incomingData = Serial1.read();
@@ -29,7 +33,8 @@ void TaskCAN( void * pvParameters ){
        else {uart_bien[tam++]=incomingData;if(tam>10)tam=0;}  
      }
     // vTaskDelay(15); 
-     vTaskDelayUntil(xTaskGetTickCount(),50);
+   
+     vTaskDelayUntil(&xLastWakeTime,25);
     //  vTaskDelay(5000); 
     //  printf("Task CAN StackHigh %d, Free Heap = %d\n",uxTaskGetStackHighWaterMark(NULL),ESP.getFreeHeap());     
       /*
@@ -47,7 +52,7 @@ boolean tach(double* soky){
   int hangtram=0;
   double soam= 1;
   *soky=0;
-  /*for (int j=0;j<sizeof(uart_bien);j++){
+ /*/ for (int j=0;j<sizeof(uart_bien);j++){
     Serial.print(uart_bien[j], HEX);Serial.print("-");
   }
   Serial.println("");*/

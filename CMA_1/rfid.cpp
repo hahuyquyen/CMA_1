@@ -197,8 +197,8 @@ bool IRAM_ATTR RFID::check()
   if ( _RFIDSERIAL->available())
   { 
     uint8_t incomingData = _RFIDSERIAL->read();
-   // Serial.print(incomingData,HEX);
-   // Serial.print("-");
+    Serial.print(incomingData,HEX);
+    Serial.print("-");
   	if (incomingData == 0x00 && _head == 0){
   		msg[_head++] = incomingData;
   	}

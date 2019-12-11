@@ -20,29 +20,27 @@ Sữaz thu viện thay delay(100) bằng
 //////////////////////////////////////////////////////////////////
 ////// Delete file SD ///////////////////////////////////////
 //////////////////////////////////////////////////////////////////
-void IRAM_ATTR deleteFile(fs::FS &fs, const char * path){fs.remove(path);}\
+void deleteFile(fs::FS &fs, const char * path){fs.remove(path);}
 //////////////////////////////////////////////////////////////////
 ////// Rename File ///////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////
-void renameFile(fs::FS &fs, const char * path1, const char * path2){
+/*void renameFile(fs::FS &fs, const char * path1, const char * path2){
     Serial.printf("Renaming file %s to %s\n", path1, path2);
     if (fs.rename(path1, path2)) {
         Serial.println("File renamed");
     } else {
         Serial.println("Rename failed");
     }
-}
+}*/
 //////////////////////////////////////////////////////////////////
 ////// rename //////////////////////////////////////
 //////////////////////////////////////////////////////////////////
 
-void renameFiles(fs::FS &fs, const char * path1){
-    char textToWrite[ 18 ];
-    sprintf(textToWrite,"O_%s", path1);
+void renameFile(fs::FS &fs, const char * path1, const char * path2){
 #ifdef debug_UART
-    Serial.printf("Renaming file %s to %s\n", path1,textToWrite);
+    Serial.printf("Renaming file %s to %s\n", path1,path2);
 #endif
-    if (fs.rename(path1, textToWrite)) {
+    if (fs.rename(path1, path2)) {
 #ifdef debug_UART
         Serial.println("File renamed");
 #endif
@@ -55,7 +53,7 @@ void renameFiles(fs::FS &fs, const char * path1){
 //////////////////////////////////////////////////////////////////
 ////// Read SD and send MQTT //////////////////////////////////////
 //////////////////////////////////////////////////////////////////
-void IRAM_ATTR readFile(fs::FS &fs, const char * path,uint32_t len){
+void readFile(fs::FS &fs, const char * path,uint32_t len){
     //Serial.printf("Reading : %s , L %lu \n", path,( unsigned long )len);
     File file = fs.open(path);
     if(!file){statusPeripheral.sdCard.statusConnect = false;return;}
@@ -71,7 +69,7 @@ void IRAM_ATTR readFile(fs::FS &fs, const char * path,uint32_t len){
 //////////////////////////////////////////////////////////////////
 ////// Write SD and send MQTT ////////////////////////////////////
 //////////////////////////////////////////////////////////////////
-void IRAM_ATTR writeFile(fs::FS &fs, const char * path, const char * message){
+void writeFile(fs::FS &fs, const char * path, const char * message){
     File file = fs.open(path, FILE_WRITE);
     if(!file){statusPeripheral.sdCard.statusConnect = false;return;}
     file.print(message);

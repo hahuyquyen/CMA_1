@@ -241,7 +241,7 @@ void loop()
       printf("Wifi 2 che do: AP va STA\n");
 #endif  
     }
-    else if ((statusPeripheral.wifi.counterWifiDisconnect < 15)&&( xTaskGetTickCount() - statusPeripheral.wifi.lastTimeConnect > 5000)) {
+    else if ((statusPeripheral.wifi.counterWifiDisconnect < 15)&&( xTaskGetTickCount() - statusPeripheral.wifi.lastTimeConnect > 1000)) {
         statusPeripheral.wifi.lastTimeConnect = xTaskGetTickCount();
         statusPeripheral.wifi.counterWifiDisconnect = statusPeripheral.wifi.counterWifiDisconnect + 1;
         wifi_connect(0, WIFI_STA,WiFiConf.sta_ssid,WiFiConf.sta_pwd,WiFiConf.ap_ssid);
@@ -280,7 +280,9 @@ void loop()
            File file = root_CMA.openNextFile();
            if(file){
             if(!file.isDirectory()){
-              if (file.name()[0] == 'O'){//delete
+              if (file.name()[5] == 'O'){//delete
+                Serial.print("delete file ");
+                Serial.println(file.name());
                 deleteFile(SD,file.name());
               }
               else readFile(SD,file.name(),file.size());

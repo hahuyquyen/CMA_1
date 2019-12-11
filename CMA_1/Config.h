@@ -30,8 +30,9 @@
 #define button_ok_pin 35
 #define buttonExitPin 39
 #define buttonErrorPin 0
-#define pinPower 33
-#define pinReadPower 32
+#define pinPower 32
+#define pinReadPower 33
+
 #define pinBuzzer 4
 #define pinLedRed 5
 #define pinLedGreen 2

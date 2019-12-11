@@ -136,6 +136,7 @@ void Display( void * pvParameters ) {
   Data_TH Data_TH;
   pinMode(pinBuzzer, OUTPUT);
   pinMode(pinLedGreen, OUTPUT);
+  pinMode(pinLedRed, OUTPUT);
   unsigned long lastTimeBlinkLed = 0;
   unsigned long timeoutDisplay = 0;
 //  unsigned long timeoutLcdLangDaIn = 0;
@@ -143,7 +144,7 @@ void Display( void * pvParameters ) {
   uint16_t Time_blink = 1000;
   uint16_t Time_check = 2500;
   // SPI.setClockDivider( SPI_CLOCK_DIV32 );
-  u8g2.setBusClock(900000);
+  u8g2.setBusClock(700000);
   u8g2.begin();
   u8g2.enableUTF8Print();
   LCD_thong_tin(2, &Data_TH);
@@ -151,6 +152,10 @@ void Display( void * pvParameters ) {
   uint8_t daucham_lcd = 0;
   u8g2.setAutoPageClear(1);
   boolean statusBuzzer = false ; 
+  digitalWrite(pinLedGreen, HIGH);
+  digitalWrite(pinLedRed, HIGH);
+  TickType_t xLastWakeTime;
+   xLastWakeTime = xTaskGetTickCount();
   for (;;) {
     /*
        30ms
@@ -165,7 +170,7 @@ void Display( void * pvParameters ) {
 #ifdef debug_UART
                 Serial.println("Data : Ro & Can KV Sua Ca - IN");
 #endif
-                digitalWrite(pinLedGreen, HIGH);
+                digitalWrite(pinLedGreen, LOW);
                 }
                 else if (getSttKhuVuc() ==  sttKvSuaCaIN){
 #ifdef debug_UART
@@ -187,14 +192,14 @@ void Display( void * pvParameters ) {
             variLcdUpdate.stateDisplayLCD = 1;
             statusBuzzer = false ;
             digitalWrite(pinBuzzer, statusBuzzer);
-            digitalWrite(pinLedGreen, LOW);
+            digitalWrite(pinLedGreen, HIGH);
            // timeoutLcdLangDaIn = 0;
             timeoutDisplay = 0;
           }
         if ((xTaskGetTickCount() - timeoutDisplay > 500) && (timeoutDisplay > 0 ) && (statusBuzzer)) {
           statusBuzzer = false ;
           digitalWrite(pinBuzzer, statusBuzzer);
-          digitalWrite(pinLedGreen, LOW);
+          digitalWrite(pinLedGreen, HIGH);
         }
         if ((xTaskGetTickCount() - timeoutDisplay > Time_check) && (timeoutDisplay > 0 )) { 
                 variLcdUpdate.stateDisplayLCD = 1;
@@ -241,7 +246,9 @@ void Display( void * pvParameters ) {
       default : break;
     }
     printDebugHeap();
-    vTaskDelayUntil(xTaskGetTickCount(),50);
+
+                 
+                  vTaskDelayUntil(&xLastWakeTime,50);
    // vTaskDelay(20);
   }
   vTaskDelete(NULL) ;

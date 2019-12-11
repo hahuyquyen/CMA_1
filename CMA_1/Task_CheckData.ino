@@ -15,6 +15,8 @@ void http_re( void * pvParameters ){
     unsigned long timeCompareMode2=10000;
   //  unsigned long TaskCheck_lastTimeSche=0;
     double canDataOutOld = 0;
+    TickType_t xLastWakeTime;
+    xLastWakeTime = xTaskGetTickCount();
     for (;;){
 
       /*
@@ -143,7 +145,10 @@ void http_re( void * pvParameters ){
       TaskCheck_lastTimeSche=xTaskGetTickCount();
     }
       */
-      vTaskDelayUntil(xTaskGetTickCount(),30);
+      
+    
+                  
+                  vTaskDelayUntil(&xLastWakeTime,30);
     //vTaskDelay(25);  
     }
     vTaskDelete(NULL) ;

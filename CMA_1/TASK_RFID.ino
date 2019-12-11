@@ -40,12 +40,15 @@ void TaskRFID( void * pvParameters ){
     nano.set_out_mode(1,1000);
     nano.set_time_ner(0x05,1000); // tna so gui 1->255s
     nano.set_reset_reader(1000);
+    TickType_t xLastWakeTime;
+    xLastWakeTime = xTaskGetTickCount();
     for (;;){
       /*
        * Chuyển task 24ms
        */
                 if (xTaskGetTickCount()-TaskRFID_lastTimeSche > 2000){
                     TaskRFID_lastTimeSche = xTaskGetTickCount();
+                    Serial.println("ssssssssssssss");
                     i=i+1; 
                   }
                   if (nano.check() == true){ 
@@ -83,7 +86,8 @@ void TaskRFID( void * pvParameters ){
                   if(xSemaphoreTake(xResetRfidMaRo, 1)){
                        strncpy( Data_rfid.id_RFID_Old,"", sizeof(""));
                   }
-                  vTaskDelayUntil(xTaskGetTickCount(),20);
+                  
+                  vTaskDelayUntil(&xLastWakeTime,20);
                // vTaskDelay(10);  
     }
     vTaskDelete(NULL) ;

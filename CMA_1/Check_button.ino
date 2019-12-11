@@ -84,6 +84,8 @@ void Check_button( void * pvParameters ){
     button_ok.onPressedFor(80,onPressed_ok);
     buttonError.onPressedFor(80,onPressedError);
     buttonPower.onPressedFor(1000,onPressedPower);
+    TickType_t xLastWakeTime;
+     xLastWakeTime = xTaskGetTickCount();
     for (;;){
       if (stateMachine.deviceStatus == deviceSetting){
         button_left.read();
@@ -93,7 +95,9 @@ void Check_button( void * pvParameters ){
       buttonExit.read();
       buttonError.read();
       buttonPower.read();
-      vTaskDelayUntil(xTaskGetTickCount(),50);
+      
+                  vTaskDelayUntil(&xLastWakeTime,50);
+     // vTaskDelayUntil(xTaskGetTickCount(),50);
      // vTaskDelay(30);     
     }
     vTaskDelete(NULL) ;

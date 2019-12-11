@@ -131,10 +131,12 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
       else if (!jsonBuffer.containsKey("s")) {return;}
       uint32_t sttData = jsonBuffer["i"].as<uint32_t>();
       uint8_t statusSaveData = jsonBuffer["s"].as<uint8_t>();
-      char textToWrite[ 16 ];
-      sprintf(textToWrite,"/CMA/%lu", ( unsigned long )sttData);
+      char textEnd[ 18 ];
+      sprintf(textEnd,"/CMA/O_%lu", ( unsigned long )sttData);
+      char textBegin[ 18 ];
+      sprintf(textBegin,"/CMA/%lu", ( unsigned long )sttData);
      // if (statusSaveData == 1)deleteFile(SD,textToWrite); Thay doi tu delete toi rename.
-      if (statusSaveData == 1)renameFiles(SD,textToWrite);
+      if (statusSaveData == 1)renameFile(SD,textBegin,textEnd);
   }
 }
 //////////////////////////////////////////////////////////////////
