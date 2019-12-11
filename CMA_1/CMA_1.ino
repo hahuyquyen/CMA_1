@@ -262,7 +262,7 @@ void loop()
     else if (statusPeripheral.sdCard.statusGetAllFile == false) {// open next file
     checkNextFile(&root_CMA);
     }
-    else if ((xTaskGetTickCount() - statusPeripheral.sdCard.lastTimeReadEnd > 3 * 6000) && (statusPeripheral.sdCard.statusGetAllFile)) { //30 phut moi mo lai va
+    else if ((xTaskGetTickCount() - statusPeripheral.sdCard.lastTimeReadEnd > 3 * 6000 *100 ) && (statusPeripheral.sdCard.statusGetAllFile)) { //30 phut moi mo lai va
         reOpenFolder();
     }
   }
