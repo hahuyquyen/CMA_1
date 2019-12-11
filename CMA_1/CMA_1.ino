@@ -1,6 +1,5 @@
 
 extern "C" {
-
 #include "freertos/FreeRTOS.h"
 #include "freertos/timers.h"
 }
@@ -106,7 +105,6 @@ void setup()
   Queue_RFID_NV = xQueueCreate(3, sizeof(Data_RFID));
   Queue_mqtt = xQueueCreate(5, sizeof(Data_TH));
   Queue_display = xQueueCreate(3, sizeof(Data_TH));
-  //   Queue_can_interrup= xQueueCreate(3,sizeof(rfid_data));
   Queue_Time_blink = xQueueCreate(3, sizeof(uint16_t));
   xCountingSemaphore = xSemaphoreCreateCounting( 2, 0 );
   xSignal_FromRFID = xSemaphoreCreateCounting( 2, 0 );
@@ -240,7 +238,9 @@ void loop()
 {  
   
   vTaskDelayUntil(&xLastWakeTimeLoop, 20);
-  //vTaskDelay(30);
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////  Reconnect Wifi        /////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   if (statusPeripheral.wifi.statusConnectAP == false) {
     if ((statusPeripheral.wifi.counterWifiDisconnect == 15) && ( xTaskGetTickCount() - statusPeripheral.wifi.lastTimeConnect > 500)) {
       statusPeripheral.wifi.lastTimeConnect = xTaskGetTickCount();
@@ -265,65 +265,20 @@ void loop()
     statusPeripheral.sdCard.lastTimeSendMQTT = xTaskGetTickCount();
   }
   else if ((statusPeripheral.mqtt.statusMqttConnect) && ((xTaskGetTickCount() - statusPeripheral.sdCard.lastTimeSendMQTT > statusPeripheral.mqtt.timeTruyenMQTT))) {
-    /*
-       Check nếu có file còn lưu trong thu muc SD card thì đọc và gửi MQTT den server
-    */
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////  Check nếu có file còn lưu trong thu muc SD card thì đọc và gửi MQTT den server        /////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     statusPeripheral.sdCard.lastTimeSendMQTT = xTaskGetTickCount();
-    // reconnect SD card
-    if (statusPeripheral.sdCard.statusConnect == false) {
-      if (statusPeripheral.mqtt.timeTruyenMQTT == 1000) {
-        root_CMA.close();
-      }
-      SD.end() ;
-      delay(200);
-      if (!SD.begin(15, SDSPI, 6000000)) {
-#ifdef debug_UART
-        Serial.println("Card Mount Failed");
-#endif
-        statusPeripheral.mqtt.timeTruyenMQTT = 3000;
-      }
-      else {
-        statusPeripheral.sdCard.statusConnect = true;
-        statusPeripheral.mqtt.timeTruyenMQTT = 1000;
-      }
-#ifdef debug_UART
-      Serial.println(" Reinit SD Card");
-#endif
+    if ((statusPeripheral.sdCard.statusConnect == false)&& (xTaskGetTickCount() - statusPeripheral.sdCard.lastTimeReInit > 5000)) { // ReInit SD card
+      statusPeripheral.sdCard.lastTimeReInit=xTaskGetTickCount();
+      reInitSD(&root_CMA);
+    } 
+    else if (statusPeripheral.sdCard.statusGetAllFile == false) {// open next file
+    checkNextFile(&root_CMA);
     }
-    // open next file
-    else if (statusPeripheral.sdCard.statusGetAllFile == false) {
-      File file = root_CMA.openNextFile();
-      if (file) {
-        if (!file.isDirectory()) {
-          if (file.name()[5] == 'O') { //delete
-            Serial.print("delete file ");
-            Serial.println(file.name());
-            deleteFile(SD, file.name());
-          }
-          else readFile(SD, file.name(), file.size());
-        }
-      }
-      else {
-        root_CMA.close();
-        statusPeripheral.sdCard.statusGetAllFile = true;
-        statusPeripheral.sdCard.lastTimeReadEnd = xTaskGetTickCount();
-      }
+    else if ((xTaskGetTickCount() - statusPeripheral.sdCard.lastTimeReadEnd > 3 * 6000) && (statusPeripheral.sdCard.statusGetAllFile)) { //30 phut moi mo lai va
+        reOpenFolder();
     }
-    // Neu da mo het thi cho 60s va mo lai và check folder
-    else if ((xTaskGetTickCount() - statusPeripheral.sdCard.lastTimeReadEnd > 30 * 60000) && (statusPeripheral.sdCard.statusGetAllFile)) { //30 phut moi mo lai va
-      statusPeripheral.sdCard.lastTimeReadEnd = xTaskGetTickCount();
-      statusPeripheral.sdCard.statusGetAllFile = false;
-
-      root_CMA = SD.open("/CMA");
-
-      if (!root_CMA) {
-        statusPeripheral.sdCard.statusConnect = false;
-      }
-#ifdef debug_UART
-      Serial.println("Read Folder SD CATRĐ");
-#endif
-    }
-
   }
   
     //////////////////////////////////////////////////////////////////
@@ -336,7 +291,11 @@ void loop()
       }
     }
 }
-  void sendMQTTConfig(uint8_t loaiconfig = 0 , uint8_t maboxung = 0) {
+
+/////////////////////////////////////////////////
+// Send MQTT Con fig                   //////////////
+////////////////////////////////////////////////
+void sendMQTTConfig(uint8_t loaiconfig = 0 , uint8_t maboxung = 0) {
     StaticJsonDocument<55> doc;
     char buffer[55];
     doc["i"] = stateMachine.idDevice;
@@ -345,7 +304,7 @@ void loop()
     serializeJson(doc, buffer);
     mqttClient.publish("/config", 0, true, buffer);
   }
-  void checkSendMQTTConfig() {
+void checkSendMQTTConfig() {
     if (inforServer.nhaCC.total == 0) {
       sendMQTTConfig(1, 0);
     }
@@ -356,4 +315,4 @@ void loop()
     else if ((inforServer.giaiDoan.userSelect != 0) && (inforServer.thanhPham.total == 0) && (stateMachine.bottonSelect > 1)) { // Chi gui yeu cau khi da chon khu vuc can và qua buoc chọn thành phảm
       sendMQTTConfig(3, inforServer.giaiDoan.arrayType[inforServer.giaiDoan.userSelect]);
     }
-  }
+}

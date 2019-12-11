@@ -25,6 +25,7 @@ struct statusPeripheralConf{
     }RTC={false};    
     struct sdCardConf{
       unsigned long lastTimeReadEnd;
+      unsigned long lastTimeReInit;
       unsigned long lastTimeSendMQTT;
       boolean statusConnect;
       boolean statusGetAllFile;
