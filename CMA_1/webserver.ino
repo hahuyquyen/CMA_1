@@ -90,6 +90,11 @@ void setupWiFiConf(void) {
   server.on("/mqtt_conf", HTTP_GET, [](AsyncWebServerRequest * request) {
     request->send(SPIFFS, F("/mqtt_conf.html"), String(), false, processor);
   });
+  server.on("/set_rtc", HTTP_GET, [](AsyncWebServerRequest * request) {
+    if (request->hasParam(F("timestamp"), true)) {
+      set_RTC(strtoul(request->getParam(F("timestamp"), true)->value().c_str(), NULL, 10));
+    }
+  });
   server.on("/set_wifi_conf", HTTP_POST, [](AsyncWebServerRequest * request) {
     if (request->hasParam(F("html_ssid"), true)) {
       request->getParam(F("html_ssid"), true)->value().toCharArray(WiFiConf.sta_ssid, sizeof(WiFiConf.sta_ssid));

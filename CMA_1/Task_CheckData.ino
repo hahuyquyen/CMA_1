@@ -1,4 +1,4 @@
-char idRFID_OLD[25];
+
 
 
 void http_re( void * pvParameters ){
@@ -7,6 +7,7 @@ void http_re( void * pvParameters ){
     Data_RFID Data_RFID_TH;
     Data_RFID Data_RFID_NV;
     Data_TH Data_TH;
+    char idRFID_OLD[25];
     unsigned long lastTimeGetQueueCan = 0;
     unsigned long lastTimeGetQueueRFID_Ro = 0;
     unsigned long lastTimeGetQueueRFID_NV = 0;
