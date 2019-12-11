@@ -3,14 +3,17 @@ EasyButton button_right(button_right_pin, 80, true);
 EasyButton button_ok(button_ok_pin, 80, true);
 EasyButton buttonExit(buttonExitPin, 80, true);
 EasyButton buttonError(buttonErrorPin, 80, true);
-EasyButton buttonPower(pinReadPower, 1000, true);
+EasyButton buttonPower(pinReadPower, 500, true);
 //////////////////////////////////////////////////////////////////
 ////// Button POWER ///////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////
 void onPressedPower() {
-  if (xTaskGetTickCount() > 1000) {
+ // if (xTaskGetTickCount() > 1000) {
+    Serial.println("Turn OFF");
     digitalWrite(pinPower, LOW);
-  }
+    stateMachine.deviceStatus=deviceTurnOff;
+    variLcdUpdate.updateLCD = true;
+ // }
 }
 //////////////////////////////////////////////////////////////////
 ////// Button LEFT ///////////////////////////////////////////////
@@ -96,6 +99,7 @@ void onPressedError() {
 ////// Task Check Button /////////////////////////////////////////
 //////////////////////////////////////////////////////////////////
 void Check_button( void * pvParameters ) {
+  pinMode(pinReadPower, INPUT_PULLUP);
   button_left.begin();
   button_right.begin();
   buttonExit.begin();
@@ -107,13 +111,19 @@ void Check_button( void * pvParameters ) {
   buttonExit.onPressedFor(80, onPressedExit);
   button_ok.onPressedFor(80, onPressed_ok);
   buttonError.onPressedFor(80, onPressedError);
-  buttonPower.onPressedFor(1000, onPressedPower);
+  buttonPower.onPressedFor(700, onPressedPower);
+  pinMode(pinReadPower, INPUT_PULLUP);
   TickType_t xLastWakeTime;
   xLastWakeTime = xTaskGetTickCount();
   pinMode(pinAnalogPower, INPUT);
   unsigned long lastTimeReadADC = 0;
   int powervalue;
+  while (digitalRead(pinReadPower) == LOW){
+    Serial.println("Wait ");
+    delay(50);
+  }
   for (;;) {
+    
     if (stateMachine.deviceStatus == deviceSetting) {
       button_left.read();
       button_right.read();

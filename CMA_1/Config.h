@@ -56,6 +56,7 @@
 #define deviceRunning 1
 #define deviceError 2
 #define deviceLowPower 3
+#define deviceTurnOff 4
 
 #define sttKvFillerIN 1
 #define sttKvFillerOUT 2

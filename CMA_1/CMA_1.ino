@@ -88,7 +88,7 @@ void khoiTaoGiaTri() {
   //   statusPeripheral.sdCard.statusConnect = false;
 }
 void setup()
-{ pinMode(pinPower, OUTPUT);
+{   pinMode(pinPower, OUTPUT);
   digitalWrite(pinPower, HIGH);
   Serial.begin(115200);
   pinMode(pinBuzzer, OUTPUT);
@@ -142,25 +142,11 @@ void setup()
     Serial.println("SD card OK");
 #endif
   }
-
-
-  //RTC
   if (! rtc.begin()) {
 #ifdef debug_UART
     Serial.println(F("Couldn't find RTC"));
 #endif
   }
-/*  if (rtc.lostPower()) {
-#ifdef debug_UART
-    Serial.println(F("Ghi Time"));
-#endif
-    rtc.adjust(DateTime(2019, 12, 4, 13, 53, 0));
-  }
-*/
-  //Wifi
-
-  // WiFi.disconnect(true);
-  // WiFi.setSleep(false);
 #ifdef using_sta
   wifi_connect(0, WIFI_STA, WiFiConf.sta_ssid, WiFiConf.sta_pwd, WiFiConf.ap_ssid);
 #else

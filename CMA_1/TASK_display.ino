@@ -21,6 +21,13 @@ void LCD_print_KV(uint8_t vitri = 48) {
   u8g2.setCursor(66 , vitri);
   u8g2.print(inforServer.nameCheDoInOut[inforServer.giaiDoan.cheDoInOut]);
 }
+void turnOffPower() {
+    u8g2.clearBuffer();
+  u8g2.setFont(u8g2_font_unifont_t_vietnamese2);
+  u8g2.setCursor(((128 - (u8g2.getUTF8Width("Tắt Máy"))) / 2), 32);
+    u8g2.print("Tắt Máy");
+  u8g2.sendBuffer();
+}
 void hienthiSetting(char* dataDisplay = NULL, char* dataUserDisplay = NULL) {
   if (dataDisplay != NULL ) {
     u8g2.setCursor(((128 - (u8g2.getUTF8Width(LCD_setting))) / 2), 16);
@@ -249,8 +256,12 @@ void Display( void * pvParameters ) {
         }
         break;
       //////////////////////////////////////////////////////////////////
-      case deviceLowPower: /////////////////////////////////////////////
+      case deviceTurnOff: /////////////////////////////////////////////
         //////////////////////////////////////////////////////////////////
+        if ((xTaskGetTickCount() - lastBlinkLCD > 5000)|| variLcdUpdate.updateLCD ) {
+        turnOffPower();
+                  lastBlinkLCD = xTaskGetTickCount();
+        }
         break;
       default : break;
     }
