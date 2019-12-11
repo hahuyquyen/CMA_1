@@ -11,7 +11,7 @@ bool loadWiFiConf() {
       *((char*)&WiFiConf + t) = EEPROM.read(WIFI_CONF_START + t); //& lÃ  Ä‘á»‹a chá»‰  cá»§a biáº¿n Struc, *lÃ  data tá»©c lÃ  gÃ¡n data trong Ã´ nhá»› struc báº±ng eprom Ä‘á»�c dc (char*) lÃ  Ã©p kiá»ƒu dá»¯ liá»‡u
     }
     return true;
-  } 
+  }
   return false;
 }
 //////////////////////////////////////////////////////////////////
@@ -25,29 +25,29 @@ bool saveWiFiConf(void) {
 }
 
 /*
-bool loaddata() {
+  bool loaddata() {
     uint8_t bien=0;
     for (unsigned int t = 0; t < sizeof(inforServer); t++) {
       bien ++ ;
-      *((uint8_t*)&inforServer + t) = EEPROM.read(700 + t); //& lÃ  Ä‘á»‹a chá»‰  cá»§a biáº¿n Struc, *lÃ  data tá»©c lÃ  gÃ¡n data trong Ã´ nhá»› struc báº±ng eprom Ä‘á»�c dc (char*) lÃ  Ã©p kiá»ƒu dá»¯ liá»‡u
+       ((uint8_t*)&inforServer + t) = EEPROM.read(700 + t); //& lÃ  Ä‘á»‹a chá»‰  cá»§a biáº¿n Struc, *lÃ  data tá»©c lÃ  gÃ¡n data trong Ã´ nhá»› struc báº±ng eprom Ä‘á»�c dc (char*) lÃ  Ã©p kiá»ƒu dá»¯ liá»‡u
     }
     return true;
-}
-void savedata(void) {
+  }
+  void savedata(void) {
   for (unsigned int t = 0; t < sizeof(inforServer); t++) {
     EEPROM.write(700 + t, *((uint8_t*)&inforServer + t));
   }
   EEPROM.commit();
-}
-bool loaddata_SX() {
+  }
+  bool loaddata_SX() {
     for (unsigned int t = 0; t < sizeof(Nha_SX); t++) {
-      *((char*)&Nha_SX + t) = EEPROM.read(1000 + t); //& lÃ  Ä‘á»‹a chá»‰  cá»§a biáº¿n Struc, *lÃ  data tá»©c lÃ  gÃ¡n data trong Ã´ nhá»› struc báº±ng eprom Ä‘á»�c dc (char*) lÃ  Ã©p kiá»ƒu dá»¯ liá»‡u
+       ((char*)&Nha_SX + t) = EEPROM.read(1000 + t); //& lÃ  Ä‘á»‹a chá»‰  cá»§a biáº¿n Struc, *lÃ  data tá»©c lÃ  gÃ¡n data trong Ã´ nhá»› struc báº±ng eprom Ä‘á»�c dc (char*) lÃ  Ã©p kiá»ƒu dá»¯ liá»‡u
     }
    return true;
-}
-void savedata_SX(void) {
+  }
+  void savedata_SX(void) {
   for (unsigned int t = 0; t < sizeof(Nha_SX); t++) {
     EEPROM.write(1000 + t, *((char*)&Nha_SX + t));
   }
   EEPROM.commit();
-}*/
+  }*/

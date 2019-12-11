@@ -197,15 +197,15 @@ bool IRAM_ATTR RFID::check()
   if ( _RFIDSERIAL->available())
   { 
     uint8_t incomingData = _RFIDSERIAL->read();
-    Serial.print(incomingData,HEX);
-    Serial.print("-");
+    //Serial.print(incomingData,HEX);
+    //Serial.print("-");
   	if (incomingData == 0x00 && _head == 0){
   		msg[_head++] = incomingData;
   	}
   	else if ( _head > 0 && incomingData != 0xFF){
       
   		msg[_head++] = incomingData;
-      if( _head == 30) _head = 0; // Chống tràn bộ nhớ gây reset
+      if( _head == 29) _head = 0; // Chống tràn bộ nhớ gây reset
   	}
   	else if (incomingData == 0xFF){
   		msg[_head]=0xFF;

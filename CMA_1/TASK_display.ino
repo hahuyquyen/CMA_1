@@ -14,11 +14,11 @@
 
 const char LCD_setting[] = "Cài Đặt";
 void LCD_print_KV(uint8_t vitri = 48) {
-  u8g2.setCursor(5, vitri); 
+  u8g2.setCursor(5, vitri);
   u8g2.print(inforServer.giaiDoan.arrayName[inforServer.giaiDoan.userSelect]);
   u8g2.setCursor(60 , vitri);
   u8g2.print(" - ");
-  u8g2.setCursor(66 , vitri); 
+  u8g2.setCursor(66 , vitri);
   u8g2.print(inforServer.nameCheDoInOut[inforServer.giaiDoan.cheDoInOut]);
 }
 void hienthiSetting(char* dataDisplay = NULL, char* dataUserDisplay = NULL) {
@@ -43,37 +43,47 @@ void hienthiSetting(char* dataDisplay = NULL, char* dataUserDisplay = NULL) {
     if (abs(variLcdUpdate.numScroll) > u8g2.getUTF8Width(dataUserDisplay))variLcdUpdate.numScroll = 0;
   }
   else u8g2.drawUTF8(((128 - (u8g2.getUTF8Width(dataUserDisplay))) / 2), 48, dataUserDisplay);
-}*/
+  }*/
 void LCD_thong_tin(uint8_t chedo_HT, Data_TH* Data_TH  , uint8_t daucham = 0) {
   u8g2.clearBuffer();
   u8g2.setFont(u8g2_font_unifont_t_vietnamese2);
   if (chedo_HT == 0) {
-    
+
     char rfidDisplay[10];
     uint8_t vitri = 0;
-    
+
     memcpy(rfidDisplay, & Data_TH->id_RFID_NV[16], 8);
-    rfidDisplay[9]='\0';
-    if ((Data_TH->id_RFID_NV[0] == 'x')&&( getSttKhuVuc() ==  sttKvSuaCaIN )){
+    rfidDisplay[9] = '\0';
+    if ((Data_TH->id_RFID_NV[0] == 'x') && ( getSttKhuVuc() ==  sttKvSuaCaIN )) {
       vitri = 18;
       u8g2.setCursor(10, vitri);
       u8g2.print(F("NV: x"));
     }
-    else if (Data_TH->id_RFID_NV[0] != 'x'){
+    else if (Data_TH->id_RFID_NV[0] != 'x') {
       vitri = 18;
       u8g2.setCursor(10, vitri);
       u8g2.print(F("NV: "));
       u8g2.print(rfidDisplay);
     }
     memcpy(rfidDisplay, & Data_TH->id_RFID[16], 8);
-    rfidDisplay[9]='\0';
-    if (Data_TH->id_RFID[0] != 'x'){if (vitri == 18)vitri = 36; else vitri = 18;  u8g2.setCursor(10, vitri);u8g2.print(F("Rổ: "));u8g2.print(rfidDisplay);}
-    if (vitri == 18){vitri = 36;}
-    else if (vitri == 36){vitri = 54;}
+    rfidDisplay[9] = '\0';
+    if (Data_TH->id_RFID[0] != 'x') {
+      if (vitri == 18)vitri = 36;
+      else vitri = 18;
+      u8g2.setCursor(10, vitri);
+      u8g2.print(F("Rổ: "));
+      u8g2.print(rfidDisplay);
+    }
+    if (vitri == 18) {
+      vitri = 36;
+    }
+    else if (vitri == 36) {
+      vitri = 54;
+    }
     u8g2.setCursor(10, vitri);
     u8g2.print(F("Kg: "));
     u8g2.print(Data_TH->data_weight);
-    
+
   }
   else if (chedo_HT == 1) {
     LCD_print_KV(16);
@@ -120,7 +130,7 @@ void LCD_thong_tin(uint8_t chedo_HT, Data_TH* Data_TH  , uint8_t daucham = 0) {
     u8g2.print(xacnhan);
     LCD_print_KV(32);
     u8g2.setCursor(2, 48);
-   if (inforServer.giaiDoan.cheDoInOut == cheDoIN) {
+    if (inforServer.giaiDoan.cheDoInOut == cheDoIN) {
       hienthiSetting(NULL, inforServer.nhaCC.arrayName[inforServer.nhaCC.userSelect]);
     }
     else {
@@ -128,18 +138,16 @@ void LCD_thong_tin(uint8_t chedo_HT, Data_TH* Data_TH  , uint8_t daucham = 0) {
     }
   }
   u8g2.sendBuffer();
-}                                                                              
+}
 
 
 void Display( void * pvParameters ) {
   boolean status_led = true;
   Data_TH Data_TH;
-  pinMode(pinBuzzer, OUTPUT);
-  pinMode(pinLedGreen, OUTPUT);
-  pinMode(pinLedRed, OUTPUT);
+
   unsigned long lastTimeBlinkLed = 0;
   unsigned long timeoutDisplay = 0;
-//  unsigned long timeoutLcdLangDaIn = 0;
+  //  unsigned long timeoutLcdLangDaIn = 0;
   unsigned long lastBlinkLCD = 0;
   uint16_t Time_blink = 1000;
   uint16_t Time_check = 2500;
@@ -151,105 +159,106 @@ void Display( void * pvParameters ) {
   variLcdUpdate.stateDisplayLCD = 1;
   uint8_t daucham_lcd = 0;
   u8g2.setAutoPageClear(1);
-  boolean statusBuzzer = false ; 
+  boolean statusBuzzer = false ;
   digitalWrite(pinLedGreen, HIGH);
   digitalWrite(pinLedRed, HIGH);
   TickType_t xLastWakeTime;
-   xLastWakeTime = xTaskGetTickCount();
+  xLastWakeTime = xTaskGetTickCount();
   for (;;) {
     /*
        30ms
     */
-    switch (stateMachine.deviceStatus){
+    switch (stateMachine.deviceStatus) {
       //////////////////////////////////////////////////////////////////
       case deviceRunning: //////////////////////////////////////////////
-      //////////////////////////////////////////////////////////////////
-            if (xQueueReceive( Queue_display, &Data_TH,  ( TickType_t ) 1 ) == pdPASS ) {
-                variLcdUpdate.stateDisplayLCD = 0;
-                if ((Data_TH.id_RFID_NV[0] == 'x') && (getSttKhuVuc() ==  sttKvSuaCaIN)) {
+        //////////////////////////////////////////////////////////////////
+        if (xQueueReceive( Queue_display, &Data_TH,  ( TickType_t ) 1 ) == pdPASS ) {
+          variLcdUpdate.stateDisplayLCD = 0;
+          if ((Data_TH.id_RFID_NV[0] == 'x') && (getSttKhuVuc() ==  sttKvSuaCaIN)) {
 #ifdef debug_UART
-                Serial.println("Data : Ro & Can KV Sua Ca - IN");
+            Serial.println("Data : Ro & Can KV Sua Ca - IN");
 #endif
-                digitalWrite(pinLedGreen, LOW);
-                }
-                else if (getSttKhuVuc() ==  sttKvSuaCaIN){
-#ifdef debug_UART
-                  Serial.println(" Da Nhan du thong tin");
-#endif
-                  timeoutDisplay = xTaskGetTickCount();
-                  statusBuzzer = true ;
-                  digitalWrite(pinBuzzer, statusBuzzer);
-                }
-                else{ timeoutDisplay = xTaskGetTickCount();
-                statusBuzzer = true ;
-                digitalWrite(pinBuzzer, statusBuzzer);
-                }
+            digitalWrite(pinLedGreen, LOW);
           }
-         /* if (xSemaphoreTake(xSignal_Display_check, 1)) {
+          else if (getSttKhuVuc() ==  sttKvSuaCaIN) {
+#ifdef debug_UART
+            Serial.println(" Da Nhan du thong tin");
+#endif
             timeoutDisplay = xTaskGetTickCount();
-          }*/
-          if (xSemaphoreTake(xSignal_Display_checkdone, 1)) { //Che do IN qua timeout se tat
-            variLcdUpdate.stateDisplayLCD = 1;
-            statusBuzzer = false ;
+            statusBuzzer = true ;
             digitalWrite(pinBuzzer, statusBuzzer);
-            digitalWrite(pinLedGreen, HIGH);
-           // timeoutLcdLangDaIn = 0;
-            timeoutDisplay = 0;
           }
+          else {
+            timeoutDisplay = xTaskGetTickCount();
+            statusBuzzer = true ;
+            digitalWrite(pinBuzzer, statusBuzzer);
+          }
+        }
+        /* if (xSemaphoreTake(xSignal_Display_check, 1)) {
+           timeoutDisplay = xTaskGetTickCount();
+          }*/
+        if (xSemaphoreTake(xSignal_Display_checkdone, 1)) { //Che do IN qua timeout se tat
+          variLcdUpdate.stateDisplayLCD = 1;
+          statusBuzzer = false ;
+          digitalWrite(pinBuzzer, statusBuzzer);
+          digitalWrite(pinLedGreen, HIGH);
+          // timeoutLcdLangDaIn = 0;
+          timeoutDisplay = 0;
+        }
         if ((xTaskGetTickCount() - timeoutDisplay > 500) && (timeoutDisplay > 0 ) && (statusBuzzer)) {
           statusBuzzer = false ;
           digitalWrite(pinBuzzer, statusBuzzer);
           digitalWrite(pinLedGreen, HIGH);
         }
-        if ((xTaskGetTickCount() - timeoutDisplay > Time_check) && (timeoutDisplay > 0 )) { 
-                variLcdUpdate.stateDisplayLCD = 1;
-                timeoutDisplay = 0; 
-         }
-          xQueueReceive( Queue_Time_blink, &Time_blink,  ( TickType_t ) 1 );
-          if (xTaskGetTickCount() - lastTimeBlinkLed > Time_blink) {
-            lastTimeBlinkLed = xTaskGetTickCount();
-            status_led = !status_led;
-          }
-          printDebugHeap();
-          switch (variLcdUpdate.stateDisplayLCD) {
-            case 0:
-              LCD_thong_tin(0, &Data_TH, daucham_lcd);
-              variLcdUpdate.stateDisplayLCD = 4;
-              break;
-            case 1:
-              if (xTaskGetTickCount() - lastBlinkLCD > 150) {
-                daucham_lcd ++ ;
-                if (daucham_lcd > 3)daucham_lcd = 0;
-                lastBlinkLCD = xTaskGetTickCount();
-                LCD_thong_tin(1, &Data_TH, daucham_lcd);
-              }
-              break;
-            case 2:
-              variLcdUpdate.stateDisplayLCD = 4;
-              break;
-            default: break;
-          }
-          break;
-       //////////////////////////////////////////////////////////////////
-      case deviceSetting: ///////////////////////////////////////////////
+        if ((xTaskGetTickCount() - timeoutDisplay > Time_check) && (timeoutDisplay > 0 )) {
+          variLcdUpdate.stateDisplayLCD = 1;
+          timeoutDisplay = 0;
+        }
+        xQueueReceive( Queue_Time_blink, &Time_blink,  ( TickType_t ) 1 );
+        if (xTaskGetTickCount() - lastTimeBlinkLed > Time_blink) {
+          lastTimeBlinkLed = xTaskGetTickCount();
+          status_led = !status_led;
+        }
+        printDebugHeap();
+        switch (variLcdUpdate.stateDisplayLCD) {
+          case 0:
+            LCD_thong_tin(0, &Data_TH, daucham_lcd);
+            variLcdUpdate.stateDisplayLCD = 4;
+            break;
+          case 1:
+            if (xTaskGetTickCount() - lastBlinkLCD > 150) {
+              daucham_lcd ++ ;
+              if (daucham_lcd > 3)daucham_lcd = 0;
+              lastBlinkLCD = xTaskGetTickCount();
+              LCD_thong_tin(1, &Data_TH, daucham_lcd);
+            }
+            break;
+          case 2:
+            variLcdUpdate.stateDisplayLCD = 4;
+            break;
+          default: break;
+        }
+        break;
       //////////////////////////////////////////////////////////////////
-          if ((xTaskGetTickCount() - lastBlinkLCD > 100) || variLcdUpdate.updateLCD ) {
-            variLcdUpdate.updateLCD = false;
-            lastBlinkLCD = xTaskGetTickCount();
-            LCD_thong_tin(stateMachine.bottonSelect + 2, &Data_TH, daucham_lcd);
-          }
-          break;
+      case deviceSetting: ///////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////
+        if ((xTaskGetTickCount() - lastBlinkLCD > 100) || variLcdUpdate.updateLCD ) {
+          variLcdUpdate.updateLCD = false;
+          lastBlinkLCD = xTaskGetTickCount();
+          LCD_thong_tin(stateMachine.bottonSelect + 2, &Data_TH, daucham_lcd);
+        }
+        break;
       //////////////////////////////////////////////////////////////////
       case deviceLowPower: /////////////////////////////////////////////
-      //////////////////////////////////////////////////////////////////
-          break;
+        //////////////////////////////////////////////////////////////////
+        break;
       default : break;
     }
     printDebugHeap();
 
-                 
-                  vTaskDelayUntil(&xLastWakeTime,50);
-   // vTaskDelay(20);
+
+    vTaskDelayUntil(&xLastWakeTime, 50);
+    // vTaskDelay(20);
   }
   vTaskDelete(NULL) ;
 }
@@ -259,9 +268,9 @@ void printDebugHeap() {
   if (xTaskGetTickCount() - getTimeSendHeapDebug > 15000) {
     getTimeSendHeapDebug = xTaskGetTickCount();
 #ifdef debug_UART
-    DateTime now = rtc.now(); 
+    DateTime now = rtc.now();
     Serial.print (getSttKhuVuc());
-    printf("%lu , %d, Heap %d\n",(unsigned long )now.unixtime(), uxTaskGetStackHighWaterMark(NULL), ESP.getFreeHeap());
+    printf("%lu , %d, Heap %d\n", (unsigned long )now.unixtime(), uxTaskGetStackHighWaterMark(NULL), ESP.getFreeHeap());
 #endif
   }
 }
