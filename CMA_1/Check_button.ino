@@ -110,6 +110,9 @@ void Check_button( void * pvParameters ) {
   buttonPower.onPressedFor(1000, onPressedPower);
   TickType_t xLastWakeTime;
   xLastWakeTime = xTaskGetTickCount();
+  pinMode(pinAnalogPower, INPUT);
+  unsigned long lastTimeReadADC = 0;
+  int powervalue;
   for (;;) {
     if (stateMachine.deviceStatus == deviceSetting) {
       button_left.read();
@@ -123,6 +126,16 @@ void Check_button( void * pvParameters ) {
     vTaskDelayUntil(&xLastWakeTime, 50);
     // vTaskDelayUntil(xTaskGetTickCount(),50);
     // vTaskDelay(30);
+        if (xTaskGetTickCount() - lastTimeReadADC > 5000) {
+          lastTimeReadADC = xTaskGetTickCount();
+          powervalue = analogRead(pinAnalogPower);
+#ifdef debug_UART          
+          Serial.print("POWER : ");
+          Serial.print(powervalue);
+          Serial.print(" Dien Ap : ");
+          Serial.print(map(powervalue, 0, 4096, 0, 5));
+#endif
+    }
   }
   vTaskDelete(NULL) ;
 }

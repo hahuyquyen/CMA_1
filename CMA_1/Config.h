@@ -32,6 +32,7 @@
 #define buttonErrorPin 0
 #define pinPower 32
 #define pinReadPower 33
+#define pinAnalogPower 25
 
 #define pinBuzzer 4
 #define pinLedRed 5

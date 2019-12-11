@@ -150,12 +150,13 @@ void setup()
     Serial.println(F("Couldn't find RTC"));
 #endif
   }
-  if (rtc.lostPower()) {
+/*  if (rtc.lostPower()) {
 #ifdef debug_UART
     Serial.println(F("Ghi Time"));
 #endif
     rtc.adjust(DateTime(2019, 12, 4, 13, 53, 0));
   }
+*/
   //Wifi
 
   // WiFi.disconnect(true);
@@ -192,7 +193,7 @@ void setup()
     NULL,       /* Task input parameter */
     12,          /* Priority of the task */
     NULL,       /* Task handle. */
-    1);  /* Core where the task should run */
+    0);  /* Core where the task should run */
   xTaskCreatePinnedToCore(
     TaskCAN,   /* Function to implement the task */
     "TaskCAN", /* Name of the task */
@@ -200,7 +201,7 @@ void setup()
     NULL,       /* Task input parameter */
     13,          /* Priority of the task */
     NULL,       /* Task handle. */
-    0);  /* Core where the task should run */
+    1);  /* Core where the task should run */
   xTaskCreatePinnedToCore(
     http_re,   /* Function to implement the task */
     "http_re", /* Name of the task */
@@ -208,7 +209,7 @@ void setup()
     NULL,       /* Task input parameter */
     14,          /* Priority of the task */
     NULL,       /* Task handle. */
-    0);  /* Core where the task should run */
+    1);  /* Core where the task should run */
   xTaskCreatePinnedToCore(
     TaskRFID,   /* Function to implement the task */
     "TaskRFID", /* Name of the task */
@@ -228,13 +229,16 @@ void setup()
   mqttClient.setServer(WiFiConf.mqtt_server, atoi(WiFiConf.mqtt_port));
   mqttClient.setCredentials(WiFiConf.mqtt_user, WiFiConf.mqtt_pass);
   root_CMA = SD.open("/CMA");
+  xLastWakeTimeLoop = xTaskGetTickCount();
 }
 /*
    Main Loop luÃ´n cháº¡y Core 1
 */
 void loop()
-{
-  vTaskDelay(30);
+{  
+  
+  vTaskDelayUntil(&xLastWakeTimeLoop, 20);
+  //vTaskDelay(30);
   if (statusPeripheral.wifi.statusConnectAP == false) {
     if ((statusPeripheral.wifi.counterWifiDisconnect == 15) && ( xTaskGetTickCount() - statusPeripheral.wifi.lastTimeConnect > 500)) {
       statusPeripheral.wifi.lastTimeConnect = xTaskGetTickCount();

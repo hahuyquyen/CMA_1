@@ -40,15 +40,12 @@ void deleteFile(fs::FS &fs, const char * path) {
 
 void renameFile(fs::FS &fs, const char * path1, const char * path2) {
 #ifdef debug_UART
-  Serial.printf("Renaming file %s to %s\n", path1, path2);
+  Serial.printf("Rename %s to %s\n", path1, path2);
 #endif
-  if (fs.rename(path1, path2)) {
+  if (!fs.rename(path1, path2)) {
+    statusPeripheral.sdCard.statusConnect = false;
 #ifdef debug_UART
-    Serial.println("File renamed");
-#endif
-  } else {
-#ifdef debug_UART
-    Serial.println("Rename failed");
+    Serial.println("Rename failed");  
 #endif
   }
 }

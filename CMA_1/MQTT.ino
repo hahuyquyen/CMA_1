@@ -107,8 +107,8 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
       strlcpy(inforServer.nhaCC.arrayName[0], ramChuaChon, sizeof(inforServer.nhaCC.arrayName[0]));
       inforServer.nhaCC.total = jsonBuffer["l"].as<uint8_t>();
       for (int i = 0; i < inforServer.nhaCC.total; i++) {
-        if (jsonBuffer["d"][i].isNull()) {Serial.println("error key");inforServer.nhaCC.total = 0;return;}
-        if (i == 15)break; //qua array cua data
+        if (jsonBuffer["d"][i].isNull()) {Serial.println("error key");inforServer.nhaCC.total = 0;return;} // Fix loi thieu data
+        if (i == 15)break; //fix tran array cua data
         inforServer.nhaCC.arrayType[i + 1] = jsonBuffer["d"][i]["i"].as<uint16_t>();
         strlcpy(inforServer.nhaCC.arrayName[i + 1], jsonBuffer["d"][i]["n"], sizeof(inforServer.nhaCC.arrayName[i + 1]));
       }
@@ -117,7 +117,7 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
       strlcpy(inforServer.giaiDoan.arrayName[0], ramChuaChon, sizeof(inforServer.giaiDoan.arrayName[0]));
       inforServer.giaiDoan.total = jsonBuffer["l"].as<uint8_t>();
       for (int i = 0; i < inforServer.giaiDoan.total; i++) {
-        if (jsonBuffer["d"][i].isNull()) {Serial.println("error key");inforServer.giaiDoan.total = 0;return;}
+        if (jsonBuffer["d"][i].isNull()) {Serial.println("error key");inforServer.giaiDoan.total = 0;return;} // Fix loi thieu data
         if (i == 10)break; //qua array cua data
         inforServer.giaiDoan.arrayType[i + 1] = jsonBuffer["d"][i]["i"].as<uint16_t>();
         strlcpy(inforServer.giaiDoan.arrayName[i + 1], jsonBuffer["d"][i]["n"], sizeof(inforServer.giaiDoan.arrayName[i + 1]));
@@ -128,7 +128,7 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
       strlcpy(inforServer.thanhPham.arrayName[0], ramChuaChon, sizeof(inforServer.thanhPham.arrayName[0]));
       inforServer.thanhPham.total = jsonBuffer["l"].as<uint8_t>();
       for (int i = 0; i < inforServer.thanhPham.total; i++) {
-        if (jsonBuffer["d"][i].isNull()) {Serial.println("error key");inforServer.thanhPham.total=0;return;}
+        if (jsonBuffer["d"][i].isNull()) {Serial.println("error key");inforServer.thanhPham.total=0;return;} // Fix loi thieu data
         if (i == 15)break; //qua array cua data
         inforServer.thanhPham.arrayType[i + 1] = jsonBuffer["d"][i]["i"].as<uint16_t>();
         strlcpy(inforServer.thanhPham.arrayName[i + 1], jsonBuffer["d"][i]["n"], sizeof(inforServer.thanhPham.arrayName[i + 1]));
