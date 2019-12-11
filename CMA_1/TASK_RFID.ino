@@ -40,19 +40,16 @@ void TaskRFID( void * pvParameters ) {
   nano.set_reset_reader(1000);
   TickType_t xLastWakeTime;
   xLastWakeTime = xTaskGetTickCount();
-  unsigned long lastTimeLED = 0;
-  boolean statusLED = true ;
+
   for (;;) {
     /*
        Chuyển task 24ms
     */
-    if ((xTaskGetTickCount() - lastTimeLED > 500) && (statusLED == false)) {
-      statusLED = true;
-         digitalWrite(pinLedGreen, statusLED);
-    }
+
     if (nano.check() == true) {
       myEPClength = sizeof(myEPC);
       if (nano.parseResponse(myEPC, myEPClength)) {
+        
         if (myEPC[0] == MaRo_RFID) {
           array_to_string(&myEPC[0], 12, Data_rfid.id_RFID); //0->12 5->7
           /*
@@ -63,6 +60,7 @@ void TaskRFID( void * pvParameters ) {
           if ( getSttKhuVuc() ==  sttKvSuaCaOUT ) {
             strncpy( Data_rfid.id_RFID_Old, Data_rfid.id_RFID, sizeof(Data_rfid.id_RFID));
             xQueueSend( Queue_RFID, &Data_rfid, xTicksToWait );
+            
           }
           else if (strcmp(Data_rfid.id_RFID, Data_rfid.id_RFID_Old) != 0) {
             strncpy( Data_rfid.id_RFID_Old, Data_rfid.id_RFID, sizeof(Data_rfid.id_RFID));
@@ -73,13 +71,12 @@ void TaskRFID( void * pvParameters ) {
         else if (myEPC[0] == MaNV_RFID) {
           array_to_string(&myEPC[0], 12, Data_rfid_nv.id_RFID);
           if (strcmp(Data_rfid_nv.id_RFID, Data_rfid_nv.id_RFID_Old) != 0) {
+            
             strncpy( Data_rfid_nv.id_RFID_Old, Data_rfid_nv.id_RFID, sizeof(Data_rfid_nv.id_RFID));
             xQueueSend( Queue_RFID_NV, &Data_rfid_nv, xTicksToWait );
           }
         }
-        statusLED = false;
-        digitalWrite(pinLedGreen, statusLED);
-        lastTimeLED = xTaskGetTickCount();
+
       }
     }
 

@@ -35,8 +35,8 @@
 #define pinAnalogPower 25
 
 #define pinBuzzer 4
-#define pinLedRed 5
-#define pinLedGreen 2
+#define pinLedRed 2
+#define pinLedGreen 5
 #define pinAnalogPower 25
 
 #define cheDoIN 1

@@ -95,6 +95,8 @@ void setup()
   pinMode(pinBuzzer, OUTPUT);
   pinMode(pinLedGreen, OUTPUT);
   pinMode(pinLedRed, OUTPUT);
+ digitalWrite(pinLedGreen, HIGH);
+  digitalWrite(pinLedRed, HIGH);
   /* Serial.println(statusPeripheral.wifi.statusConnectAP);
     Serial.println(statusPeripheral.mqtt.statusMqttConnect);
     Serial.println(statusPeripheral.mqtt.statusMqttConnect);

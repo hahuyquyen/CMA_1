@@ -133,7 +133,7 @@ void Check_button( void * pvParameters ) {
           Serial.print("POWER : ");
           Serial.print(powervalue);
           Serial.print(" Dien Ap : ");
-          Serial.print(map(powervalue, 0, 4096, 0, 5));
+          Serial.println(map(powervalue, 0, 4096, 0, 5));
 #endif
     }
   }
