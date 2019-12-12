@@ -30,6 +30,8 @@ struct statusPeripheralConf{
       boolean statusConnect;
       boolean statusGetAllFile;
     }sdCard={0,0,false,false};
+    int rssiWifi;
+    int powerValue;
 }statusPeripheral;
 
 struct timeServerConf{

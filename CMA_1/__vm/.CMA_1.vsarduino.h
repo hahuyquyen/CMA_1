@@ -109,7 +109,6 @@ typedef long pthread_cond_t;
 
 #include "CMA_1.ino"
 #include "MQTT.ino"
-#include "SPIFFS_save.ino"
 #include "SaveData.ino"
 #include "TASK_Can.ino"
 #include "TASK_RFID.ino"

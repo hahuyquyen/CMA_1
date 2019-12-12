@@ -216,6 +216,7 @@ void setup()
   mqttClient.setCredentials(WiFiConf.mqtt_user, WiFiConf.mqtt_pass);
   root_CMA = SD.open("/CMA");
   xLastWakeTimeLoop = xTaskGetTickCount();
+  statusPeripheral.rssiWifi=WiFi.RSSI();
 }
 /*
    Main Loop luÃ´n cháº¡y Core 1

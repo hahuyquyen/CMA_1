@@ -31,13 +31,11 @@
 #define buttonExitPin 39
 #define buttonErrorPin 0
 #define pinPower 32
-#define pinReadPower 33
-#define pinAnalogPower 25
+#define pinReadPower 25
 
 #define pinBuzzer 4
 #define pinLedRed 2
 #define pinLedGreen 5
-#define pinAnalogPower 25
 
 #define cheDoIN 1
 #define cheDoOut 2

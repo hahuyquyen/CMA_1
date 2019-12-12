@@ -43,24 +43,24 @@ void hienthiSetting(char* dataDisplay = NULL, char* dataUserDisplay = NULL) {
   }
   else u8g2.drawUTF8(((128 - (u8g2.getUTF8Width(dataUserDisplay))) / 2), 52, dataUserDisplay);
 }
-/*void hienthiRunning(char* dataUserDisplay) {
-  if (u8g2.getUTF8Width(dataUserDisplay) > 128) {
-    u8g2.drawUTF8(variLcdUpdate.numScroll, 48, dataUserDisplay);
-    variLcdUpdate.numScroll = variLcdUpdate.numScroll - 15 ;
-    if (abs(variLcdUpdate.numScroll) > u8g2.getUTF8Width(dataUserDisplay))variLcdUpdate.numScroll = 0;
-  }
-  else u8g2.drawUTF8(((128 - (u8g2.getUTF8Width(dataUserDisplay))) / 2), 48, dataUserDisplay);
-  }*/
+void hienthiInfor(){
+    u8g2.setCursor(((128 - (u8g2.getUTF8Width("Thông Tin"))) / 2), 16);
+    u8g2.print("Thông Tin");
+    u8g2.setCursor(((128 - (u8g2.getUTF8Width(WiFi.localIP().toString().c_str()))) / 2), 32);
+    u8g2.print(WiFi.localIP().toString().c_str());
+    u8g2.setCursor(((128 - (u8g2.getUTF8Width(WiFiConf.sta_ssid))) / 2), 48);
+    u8g2.print(WiFiConf.sta_ssid);
+}
+
 void LCD_thong_tin(uint8_t chedo_HT, Data_TH* Data_TH  , uint8_t daucham = 0) {
   u8g2.clearBuffer();
   u8g2.setFont(u8g2_font_unifont_t_vietnamese2);
+  char textTam[ 40 ];
   if (chedo_HT == 0) {
-
-    char rfidDisplay[10];
+    //char rfidDisplay[10];
     uint8_t vitri = 0;
-
-    memcpy(rfidDisplay, & Data_TH->id_RFID_NV[16], 8);
-    rfidDisplay[9] = '\0';
+    memcpy(textTam, & Data_TH->id_RFID_NV[16], 8);
+    textTam[9] = '\0';
     if ((Data_TH->id_RFID_NV[0] == 'x') && ( getSttKhuVuc() ==  sttKvSuaCaIN )) {
       vitri = 18;
       u8g2.setCursor(10, vitri);
@@ -70,16 +70,16 @@ void LCD_thong_tin(uint8_t chedo_HT, Data_TH* Data_TH  , uint8_t daucham = 0) {
       vitri = 18;
       u8g2.setCursor(10, vitri);
       u8g2.print(F("NV: "));
-      u8g2.print(rfidDisplay);
+      u8g2.print(textTam);
     }
-    memcpy(rfidDisplay, & Data_TH->id_RFID[16], 8);
-    rfidDisplay[9] = '\0';
+    memcpy(textTam, & Data_TH->id_RFID[16], 8);
+    textTam[9] = '\0';
     if (Data_TH->id_RFID[0] != 'x') {
       if (vitri == 18)vitri = 36;
       else vitri = 18;
       u8g2.setCursor(10, vitri);
       u8g2.print(F("Rổ: "));
-      u8g2.print(rfidDisplay);
+      u8g2.print(textTam);
     }
     if (vitri == 18) {
       vitri = 36;
@@ -94,19 +94,10 @@ void LCD_thong_tin(uint8_t chedo_HT, Data_TH* Data_TH  , uint8_t daucham = 0) {
   }
   else if (chedo_HT == 1) {
     LCD_print_KV(16);
-    u8g2.setCursor(2, 32);
-    u8g2.print(F("Chờ  "));
-    u8g2.setCursor(32, 32);
-    switch (daucham) {
-      case 0: u8g2.print(F("|")); break;
-      case 1: u8g2.print(F("/")); break;
-      case 2: u8g2.print(F("-")); break;
-      case 3: u8g2.print(F("\\")); break;
-      default: break;
-    }
-    u8g2.setCursor(50, 32);
-    u8g2.print(F("Kg: "));
-    u8g2.print(can_data);
+    
+    sprintf(textTam, "Kg: %.3lf", can_data);
+    u8g2.setCursor(((128 - (u8g2.getUTF8Width(textTam))) / 2), 32);
+    u8g2.print(textTam);
     u8g2.setCursor(2, 48);
     if (inforServer.giaiDoan.cheDoInOut == cheDoIN) {
       hienthiSetting(NULL, inforServer.nhaCC.arrayName[inforServer.nhaCC.userSelect]);
@@ -114,10 +105,18 @@ void LCD_thong_tin(uint8_t chedo_HT, Data_TH* Data_TH  , uint8_t daucham = 0) {
     else {
       hienthiSetting(NULL, inforServer.thanhPham.arrayName[inforServer.thanhPham.userSelect]);
     }
+    u8g2.setFont(u8g2_font_5x8_tr);
+   // char texttam[ 100 ];
+    sprintf(textTam, "%ddB SD:%s P:%d%%\n",statusPeripheral.rssiWifi,(statusPeripheral.sdCard.statusConnect == true) ?"ok":"fail",statusPeripheral.powerValue);
+    u8g2.setCursor(((128 - (u8g2.getUTF8Width(textTam))) / 2), 64);
+    u8g2.print(textTam);
   }
   else if (chedo_HT == 2) {
     char stringdem[] = "Chế Độ";
     hienthiSetting(stringdem, inforServer.nameCheDoInOut[inforServer.giaiDoan.cheDoInOut]);
+  }
+  else if (chedo_HT == 10) {
+    hienthiInfor();
   }
   else if (chedo_HT == 3) {
     char stringdem[] = "KHU VỰC CÂN";
@@ -201,9 +200,6 @@ void Display( void * pvParameters ) {
             digitalWrite(pinBuzzer, statusBuzzer);
           }
         }
-        /* if (xSemaphoreTake(xSignal_Display_check, 1)) {
-           timeoutDisplay = xTaskGetTickCount();
-          }*/
         if (xSemaphoreTake(xSignal_Display_checkdone, 1)) { //Che do IN qua timeout se tat
           variLcdUpdate.stateDisplayLCD = 1;
           statusBuzzer = false ;
@@ -241,7 +237,8 @@ void Display( void * pvParameters ) {
             }
             break;
           case 2:
-            variLcdUpdate.stateDisplayLCD = 4;
+            LCD_thong_tin(10, &Data_TH, daucham_lcd);
+            variLcdUpdate.stateDisplayLCD = 5;
             break;
           default: break;
         }
@@ -249,11 +246,20 @@ void Display( void * pvParameters ) {
       //////////////////////////////////////////////////////////////////
       case deviceSetting: ///////////////////////////////////////////////
         //////////////////////////////////////////////////////////////////
-        if ((xTaskGetTickCount() - lastBlinkLCD > 100) || variLcdUpdate.updateLCD ) {
-          variLcdUpdate.updateLCD = false;
-          lastBlinkLCD = xTaskGetTickCount();
-          LCD_thong_tin(stateMachine.bottonSelect + 2, &Data_TH, daucham_lcd);
-        }
+          switch (variLcdUpdate.stateDisplayLCD) {
+            case 1:
+                if ((xTaskGetTickCount() - lastBlinkLCD > 100) || variLcdUpdate.updateLCD ) {
+                  variLcdUpdate.updateLCD = false;
+                  lastBlinkLCD = xTaskGetTickCount();
+                  LCD_thong_tin(stateMachine.bottonSelect + 2, &Data_TH, daucham_lcd);
+                }
+              break;
+            case 2:
+              LCD_thong_tin(10, &Data_TH, daucham_lcd);
+              variLcdUpdate.stateDisplayLCD = 5;
+              break;
+            default: break;
+          }
         break;
       //////////////////////////////////////////////////////////////////
       case deviceTurnOff: /////////////////////////////////////////////
@@ -278,9 +284,13 @@ unsigned long getTimeSendHeapDebug = 0;
 void printDebugHeap() {
   if (xTaskGetTickCount() - getTimeSendHeapDebug > 15000) {
     getTimeSendHeapDebug = xTaskGetTickCount();
+    statusPeripheral.rssiWifi=WiFi.RSSI();
 #ifdef debug_UART
+    Serial.print (statusPeripheral.rssiWifi);
+    Serial.print (" - " );
     DateTime now = rtc.now();
     Serial.print (getSttKhuVuc());
+    Serial.print (" - " );
     printf("%lu , %d, Heap %d\n", (unsigned long )now.unixtime(), uxTaskGetStackHighWaterMark(NULL), ESP.getFreeHeap());
 #endif
   }

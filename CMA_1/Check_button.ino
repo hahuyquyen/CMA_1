@@ -1,3 +1,6 @@
+#include <driver/adc.h>
+
+
 EasyButton button_left(button_left_pin, 80, true);
 EasyButton button_right(button_right_pin, 80, true);
 EasyButton button_ok(button_ok_pin, 80, true);
@@ -9,7 +12,7 @@ EasyButton buttonPower(pinReadPower, 500, true);
 //////////////////////////////////////////////////////////////////
 void onPressedPower() {
  // if (xTaskGetTickCount() > 1000) {
-    Serial.println("Turn OFF");
+  //  Serial.println("Turn OFF");
     digitalWrite(pinPower, LOW);
     stateMachine.deviceStatus=deviceTurnOff;
     variLcdUpdate.updateLCD = true;
@@ -19,20 +22,30 @@ void onPressedPower() {
 ////// Button LEFT ///////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////
 void onPressed_left() {
-  if ((stateMachine.bottonSelect == 0) && (inforServer.giaiDoan.cheDoInOut > 0)) {
-    inforServer.changeData(false, &inforServer.giaiDoan.cheDoInOut);
+  if (stateMachine.deviceStatus == deviceSetting){
+        if ((stateMachine.bottonSelect == 0) && (inforServer.giaiDoan.cheDoInOut > 0)) {
+          inforServer.changeData(false, &inforServer.giaiDoan.cheDoInOut);
+        }
+        else if ((stateMachine.bottonSelect == 1) && (inforServer.giaiDoan.userSelect > 0)) {
+          inforServer.changeData(false, &inforServer.giaiDoan.userSelect);
+        }
+        else if ((stateMachine.bottonSelect == 2) && (inforServer.nhaCC.userSelect > 0)) {
+          inforServer.changeData(false, &inforServer.nhaCC.userSelect);
+        }
+        else if ((stateMachine.bottonSelect == 3) && (inforServer.thanhPham.userSelect > 0)) {
+          inforServer.changeData(false, &inforServer.thanhPham.userSelect);
+        }
+        variLcdUpdate.stateDisplayLCD = 1;
+        variLcdUpdate.numScroll = 0;
+        variLcdUpdate.updateLCD = true;
   }
-  else if ((stateMachine.bottonSelect == 1) && (inforServer.giaiDoan.userSelect > 0)) {
-    inforServer.changeData(false, &inforServer.giaiDoan.userSelect);
+  else if (stateMachine.deviceStatus == deviceRunning){
+    if (variLcdUpdate.stateDisplayLCD == 5){
+      variLcdUpdate.stateDisplayLCD = 1;
+    }
+    else    variLcdUpdate.stateDisplayLCD = 2;
+        
   }
-  else if ((stateMachine.bottonSelect == 2) && (inforServer.nhaCC.userSelect > 0)) {
-    inforServer.changeData(false, &inforServer.nhaCC.userSelect);
-  }
-  else if ((stateMachine.bottonSelect == 3) && (inforServer.thanhPham.userSelect > 0)) {
-    inforServer.changeData(false, &inforServer.thanhPham.userSelect);
-  }
-  variLcdUpdate.numScroll = 0;
-  variLcdUpdate.updateLCD = true;
 }
 //////////////////////////////////////////////////////////////////
 ////// Button RIGHT ///////////////////////////////////////////////
@@ -54,6 +67,7 @@ void onPressed_right() {
   else if ((stateMachine.bottonSelect == 3) && (inforServer.thanhPham.total > 0)) {
     inforServer.changeData(true, &inforServer.thanhPham.userSelect, inforServer.thanhPham.total);
   }
+  if (stateMachine.deviceStatus == deviceSetting){variLcdUpdate.stateDisplayLCD = 1; }
   variLcdUpdate.numScroll = 0;
   variLcdUpdate.updateLCD = true;
 }
@@ -74,6 +88,7 @@ void onPressed_ok() {
   if (stateMachine.bottonSelect > 4) {
     stateMachine.deviceStatus = deviceRunning;
   }
+  if (stateMachine.deviceStatus == deviceSetting){variLcdUpdate.stateDisplayLCD = 1; }
   variLcdUpdate.numScroll = 0;
   variLcdUpdate.updateLCD = true;
 }
@@ -83,9 +98,11 @@ void onPressed_ok() {
 void onPressedExit() {
   stateMachine.bottonSelect = 0 ;
   stateMachine.deviceStatus = deviceSetting;
+  
 #ifdef debug_UART
   Serial.println("onPressed_vitri");
 #endif
+if (stateMachine.deviceStatus == deviceSetting){variLcdUpdate.stateDisplayLCD = 1; }
 }
 //////////////////////////////////////////////////////////////////
 ////// Button Error ///////////////////////////////////////////////
@@ -94,6 +111,12 @@ void onPressedError() {
 #ifdef debug_UART
   Serial.println("onPressed");
 #endif
+  if (stateMachine.deviceStatus == deviceSetting){
+    if (variLcdUpdate.stateDisplayLCD == 5){
+      variLcdUpdate.stateDisplayLCD = 1;
+    }
+    else    variLcdUpdate.stateDisplayLCD = 2; 
+  }
 }
 //////////////////////////////////////////////////////////////////
 ////// Task Check Button /////////////////////////////////////////
@@ -115,35 +138,37 @@ void Check_button( void * pvParameters ) {
   pinMode(pinReadPower, INPUT_PULLUP);
   TickType_t xLastWakeTime;
   xLastWakeTime = xTaskGetTickCount();
-  pinMode(pinAnalogPower, INPUT);
+ // pinMode(pinAnalogPower, INPUT);
   unsigned long lastTimeReadADC = 0;
   int powervalue;
   while (digitalRead(pinReadPower) == LOW){
     Serial.println("Wait ");
     delay(50);
   }
+  statusPeripheral.powerValue= 200;
+  adc1_config_width(ADC_WIDTH_BIT_12);
+  adc1_config_channel_atten( ADC1_CHANNEL_5, ADC_ATTEN_11db );
   for (;;) {
     
     if (stateMachine.deviceStatus == deviceSetting) {
-      button_left.read();
+      
       button_right.read();
       button_ok.read();
     }
+    button_left.read();
     buttonExit.read();
     buttonError.read();
     buttonPower.read();
 
     vTaskDelayUntil(&xLastWakeTime, 50);
-    // vTaskDelayUntil(xTaskGetTickCount(),50);
-    // vTaskDelay(30);
-        if (xTaskGetTickCount() - lastTimeReadADC > 5000) {
+    if (xTaskGetTickCount() - lastTimeReadADC > 5000) {
           lastTimeReadADC = xTaskGetTickCount();
-          powervalue = analogRead(pinAnalogPower);
+          statusPeripheral.powerValue = adc1_get_raw( ADC1_CHANNEL_5);
+          statusPeripheral.powerValue = map(statusPeripheral.powerValue, 0, 4096, 0, 100);
 #ifdef debug_UART          
           Serial.print("POWER : ");
-          Serial.print(powervalue);
-          Serial.print(" Dien Ap : ");
-          Serial.println(map(powervalue, 0, 4096, 0, 5));
+          Serial.print(statusPeripheral.powerValue);
+          Serial.println(" %");
 #endif
     }
   }
