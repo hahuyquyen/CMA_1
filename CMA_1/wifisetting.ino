@@ -4,6 +4,19 @@
   https://demo-dijiudu.readthedocs.io/en/latest/api-guides/wifi.html
   [AsyncTCP.cpp:953] _poll(): 0x3ffe16e0 != 0x3ffe2678
 */
+//////////////////////////////////////
+// GEt RSSI Theo Name Wifi//////////////
+/////////////////////////////////////////
+int32_t getRSSI(const char* target_ssid) {
+  byte available_networks = WiFi.scanNetworks();
+
+  for (int network = 0; network < available_networks; network++) {
+    if (strcmp(WiFi.SSID(network).c_str(), target_ssid) == 0) {
+      return WiFi.RSSI(network);
+    }
+  }
+  return 0;
+}
 //////////////////////////////////////////////////////////////////
 ////// even wifi mat ket noi ////////////////////////////
 //////////////////////////////////////////////////////////////////

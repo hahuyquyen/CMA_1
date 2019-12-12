@@ -140,6 +140,7 @@ void Check_button( void * pvParameters ) {
   xLastWakeTime = xTaskGetTickCount();
  // pinMode(pinAnalogPower, INPUT);
   unsigned long lastTimeReadADC = 0;
+  unsigned long lastTimeGetRSSI = 0;
   int powervalue;
   while (digitalRead(pinReadPower) == LOW){
     Serial.println("Wait ");
@@ -171,6 +172,11 @@ void Check_button( void * pvParameters ) {
           Serial.println(" %");
 #endif
     }
+     if (xTaskGetTickCount() - lastTimeGetRSSI > 30000) {
+          lastTimeGetRSSI = xTaskGetTickCount();
+        if (statusPeripheral.wifi.statusConnectAP == false) statusPeripheral.rssiWifi=getRSSI(WiFiConf.sta_ssid); //ham nay thuc hien lau nen chi khi mat ket noi moi do
+        else statusPeripheral.rssiWifi=WiFi.RSSI();
+     }
   }
   vTaskDelete(NULL) ;
 }

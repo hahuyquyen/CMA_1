@@ -94,7 +94,6 @@ void LCD_thong_tin(uint8_t chedo_HT, Data_TH* Data_TH  , uint8_t daucham = 0) {
   }
   else if (chedo_HT == 1) {
     LCD_print_KV(16);
-    
     sprintf(textTam, "Kg: %.3lf", can_data);
     u8g2.setCursor(((128 - (u8g2.getUTF8Width(textTam))) / 2), 32);
     u8g2.print(textTam);
@@ -106,7 +105,6 @@ void LCD_thong_tin(uint8_t chedo_HT, Data_TH* Data_TH  , uint8_t daucham = 0) {
       hienthiSetting(NULL, inforServer.thanhPham.arrayName[inforServer.thanhPham.userSelect]);
     }
     u8g2.setFont(u8g2_font_5x8_tr);
-   // char texttam[ 100 ];
     sprintf(textTam, "%ddB SD:%s P:%d%%\n",statusPeripheral.rssiWifi,(statusPeripheral.sdCard.statusConnect == true) ?"ok":"fail",statusPeripheral.powerValue);
     u8g2.setCursor(((128 - (u8g2.getUTF8Width(textTam))) / 2), 64);
     u8g2.print(textTam);
@@ -150,7 +148,6 @@ void LCD_thong_tin(uint8_t chedo_HT, Data_TH* Data_TH  , uint8_t daucham = 0) {
 void Display( void * pvParameters ) {
   boolean status_led = true;
   Data_TH Data_TH;
-
   unsigned long lastTimeBlinkLed = 0;
   unsigned long timeoutDisplay = 0;
   //  unsigned long timeoutLcdLangDaIn = 0;
@@ -230,8 +227,8 @@ void Display( void * pvParameters ) {
             break;
           case 1:
             if (xTaskGetTickCount() - lastBlinkLCD > 150) {
-              daucham_lcd ++ ;
-              if (daucham_lcd > 3)daucham_lcd = 0;
+            //  daucham_lcd ++ ;
+             // if (daucham_lcd > 3)daucham_lcd = 0;
               lastBlinkLCD = xTaskGetTickCount();
               LCD_thong_tin(1, &Data_TH, daucham_lcd);
             }
@@ -284,7 +281,7 @@ unsigned long getTimeSendHeapDebug = 0;
 void printDebugHeap() {
   if (xTaskGetTickCount() - getTimeSendHeapDebug > 15000) {
     getTimeSendHeapDebug = xTaskGetTickCount();
-    statusPeripheral.rssiWifi=WiFi.RSSI();
+
 #ifdef debug_UART
     Serial.print (statusPeripheral.rssiWifi);
     Serial.print (" - " );
