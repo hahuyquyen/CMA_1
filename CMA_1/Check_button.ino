@@ -172,7 +172,7 @@ void Check_button( void * pvParameters ) {
           Serial.println(" %");
 #endif
     }
-     if (xTaskGetTickCount() - lastTimeGetRSSI > 30000) {
+     if ((xTaskGetTickCount() - lastTimeGetRSSI > 30000)||(lastTimeGetRSSI==0)) {
           lastTimeGetRSSI = xTaskGetTickCount();
         if (statusPeripheral.wifi.statusConnectAP == false) statusPeripheral.rssiWifi=getRSSI(WiFiConf.sta_ssid); //ham nay thuc hien lau nen chi khi mat ket noi moi do
         else statusPeripheral.rssiWifi=WiFi.RSSI();
