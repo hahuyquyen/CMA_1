@@ -13,7 +13,7 @@ struct statusPeripheralConf{
     struct mqttConf{
       unsigned long lastTimeGetDataConfig; 
       unsigned long  timeTruyenMQTT;
-      unsigned long  lastTimeGetTimeStamp;
+      
       boolean statusMqttConnect ;  
     }mqtt={0,1000,false};
     struct wifiConf{
@@ -24,7 +24,8 @@ struct statusPeripheralConf{
     }wifi ={false,0,0,true};
     struct rtcConf{
       boolean statusConnect;
-    }RTC={false};    
+      unsigned long  lastTimeGetTimeStamp;
+    }RTC={false,0};    
     struct sdCardConf{
       unsigned long lastTimeReadEnd;
       unsigned long lastTimeReInit;

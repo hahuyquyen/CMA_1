@@ -281,8 +281,8 @@ void loop()
         checkSendMQTTConfig();
       }
     }
-    if (xTaskGetTickCount() - statusPeripheral.mqtt.lastTimeGetTimeStamp > 1000) {
-        statusPeripheral.mqtt.lastTimeGetTimeStamp = xTaskGetTickCount();
+    if (xTaskGetTickCount() - statusPeripheral.RTC.lastTimeGetTimeStamp > 1000) {
+        statusPeripheral.RTC.lastTimeGetTimeStamp = xTaskGetTickCount();
         timeStamp = rtc.now();
      }
 }
