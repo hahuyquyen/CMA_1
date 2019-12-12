@@ -20,5 +20,9 @@ uint8_t getSttKhuVuc(){
 ////// Save Time to RTC ////////////////////////////
 //////////////////////////////////////////////////////////////////
 void set_RTC(uint32_t timestampSave){
+#ifdef debug_UART
+    Serial.println("Write RTC Time : ");
+    Serial.println(timestampSave);
+#endif
   rtc.adjust(DateTime(timestampSave));
 }

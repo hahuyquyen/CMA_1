@@ -30,8 +30,8 @@ void TaskRFID( void * pvParameters ) {
   Data_RFID Data_rfid_nv;
   RFID nano;
   const TickType_t xTicksToWait = pdMS_TO_TICKS(1);
-  Serial2.begin(9600);
-  nano.begin(Serial2);
+  SerialRFID.begin(9600);
+  nano.begin(SerialRFID);
   nano.set_mode_timming(2, 1000); // Set mode eprom 0x70, mode timming
   nano.set_timing_message(0x05, 1000); //0x00 -> 0x64
   nano.set_power(0x34, 1000); // 00 -> 95

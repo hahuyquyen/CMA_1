@@ -285,10 +285,10 @@ void printDebugHeap() {
 #ifdef debug_UART
     Serial.print (statusPeripheral.rssiWifi);
     Serial.print (" - " );
-    DateTime now = rtc.now();
+   // DateTime now = rtc.now();
     Serial.print (getSttKhuVuc());
     Serial.print (" - " );
-    printf("%lu , %d, Heap %d\n", (unsigned long )now.unixtime(), uxTaskGetStackHighWaterMark(NULL), ESP.getFreeHeap());
+    printf("%lu , %d, Heap %d\n", (unsigned long )timeStamp.unixtime(), uxTaskGetStackHighWaterMark(NULL), ESP.getFreeHeap());
 #endif
   }
 }

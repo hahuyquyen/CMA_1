@@ -1,4 +1,7 @@
 #define debug_UART true
+
+#define SerialCan Serial1
+#define SerialRFID Serial2
 #define WIFI_CONF_FORMAT {0, 0, 0, 1}
 #define WIFI_CONF_START 0
 

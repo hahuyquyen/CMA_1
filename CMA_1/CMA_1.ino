@@ -23,6 +23,7 @@ extern "C" {
 
 // RTC
 RTC_DS3231 rtc;
+DateTime timeStamp;
 //LCD
 U8G2_ST7920_128X64_F_HW_SPI u8g2(U8G2_R2,/*CS=*/ U8X8_PIN_NONE,/*CS=*/ U8X8_PIN_NONE);
 //SD CArd
@@ -59,13 +60,15 @@ void printProgress(size_t prg, size_t sz) {
 //////////////////////////////////////////////////////////////////
 ////// Khoi tao gia trị mac dinh ////////////////////////////
 //////////////////////////////////////////////////////////////////
-void khoiTaoGiaTri() {
+void khoiTaoGiaTri(boolean firstTime = true) {
+  if (firstTime){
   inforServer.mqttConfig.setTopicACK(( unsigned long )stateMachine.idDevice);
   inforServer.mqttConfig.setTopicGetConfig(( unsigned long )stateMachine.idDevice);
 #ifdef debug_UART
   Serial.println(inforServer.mqttConfig.topicGetStatusACK); 
   Serial.println(inforServer.mqttConfig.topicGetConfig);
 #endif
+  }
   // inforServer.copyData(inforServer.thanhPham.arrayName[0], ramChoDuLieu);
   // inforServer.copyData(inforServer.nhaCC.arrayName[0], ramChoDuLieu);
   // inforServer.copyData(inforServer.giaiDoan.arrayName[0], ramChoDuLieu);
@@ -147,6 +150,7 @@ void setup()
     Serial.println(F("Couldn't find RTC"));
 #endif
   }
+  else rtc.writeSqwPinMode(DS3231_OFF);
 #ifdef using_sta
   wifi_connect(0, WIFI_STA, WiFiConf.sta_ssid, WiFiConf.sta_pwd, WiFiConf.ap_ssid);
 #else
@@ -277,6 +281,10 @@ void loop()
         checkSendMQTTConfig();
       }
     }
+    if (xTaskGetTickCount() - statusPeripheral.mqtt.lastTimeGetTimeStamp > 1000) {
+        statusPeripheral.mqtt.lastTimeGetTimeStamp = xTaskGetTickCount();
+        timeStamp = rtc.now();
+     }
 }
 
 /////////////////////////////////////////////////

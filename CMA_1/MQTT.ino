@@ -28,7 +28,7 @@ void connectToMqtt() {
 ////// Send MQTT ///////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////
 void truyen_mqtt() {
-  DateTime now = rtc.now();
+  //DateTime now = rtc.now();
   StaticJsonDocument<500> doc;
   doc["k"] = inforServer.giaiDoan.cheDoInOut;
   doc["x"] = inforServer.giaiDoan.arrayType[inforServer.giaiDoan.userSelect];
@@ -36,18 +36,22 @@ void truyen_mqtt() {
   doc["e"] = datatruyen_mqtt.id_RFID_NV;
   doc["s"] = (unsigned long) stateMachine.idDevice;
   doc["w"] = datatruyen_mqtt.data_weight;
-  doc["t"] = now.unixtime();
+  doc["t"] = timeStamp.unixtime();
   doc["c"] = inforServer.nhaCC.arrayType[inforServer.nhaCC.userSelect];
   doc["p"] = inforServer.thanhPham.arrayType[inforServer.thanhPham.userSelect];
   char buffer[500];
   serializeJson(doc, buffer);
   char textToWrite[ 16 ];
-  sprintf(textToWrite, "/CMA/%lu", ( unsigned long )now.unixtime());
+  sprintf(textToWrite, "/CMA/%lu", ( unsigned long )timeStamp.unixtime());
   writeFile(SD, textToWrite, buffer);
+#ifdef debug_UART
+  Serial.print("Send MQTT: ");
+  Serial.println(buffer);
+#endif
   if (statusPeripheral.mqtt.statusMqttConnect) {
     mqttClient.publish("/data", 0, true, buffer);
   }
-
+  
 }
 //////////////////////////////////////////////////////////////////
 ////// Setting MQTT ///////////////////////////////////////////////

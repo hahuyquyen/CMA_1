@@ -122,11 +122,14 @@ void readFile(fs::FS &fs, const char * path, uint32_t len) {
   while (file.available())msg1[num_ ++] = file.read();
   msg1[num_] = '\0';
   file.close();
+#ifdef debug_UART
+    Serial.print("Send MQTT SDCARD : ");
+    Serial.println(msg1);
+#endif
   if (statusPeripheral.mqtt.statusMqttConnect) {
     mqttClient.publish("/data", 0, true, msg1);
   }
   free(msg1);
-
 }
 //////////////////////////////////////////////////////////////////
 ////// Write SD and send MQTT ////////////////////////////////////

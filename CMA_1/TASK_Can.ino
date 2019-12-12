@@ -5,18 +5,15 @@ static double can_data = 0;
 //////////////////////////////////////////////////////////////////
 void TaskCAN( void * pvParameters ) {
   const TickType_t xTicksToWait = pdMS_TO_TICKS(1);
-  Serial1.begin(9600, SERIAL_8N1, 26, 12); //12 tx 13 lÃ  rx(bau,se,rx,tx)
+  SerialCan.begin(9600, SERIAL_8N1, 26, 12); //12 tx 13 lÃ  rx(bau,se,rx,tx)
   static Data_CAN Data_CAN;
   int tam = 0;
   unsigned long lastTimeSendCan = 0;
   TickType_t xLastWakeTime;
   xLastWakeTime = xTaskGetTickCount();
-  // Initialise the xLastWakeTime variable with the current time.
-
   for (;;) {
-    if (Serial1.available()) {
-      uint8_t incomingData = Serial1.read();
-
+    if (SerialCan.available()) {
+      uint8_t incomingData = SerialCan.read();
       if ( incomingData == canStartByte) {
         tam = 0;
       }
@@ -41,15 +38,7 @@ void TaskCAN( void * pvParameters ) {
         if (tam > 10)tam = 0;
       }
     }
-    // vTaskDelay(15);
-
     vTaskDelayUntil(&xLastWakeTime, 25);
-    //  vTaskDelay(5000);
-    //  printf("Task CAN StackHigh %d, Free Heap = %d\n",uxTaskGetStackHighWaterMark(NULL),ESP.getFreeHeap());
-    /*
-      Hien thi thong tin cua stack de chinh bo nho
-      task nay can  2048 bo nho stack -> chỉnh 3072 dư 50%
-    */
   }
   vTaskDelete(NULL) ;
 }

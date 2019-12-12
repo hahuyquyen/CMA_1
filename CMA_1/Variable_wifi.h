@@ -8,10 +8,12 @@ const char ramChoDuLieu[] = "Chờ Dữ Liệu"; // dung can lây FPSTR(ramChoDu
 const char ramChuaChon[] = "Chưa Chọn";
 const uint8_t wifi_conf_format[] = WIFI_CONF_FORMAT;
 TickType_t xLastWakeTimeLoop;
+
 struct statusPeripheralConf{
     struct mqttConf{
       unsigned long lastTimeGetDataConfig; 
       unsigned long  timeTruyenMQTT;
+      unsigned long  lastTimeGetTimeStamp;
       boolean statusMqttConnect ;  
     }mqtt={0,1000,false};
     struct wifiConf{
@@ -32,6 +34,7 @@ struct statusPeripheralConf{
     }sdCard={0,0,false,false};
     int rssiWifi;
     int powerValue;
+    
 }statusPeripheral;
 
 struct timeServerConf{

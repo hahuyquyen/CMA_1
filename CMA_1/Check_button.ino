@@ -1,11 +1,11 @@
 #include <driver/adc.h>
 
 
-EasyButton button_left(button_left_pin, 80, true);
-EasyButton button_right(button_right_pin, 80, true);
-EasyButton button_ok(button_ok_pin, 80, true);
-EasyButton buttonExit(buttonExitPin, 80, true);
-EasyButton buttonError(buttonErrorPin, 80, true);
+EasyButton button_left(button_left_pin, 50, true);
+EasyButton button_right(button_right_pin, 50, true);
+EasyButton button_ok(button_ok_pin, 50, true);
+EasyButton buttonExit(buttonExitPin, 50, true);
+EasyButton buttonError(buttonErrorPin, 50, true);
 EasyButton buttonPower(pinReadPower, 500, true);
 //////////////////////////////////////////////////////////////////
 ////// Button POWER ///////////////////////////////////////////////
@@ -102,7 +102,12 @@ void onPressedExit() {
 #ifdef debug_UART
   Serial.println("onPressed_vitri");
 #endif
-if (stateMachine.deviceStatus == deviceSetting){variLcdUpdate.stateDisplayLCD = 1; }
+////////////////////////////////////////////////
+//b Reset de nhan cac thong so lai /////////////
+///////////////////////////////////////////////
+
+  khoiTaoGiaTri(false);
+  if (stateMachine.deviceStatus == deviceSetting){variLcdUpdate.stateDisplayLCD = 1; }
 }
 //////////////////////////////////////////////////////////////////
 ////// Button Error ///////////////////////////////////////////////
@@ -143,7 +148,9 @@ void Check_button( void * pvParameters ) {
   unsigned long lastTimeGetRSSI = 0;
   int powervalue;
   while (digitalRead(pinReadPower) == LOW){
+#ifdef debug_UART    
     Serial.println("Wait ");
+#endif
     delay(50);
   }
   statusPeripheral.powerValue= 200;
@@ -162,6 +169,9 @@ void Check_button( void * pvParameters ) {
     buttonPower.read();
 
     vTaskDelayUntil(&xLastWakeTime, 50);
+///////////////////////////////////////
+// 5s get Power 1 lan ////////////////
+ //////////////////////////////////////
     if (xTaskGetTickCount() - lastTimeReadADC > 5000) {
           lastTimeReadADC = xTaskGetTickCount();
           statusPeripheral.powerValue = adc1_get_raw( ADC1_CHANNEL_5);
@@ -172,6 +182,9 @@ void Check_button( void * pvParameters ) {
           Serial.println(" %");
 #endif
     }
+///////////////////////////////////
+//////// 30s get RSSI ////////////
+/////////////////////////////////
      if ((xTaskGetTickCount() - lastTimeGetRSSI > 30000)||(lastTimeGetRSSI==0)) {
           lastTimeGetRSSI = xTaskGetTickCount();
         if (statusPeripheral.wifi.statusConnectAP == false) statusPeripheral.rssiWifi=getRSSI(WiFiConf.sta_ssid); //ham nay thuc hien lau nen chi khi mat ket noi moi do
