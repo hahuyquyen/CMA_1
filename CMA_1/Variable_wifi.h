@@ -13,7 +13,6 @@ struct statusPeripheralConf{
     struct mqttConf{
       unsigned long lastTimeGetDataConfig; 
       unsigned long  timeTruyenMQTT;
-      
       boolean statusMqttConnect ;  
     }mqtt={0,1000,false};
     struct wifiConf{

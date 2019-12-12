@@ -220,7 +220,6 @@ void setup()
   mqttClient.setCredentials(WiFiConf.mqtt_user, WiFiConf.mqtt_pass);
   root_CMA = SD.open("/CMA");
   xLastWakeTimeLoop = xTaskGetTickCount();
-  statusPeripheral.rssiWifi=WiFi.RSSI();
 }
 /*
    Main Loop luÃ´n cháº¡y Core 1
@@ -311,3 +310,11 @@ void checkSendMQTTConfig() {
       sendMQTTConfig(3, inforServer.giaiDoan.arrayType[inforServer.giaiDoan.userSelect]);
     }
 }
+
+/*
+Wire.setClock(400000);  Cai Clock cho RTC
+mac dinh RTC chỉ 100000khz
+
+
+ 
+ */

@@ -124,7 +124,6 @@ void setupWiFiConf(void) {
     //if (request->hasParam(F("chooseinout"), true)) {request->getParam(F("chooseinout"), true)->value().toCharArray(WiFiConf.mqtt_choose_inout, sizeof(WiFiConf.mqtt_choose_inout));}
     if (saveWiFiConf())request->send(200, F("text/plain"), F("OK BABY"));
     else request->send(200, F("text/plain"), F("Fail Save EEPROM"));
-
   });
   server.on("/set_id", HTTP_POST, [](AsyncWebServerRequest * request) {
     if (request->hasParam("id", true)) {
