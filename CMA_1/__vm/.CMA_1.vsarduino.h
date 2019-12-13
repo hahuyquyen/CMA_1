@@ -108,7 +108,9 @@ typedef long pthread_cond_t;
 #define noInterrupts() cli()
 
 #include "CMA_1.ino"
+#include "Check_button.ino"
 #include "MQTT.ino"
+#include "SDCARD.ino"
 #include "SaveData.ino"
 #include "TASK_Can.ino"
 #include "TASK_RFID.ino"

@@ -54,11 +54,17 @@ static struct stateMachineConf {
   uint8_t bottonSelect;
   uint8_t deviceStatus;
   uint32_t idDevice;
-  
+  uint8_t powerRFID;
+  void getPowerRFID(){
+    this->powerRFID=EEPROM.readUInt(810);
+  }
   void getIdControl(){
     this->idDevice=EEPROM.readUInt(800);
   }
-  
+  void setPowerRFID(){
+    EEPROM.write(810, this->powerRFID);
+    EEPROM.commit();
+  }  
   void setIdControl(){
     EEPROM.writeUInt(800, this->idDevice);
     EEPROM.commit();

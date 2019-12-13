@@ -102,6 +102,14 @@ void setupWiFiConf(void) {
     }
     request->send(200, F("text/plain"), F("OK ...."));
   });
+  server.on("/set_powerRF", HTTP_GET, [](AsyncWebServerRequest * request) {
+    if (request->hasParam(F("power"))) {
+      stateMachine.powerRFID = request->getParam(F("power"))->value().toInt();
+      stateMachine.setPowerRFID();
+      Serial.println(stateMachine.powerRFID, HEX);
+    }
+    request->send(200, F("text/plain"), F("OK ...."));
+  });
   server.on("/set_wifi_conf", HTTP_POST, [](AsyncWebServerRequest * request) {
     if (request->hasParam(F("html_ssid"), true)) {
       request->getParam(F("html_ssid"), true)->value().toCharArray(WiFiConf.sta_ssid, sizeof(WiFiConf.sta_ssid));

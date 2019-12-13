@@ -136,6 +136,8 @@ void RFID::sendCommand(uint16_t timeOut, boolean waitForResponse)
     if ( _RFIDSERIAL->available())
     {
       msg[spot] = _RFIDSERIAL->read();
+      //    Serial.print(msg[spot],HEX);
+   // Serial.print("-");
       spot++;
       if (spot == 2) messageLength = msg[1] + 2; 
       else if (spot == MAX_MSG_SIZE) {return;} // Chống tràn bộ nhớ gây reset

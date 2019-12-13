@@ -1,5 +1,6 @@
 
 extern "C" {
+//#include <dummy.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/timers.h"
 }
@@ -37,12 +38,74 @@ WiFiClient espClient;
 
 //display_NV Display_NV;
 Data_TH datatruyen_mqtt;
+/*
+SaveData
+*/
+bool loadWiFiConf();
+bool saveWiFiConf(void);
+/*
+Button
+*/
+void onPressed_left();
+void onPressed_ok();
+void onPressed_right();
+void onPressedError();
+void onPressedExit();
+void onPressedPower();
+/*
+functions
+*/
+uint8_t getSttKhuVuc();
+void set_RTC(uint32_t timestampSave);
+/*
+MQTT
+*/
+void connectToMqtt();
+void onMqttConnect(bool sessionPresent);
+void onMqttDisconnect(AsyncMqttClientDisconnectReason reason);
+void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties properties, size_t len, size_t index, size_t total);
+void onMqttPublish(uint16_t packetId);
+void onMqttSubscribe(uint16_t packetId, uint8_t qos);
+void onMqttSubscribe(uint16_t packetId, uint8_t qos);
+void onMqttUnsubscribe(uint16_t packetId);
+/*
+SD Card
+*/
+void checkNextFile(File* fileMaster);
+void reInitSD(File* masterFile);
+void readFile(fs::FS& fs, const char* path, uint32_t len);
+void renameFile(fs::FS& fs, const char* path1, const char* path2);
+void reOpenFolder();
+void writeFile(fs::FS& fs, const char* path, const char* message);
+void deleteFile(fs::FS& fs, const char* path);
+/*
+File webserver
+*/
+void handleDoUpdate(AsyncWebServerRequest* request, const String& filename, size_t index, uint8_t* data, size_t len, bool final);
+String processor(const String& var);
+void setupWiFiConf(void);
+/*
+trong File WifiSetting
+*/
+void WiFiEvent(WiFiEvent_t event);
+void wifigotip();
+void wifiOnDisconnect(WiFiEventInfo_t info);
+void parseBytes1(const char* str, char sep, int address, int maxBytes, int base);
+void wifi_connect(byte _mode, wifi_mode_t wifi_mode, char* ssid, char* password, char* ap_ssid);
+void wifi_staticip(char* ip_in, char* gateway_in, char* subnet_in);
+int32_t getRSSI(const char* target_ssid);
 
+
+
+
+
+
+void Check_button(void* pvParameters);
 void TaskRFID( void * pvParameters );
 void TaskCAN( void * pvParameters );
 void Display( void * pvParameters );
 void http_re( void * pvParameters );
-void callback_mqtt(char* topic, byte* payload, unsigned int length) ;
+//void callback_mqtt(char* topic, byte* payload, unsigned int length) ;
 //boolean reconnect_mqtt();
 //bool loadWiFiConf();
 //void wifi_staticip(char *ip_in, char* gateway_in, char* subnet_in);
@@ -118,6 +181,8 @@ void setup()
   //Get ID device
   EEPROM.begin(1024);
   stateMachine.getIdControl();
+  stateMachine.getPowerRFID();
+  Serial.println(stateMachine.powerRFID, HEX);
 #ifdef debug_UART
   Serial.print("ID Device : ");
   Serial.println( stateMachine.idDevice);
@@ -133,6 +198,7 @@ void setup()
 #endif
   }
   //SD CArd
+
   SDSPI.begin(14, 27, 13, 15); ///SCK,MISO,MOSI,ss
   if (!SD.begin(15, SDSPI, 10000000)) {
 #ifdef debug_UART

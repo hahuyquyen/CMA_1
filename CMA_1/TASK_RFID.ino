@@ -34,13 +34,13 @@ void TaskRFID( void * pvParameters ) {
   nano.begin(SerialRFID);
   nano.set_mode_timming(2, 1000); // Set mode eprom 0x70, mode timming
   nano.set_timing_message(0x05, 1000); //0x00 -> 0x64
-  nano.set_power(0x34, 1000); // 00 -> 95
+  nano.set_power(stateMachine.powerRFID, 1000); // 00 -> 95
   nano.set_out_mode(1, 1000);
   nano.set_time_ner(0x05, 1000); // tna so gui 1->255s
   nano.set_reset_reader(1000);
   TickType_t xLastWakeTime;
   xLastWakeTime = xTaskGetTickCount();
-
+  Serial.println(stateMachine.powerRFID, HEX);
   for (;;) {
     /*
        Chuyển task 24ms
@@ -49,7 +49,8 @@ void TaskRFID( void * pvParameters ) {
     if (nano.check() == true) {
       myEPClength = sizeof(myEPC);
       if (nano.parseResponse(myEPC, myEPClength)) {
-        
+        Serial.print("Ma RFID : ");
+        Serial.println(myEPC);
         if (myEPC[0] == MaRo_RFID) {
           array_to_string(&myEPC[0], 12, Data_rfid.id_RFID); //0->12 5->7
           /*
