@@ -62,9 +62,9 @@ void checkNextFile(File* fileMaster){
     if (file) {
         if (!file.isDirectory()) {
             if (file.name()[5] == 'O') { //delete
-                Serial.print("delete file ");
-                Serial.println(file.name());
-                deleteFile(SD, file.name());
+              //  Serial.print("delete file ");
+             //   Serial.println(file.name());
+            //    deleteFile(SD, file.name());
             }
             else readFile(SD, file.name(), file.size());
         }

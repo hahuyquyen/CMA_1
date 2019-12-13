@@ -24,5 +24,14 @@ void set_RTC(uint32_t timestampSave){
     Serial.println("Write RTC Time : ");
     Serial.println(timestampSave);
 #endif
+  uint32_t tam = (timestampSave > timeStamp.unixtime()) ? (timestampSave - timeStamp.unixtime()):(timeStamp.unixtime() - timestampSave );
+  if (tam > 1800){
   rtc.adjust(DateTime(timestampSave));
+   Serial.print("Set TimeStamp: ");
+    Serial.println(tam);
+  }
+  else {
+    Serial.print("Khong set TimeStamp: ");
+    Serial.println(tam);
+  }
 }

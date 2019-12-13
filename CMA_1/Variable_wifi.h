@@ -34,7 +34,7 @@ struct statusPeripheralConf{
     }sdCard={0,0,false,false};
     int rssiWifi;
     int powerValue;
-    
+    uint32_t timeStampServer;
 }statusPeripheral;
 
 struct timeServerConf{
