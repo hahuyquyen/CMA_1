@@ -50,7 +50,10 @@ void TaskRFID( void * pvParameters ) {
       myEPClength = sizeof(myEPC);
       if (nano.parseResponse(myEPC, myEPClength)) {
         Serial.print("Ma RFID : ");
-        Serial.println(myEPC);
+        for (int kj=0;kj<12;kj++){
+        Serial.print(myEPC[kj]);
+        }
+        Serial.println("");
         if (myEPC[0] == MaRo_RFID) {
           array_to_string(&myEPC[0], 12, Data_rfid.id_RFID); //0->12 5->7
           /*
