@@ -49,7 +49,7 @@ void truyen_mqtt() {
   serializeJson(doc, msg1 , 500);
   char textToWrite[ 16 ];
   sprintf(textToWrite, "/CMA/%lu", ( unsigned long )timeStamp.unixtime());
-  writeFile(SD, textToWrite, msg1);
+  SdWriteFile(SD, textToWrite, msg1);
 #ifdef debug_UART
   Serial.print("Send MQTT: ");
   Serial.println(msg1);
@@ -169,8 +169,8 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
     sprintf(textEnd, "/CMA/O_%lu", ( unsigned long )sttData);
     char textBegin[ 18 ];
     sprintf(textBegin, "/CMA/%lu", ( unsigned long )sttData);
-    // if (statusSaveData == 1)deleteFile(SD,textToWrite); Thay doi tu delete toi rename.
-    if (statusSaveData == 1)renameFile(SD, textBegin, textEnd);
+    // if (statusSaveData == 1)SdDeleteFile(SD,textToWrite); Thay doi tu delete toi rename.
+    if (statusSaveData == 1)SdRenameFile(SD, textBegin, textEnd);
   }
   jsonBuffer.clear(); //giai phong bo nho
 }

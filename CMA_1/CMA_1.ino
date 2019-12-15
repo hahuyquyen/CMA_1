@@ -72,13 +72,13 @@ void onMqttUnsubscribe(uint16_t packetId);
 /*
 SD Card
 */
-void checkNextFile(File* fileMaster);
-void reInitSD(File* masterFile);
-void readFile(fs::FS& fs, const char* path, uint32_t len);
-void renameFile(fs::FS& fs, const char* path1, const char* path2);
-void reOpenFolder();
-void writeFile(fs::FS& fs, const char* path, const char* message);
-void deleteFile(fs::FS& fs, const char* path);
+void SdOpenNextFile(File* fileMaster);
+void SdReInit(File* masterFile);
+void SdReadFile(fs::FS& fs, const char* path, uint32_t len);
+void SdRenameFile(fs::FS& fs, const char* path1, const char* path2);
+void SdReOpenFolder();
+void SdWriteFile(fs::FS& fs, const char* path, const char* message);
+void SdDeleteFile(fs::FS& fs, const char* path);
 /*
 File webserver
 */
@@ -322,13 +322,13 @@ void loop()
     statusPeripheral.sdCard.lastTimeSendMQTT = xTaskGetTickCount();
     if ((statusPeripheral.sdCard.statusConnect == false)&& (xTaskGetTickCount() - statusPeripheral.sdCard.lastTimeReInit > 5000)) { // ReInit SD card
       statusPeripheral.sdCard.lastTimeReInit=xTaskGetTickCount();
-      reInitSD(&root_CMA);
+        SdReInit(&root_CMA);
     } 
     else if (statusPeripheral.sdCard.statusGetAllFile == false) {// open next file
-    checkNextFile(&root_CMA);
+        SdOpenNextFile(&root_CMA);
     }
     else if ((xTaskGetTickCount() - statusPeripheral.sdCard.lastTimeReadEnd > 3 * 6000 *100 ) && (statusPeripheral.sdCard.statusGetAllFile)) { //30 phut moi mo lai va
-        reOpenFolder();
+        SdReOpenFolder();
     }
   }
   
@@ -364,7 +364,7 @@ void SendDataConfigMqtt(uint8_t loaiconfig = 0 , uint8_t maboxung = 0) {
   }
 void checkSendMQTTConfig() {
     if (inforServer.nhaCC.total == 0) {
-      sendMQTTConfig(1, 0);
+       SendDataConfigMqtt(1, 0);
     }
     else if (inforServer.giaiDoan.total == 0) {
       SendDataConfigMqtt(2, 0);

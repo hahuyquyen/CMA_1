@@ -8,7 +8,7 @@
 
   Sữa
   if (card->base_path) {
-        err = esp_vfs_fat_unregister_path(card->base_path);
+        err = esp_vfs_fat_unregister_path(card->base_path);SdReOpenFolder
         free(card->base_path);
     }
     them dong free de xoa bo nho
@@ -20,7 +20,7 @@
 // Init SD card neu loi giua chung //////////////
 ////////////////////////////////////////////////
 //extern statusPeripheral;
-void reInitSD(File* masterFile){
+void SdReInit(File* masterFile){
       if (statusPeripheral.mqtt.timeTruyenMQTT == 1000) {
         masterFile->close();
       }
@@ -44,7 +44,7 @@ void reInitSD(File* masterFile){
 /////////////////////////////////////////////////
 // Mo lại Folder                   //////////////
 ////////////////////////////////////////////////
-void reOpenFolder(){
+void SdReOpenFolder(){
       statusPeripheral.sdCard.lastTimeReadEnd = xTaskGetTickCount();
       statusPeripheral.sdCard.statusGetAllFile = false;
       root_CMA = SD.open("/CMA");
@@ -58,16 +58,16 @@ void reOpenFolder(){
 /////////////////////////////////////////////////
 // Open Next File                   //////////////
 ////////////////////////////////////////////////
-void checkNextFile(File* fileMaster){
+void SdOpenNextFile(File* fileMaster){
     File file = fileMaster->openNextFile();
     if (file) {
         if (!file.isDirectory()) {
             if (file.name()[5] == 'O') { //delete
               //  Serial.print("delete file ");
              //   Serial.println(file.name());
-            //    deleteFile(SD, file.name());
+            //    SdDeleteFile(SD, file.name());
             }
-            else readFile(SD, file.name(), file.size());
+            else SdReadFile(SD, file.name(), file.size());
         }
     }
     else {
@@ -79,13 +79,13 @@ void checkNextFile(File* fileMaster){
 //////////////////////////////////////////////////////////////////
 ////// Delete file SD ///////////////////////////////////////
 //////////////////////////////////////////////////////////////////
-void deleteFile(fs::FS &fs, const char * path) {
+void SdDeleteFile(fs::FS &fs, const char * path) {
   fs.remove(path);
 }
 //////////////////////////////////////////////////////////////////
 ////// Rename File ///////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////
-/*void renameFile(fs::FS &fs, const char * path1, const char * path2){
+/*void SdRenameFile(fs::FS &fs, const char * path1, const char * path2){
     Serial.printf("Renaming file %s to %s\n", path1, path2);
     if (fs.rename(path1, path2)) {
         Serial.println("File renamed");
@@ -97,7 +97,7 @@ void deleteFile(fs::FS &fs, const char * path) {
 ////// rename //////////////////////////////////////
 //////////////////////////////////////////////////////////////////
 
-void renameFile(fs::FS &fs, const char * path1, const char * path2) {
+void SdRenameFile(fs::FS &fs, const char * path1, const char * path2) {
 #ifdef debug_UART
   Serial.printf("Rename %s to %s\n", path1, path2);
 #endif
@@ -111,7 +111,7 @@ void renameFile(fs::FS &fs, const char * path1, const char * path2) {
 //////////////////////////////////////////////////////////////////
 ////// Read SD and send MQTT //////////////////////////////////////
 //////////////////////////////////////////////////////////////////
-void readFile(fs::FS &fs, const char * path, uint32_t len) {
+void SdReadFile(fs::FS &fs, const char * path, uint32_t len) {
   //Serial.printf("Reading : %s , L %lu \n", path,( unsigned long )len);
   File file = fs.open(path);
   if (!file) {
@@ -136,7 +136,7 @@ void readFile(fs::FS &fs, const char * path, uint32_t len) {
 //////////////////////////////////////////////////////////////////
 ////// Write SD and send MQTT ////////////////////////////////////
 //////////////////////////////////////////////////////////////////
-void writeFile(fs::FS &fs, const char * path, const char * message) {
+void SdWriteFile(fs::FS &fs, const char * path, const char * message) {
   File file = fs.open(path, FILE_WRITE);
   if (!file) {
     statusPeripheral.sdCard.statusConnect = false;

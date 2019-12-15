@@ -25,7 +25,7 @@ struct DefaultAllocator {
 typedef BasicJsonDocument<DefaultAllocator> DynamicJsonDocument;
 */
 
-struct statusPeripheralConf{
+static struct statusPeripheralConf{
     struct mqttConf{
       unsigned long lastTimeGetDataConfig; 
       unsigned long  timeTruyenMQTT;
