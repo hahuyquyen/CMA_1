@@ -1,13 +1,10 @@
 
 *.xml
 *.db
-*.xml
 *.ipch
 *.xml
-*.xml
-*.db
-*.db
-*.db
 *.db
 *.d
 *.o
+##Bo Folder
+CMA_1\Debug/
