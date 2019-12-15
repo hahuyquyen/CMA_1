@@ -61,7 +61,7 @@ void SetTimeRtc(uint32_t timestampSave);
 MQTT
 */
 void SendDataMqtt(char* data);
-void connectToMqtt();
+void ConnectToMqtt();
 void onMqttConnect(bool sessionPresent);
 void onMqttDisconnect(AsyncMqttClientDisconnectReason reason);
 void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties properties, size_t len, size_t index, size_t total);
@@ -270,7 +270,7 @@ void setup()
     NULL,       /* Task handle. */
     1);  /* Core where the task should run */
   //MQTT
-  mqttReconnectTimer = xTimerCreate("mqttTimer", pdMS_TO_TICKS(2000), pdFALSE, (void*)0, reinterpret_cast<TimerCallbackFunction_t>(connectToMqtt));
+  mqttReconnectTimer = xTimerCreate("mqttTimer", pdMS_TO_TICKS(2000), pdFALSE, (void*)0, reinterpret_cast<TimerCallbackFunction_t>(ConnectToMqtt));
   mqttClient.onConnect(onMqttConnect);
   mqttClient.onDisconnect(onMqttDisconnect);
   mqttClient.onSubscribe(onMqttSubscribe);
@@ -311,8 +311,8 @@ void loop()
   /*
      truyen mqtt nếu không truyền thì sẽ kiểm tra thẻ nhớ đọc và gửi
   */
-  if (xQueueReceive( Queue_mqtt, &datatruyen_mqtt,  ( TickType_t ) 1 ) == pdPASS ) {
-    truyen_mqtt();
+  if (xQueueReceive( Queue_mqtt, &dataEncoderJsonMqtt,  ( TickType_t ) 1 ) == pdPASS ) {
+    EncoderJsonMqtt();
     statusPeripheral.sdCard.lastTimeSendMQTT = xTaskGetTickCount();
   }
   else if ((statusPeripheral.mqtt.statusMqttConnect) && ((xTaskGetTickCount() - statusPeripheral.sdCard.lastTimeSendMQTT > statusPeripheral.mqtt.timeTruyenMQTT))) {

@@ -25,13 +25,13 @@ void SendDataMqtt(char* data) {
         mqttClient.publish("/data", 0, true, data);
     }
 }
-void connectToMqtt() {
+void ConnectToMqtt() {
   mqttClient.connect();
 }
 //////////////////////////////////////////////////////////////////
 ////// Config data MQTT ///////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////
-void truyen_mqtt() {
+void EncoderJsonMqtt() {
   //DateTime now = rtc.now();
  // StaticJsonDocument<300> doc;
   DynamicJsonDocument doc(300);
