@@ -60,6 +60,7 @@ void set_RTC(uint32_t timestampSave);
 /*
 MQTT
 */
+void sendMQTT(char* data);
 void connectToMqtt();
 void onMqttConnect(bool sessionPresent);
 void onMqttDisconnect(AsyncMqttClientDisconnectReason reason);
@@ -105,14 +106,8 @@ void TaskRFID( void * pvParameters );
 void TaskCAN( void * pvParameters );
 void Display( void * pvParameters );
 void http_re( void * pvParameters );
-//void callback_mqtt(char* topic, byte* payload, unsigned int length) ;
-//boolean reconnect_mqtt();
-//bool loadWiFiConf();
-//void wifi_staticip(char *ip_in, char* gateway_in, char* subnet_in);
-//void wifi_connect(byte _mode = 0 ,wifi_mode_t wifi_mode = WIFI_AP,char *ssid = (char *)"",char *password = (char *)"",char *ap_ssid = (char *)"ESP AP");
-//void setupWiFiConf(void);
-//void setting_uart();
-//void WiFiEvent(WiFiEvent_t event);
+
+
 size_t content_len;
 void printProgress(size_t prg, size_t sz) {
 #ifdef debug_UART
@@ -346,6 +341,9 @@ void loop()
         checkSendMQTTConfig();
       }
     }
+    ///////////////////////////////////////////////////////////////////////
+    /// 1 giay nhan timestamp 1 lan ///////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////
     if (xTaskGetTickCount() - statusPeripheral.RTC.lastTimeGetTimeStamp > 1000) {
         statusPeripheral.RTC.lastTimeGetTimeStamp = xTaskGetTickCount();
         timeStamp = rtc.now();

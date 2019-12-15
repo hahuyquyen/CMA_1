@@ -114,19 +114,25 @@ static struct inforServerStruct {
   struct mqttConfigConf{
       char topicGetStatusACK[25];
       char topicGetConfig[25];
+      //char dataSend[300];
       void setTopicACK(unsigned long id_device){
         sprintf(this->topicGetStatusACK, "/data/ack/%lu", id_device) ;
       }
      void setTopicGetConfig(unsigned long id_device){
         sprintf(this->topicGetConfig, "/config/%lu", id_device) ;
       }
+
   }mqttConfig;
   void changeData(boolean chedo, uint8_t* userSelect, uint8_t totaldata=0){
     if (chedo) { *userSelect = (*userSelect > (totaldata - 1)) ? 0 : (*userSelect + 1);}
     else *userSelect = *userSelect - 1;
   }
-  
+  //char ssssssss[6533];
 } inforServer;
+/*
+Program size: 904,750 bytes (used 46% of a 1,966,080 byte maximum) (18.03 secs)
+Minimum Memory Usage: 48144 bytes (15% of a 327680 byte maximum)
+*/
 /////////////////////////////////////////////////////////////
 ///// Data wifi, server mqtt           //////////////////////
 ////////////////////////////////////////////////////////////

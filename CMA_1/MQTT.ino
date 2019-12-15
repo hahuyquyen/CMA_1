@@ -20,16 +20,20 @@
    t: Thời gian gửi,
   }
 */
-
+void sendMQTT(char* data) {
+    if (statusPeripheral.mqtt.statusMqttConnect) {
+        mqttClient.publish("/data", 0, true, data);
+    }
+}
 void connectToMqtt() {
   mqttClient.connect();
 }
 //////////////////////////////////////////////////////////////////
-////// Send MQTT ///////////////////////////////////////////////
+////// Config data MQTT ///////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////
 void truyen_mqtt() {
   //DateTime now = rtc.now();
-  StaticJsonDocument<500> doc;
+  StaticJsonDocument<300> doc;
   doc["k"] = inforServer.giaiDoan.cheDoInOut;
   doc["x"] = inforServer.giaiDoan.arrayType[inforServer.giaiDoan.userSelect];
   doc["b"] = datatruyen_mqtt.id_RFID;
@@ -39,18 +43,19 @@ void truyen_mqtt() {
   doc["t"] = timeStamp.unixtime();
   doc["c"] = inforServer.nhaCC.arrayType[inforServer.nhaCC.userSelect];
   doc["p"] = inforServer.thanhPham.arrayType[inforServer.thanhPham.userSelect];
-  char buffer[500];
-  serializeJson(doc, buffer);
+  //char buffer[500];
+  char* msg1 = (char*)calloc(500, 1);
+  serializeJson(doc, msg1 , 500);
   char textToWrite[ 16 ];
   sprintf(textToWrite, "/CMA/%lu", ( unsigned long )timeStamp.unixtime());
-  writeFile(SD, textToWrite, buffer);
+  writeFile(SD, textToWrite, msg1);
 #ifdef debug_UART
   Serial.print("Send MQTT: ");
-  Serial.println(buffer);
+  Serial.println(msg1);
 #endif
-  if (statusPeripheral.mqtt.statusMqttConnect) {
-    mqttClient.publish("/data", 0, true, buffer);
-  }
+  sendMQTT(msg1);
+  free(msg1);
+ // if (statusPeripheral.mqtt.statusMqttConnect) {sendMQTT(inforServer.mqttConfig.dataSend);}
   
 }
 //////////////////////////////////////////////////////////////////

@@ -19,6 +19,7 @@
 /////////////////////////////////////////////////
 // Init SD card neu loi giua chung //////////////
 ////////////////////////////////////////////////
+//extern statusPeripheral;
 void reInitSD(File* masterFile){
       if (statusPeripheral.mqtt.timeTruyenMQTT == 1000) {
         masterFile->close();
@@ -117,18 +118,19 @@ void readFile(fs::FS &fs, const char * path, uint32_t len) {
     statusPeripheral.sdCard.statusConnect = false;
     return;
   }
-  char* msg1 = (char*)malloc(len + 1);
+  char* msg1 = (char*)calloc(len + 1,1);
+  //inforServer.mqttConfig.dataSend
   uint32_t num_ = 0;
   while (file.available())msg1[num_ ++] = file.read();
+  //while (file.available())inforServer.mqttConfig.dataSend[num_++] = file.read();
   msg1[num_] = '\0';
   file.close();
 #ifdef debug_UART
     Serial.print("Send MQTT SDCARD : ");
     Serial.println(msg1);
 #endif
-  if (statusPeripheral.mqtt.statusMqttConnect) {
-    mqttClient.publish("/data", 0, true, msg1);
-  }
+  sendMQTT(msg1);
+  //if (statusPeripheral.mqtt.statusMqttConnect) { mqttClient.publish("/data", 0, true, inforServer.mqttConfig.dataSend);}
   free(msg1);
 }
 //////////////////////////////////////////////////////////////////
