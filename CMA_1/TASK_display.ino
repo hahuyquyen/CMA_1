@@ -103,10 +103,6 @@ void LcdSeclectMode(uint8_t chedo_HT, Data_TH* Data_TH  , uint8_t daucham = 0) {
     else {
       LcdDisplaySetting(NULL, inforServer.thanhPham.arrayName[inforServer.thanhPham.userSelect]);
     }
-    u8g2.setFont(u8g2_font_5x8_tr);
-    sprintf(textTam, "%ddB SD:%s P:%d%%\n",statusPeripheral.rssiWifi,(statusPeripheral.sdCard.statusConnect == true) ?"ok":"fail",statusPeripheral.powerValue);
-    u8g2.setCursor(((128 - (u8g2.getUTF8Width(textTam))) / 2), 64);
-    u8g2.print(textTam);
   }
   else if (chedo_HT == 2) {
  //   char stringdem[] = ;
@@ -117,8 +113,8 @@ void LcdSeclectMode(uint8_t chedo_HT, Data_TH* Data_TH  , uint8_t daucham = 0) {
     LcdDisplayInfor();
   }
   else if (chedo_HT == 3) {
-    memcpy(textTam, "KHU VỰC CÂN\0", sizeof(textTam));
-    //char stringdem[] = "KHU VỰC CÂN";
+    memcpy(textTam, "Khu Vực Cân\0", sizeof(textTam));
+    //char stringdem[] = "Khu Vực Cân";
     LcdDisplaySetting(textTam, inforServer.giaiDoan.arrayName[inforServer.giaiDoan.userSelect]);
   }
   else if (chedo_HT == 4) {
@@ -145,6 +141,10 @@ void LcdSeclectMode(uint8_t chedo_HT, Data_TH* Data_TH  , uint8_t daucham = 0) {
       LcdDisplaySetting(NULL, inforServer.thanhPham.arrayName[inforServer.thanhPham.userSelect]);
     }
   }
+  u8g2.setFont(u8g2_font_5x8_tr);
+  sprintf(textTam, "%ddB SD:%s P:%d%%\n", statusPeripheral.rssiWifi, (statusPeripheral.sdCard.statusConnect == true) ? "ok" : "fail", statusPeripheral.powerValue);
+  u8g2.setCursor(((128 - (u8g2.getUTF8Width(textTam))) / 2), 64);
+  u8g2.print(textTam);
   u8g2.sendBuffer();
 }
 
