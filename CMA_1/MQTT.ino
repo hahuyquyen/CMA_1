@@ -20,7 +20,7 @@
    t: Thời gian gửi,
   }
 */
-void sendMQTT(char* data) {
+void SendDataMqtt(char* data) {
     if (statusPeripheral.mqtt.statusMqttConnect) {
         mqttClient.publish("/data", 0, true, data);
     }
@@ -54,10 +54,10 @@ void truyen_mqtt() {
   Serial.print("Send MQTT: ");
   Serial.println(msg1);
 #endif
-  sendMQTT(msg1);
+  SendDataMqtt(msg1);
   free(msg1);
   doc.clear(); // giai phong bo nho
- // if (statusPeripheral.mqtt.statusMqttConnect) {sendMQTT(inforServer.mqttConfig.dataSend);}
+ // if (statusPeripheral.mqtt.statusMqttConnect) {SendDataMqtt(inforServer.mqttConfig.dataSend);}
   
 }
 //////////////////////////////////////////////////////////////////
@@ -131,7 +131,7 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
       strlcpy(inforServer.giaiDoan.arrayName[0], ramChuaChon, sizeof(inforServer.giaiDoan.arrayName[0]));
       inforServer.giaiDoan.total = jsonBuffer["l"].as<uint8_t>();
       statusPeripheral.timeStampServer = jsonBuffer["s"].as<uint32_t>();
-      set_RTC(statusPeripheral.timeStampServer);
+      SetTimeRtc(statusPeripheral.timeStampServer);
       for (int i = 0; i < inforServer.giaiDoan.total; i++) {
         if (jsonBuffer["d"][i].isNull()) {Serial.println("error key");inforServer.giaiDoan.total = 0;return;} // Fix loi thieu data
         if (i == 10)break; //qua array cua data

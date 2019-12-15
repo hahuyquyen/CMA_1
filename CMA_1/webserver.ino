@@ -1,5 +1,5 @@
 /*
- http://192.168.100.86:4999/set_rtc?timestamp=1576032486
+ http://192.168.100.86:4999/SetTimeRtc?timestamp=1576032486
  */
 
 
@@ -96,9 +96,9 @@ void setupWiFiConf(void) {
   server.on("/mqtt_conf", HTTP_GET, [](AsyncWebServerRequest * request) {
     request->send(SPIFFS, F("/mqtt_conf.html"), String(), false, processor);
   });
-  server.on("/set_rtc", HTTP_GET, [](AsyncWebServerRequest * request) {
-    if (request->hasParam(F("timestamp"))) {
-      set_RTC(strtoul(request->getParam(F("timestamp"))->value().c_str(), NULL, 10));
+  server.on("/SetTime", HTTP_GET, [](AsyncWebServerRequest * request) {
+    if (request->hasParam(F("t"))) {
+      SetTimeRtc(strtoul(request->getParam(F("t"))->value().c_str(), NULL, 10));
     }
     request->send(200, F("text/plain"), F("OK ...."));
   });

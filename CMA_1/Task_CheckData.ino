@@ -85,7 +85,7 @@ void http_re( void * pvParameters ){
                  Neu khac ro thi van can binh thuong
                  neu cung ma ro trong 2 lần lien tiep phải khac so kg
                  */
-                if( getSttKhuVuc() ==  sttKvSuaCaOUT ){
+                if( GetSttKhuVuc() ==  sttKvSuaCaOUT ){
                   tt = false;
                   if (strcmp(Data_TH.id_RFID,idRFID_OLD) != 0){
                     strncpy( idRFID_OLD,Data_TH.id_RFID, sizeof(Data_TH.id_RFID));if (Data_CAN_TH.data_can >0.5) tt = true;
@@ -100,7 +100,7 @@ void http_re( void * pvParameters ){
                 if(tt){
                     xQueueSend( Queue_display, &Data_TH, xTicksToWait );
                     //if ((inforServer.giaiDoan.cheDoInOut == cheDoIN)&& (inforServer.giaiDoan.arrayType[inforServer.giaiDoan.userSelect]  == kvSuaCa)) {   //Neu Sua Ca Ngo Vao thi reset ma Nhan vien
-                    if (getSttKhuVuc() == sttKvSuaCaIN) {   //Neu Sua Ca Ngo Vao thi reset ma Nhan vien
+                    if (GetSttKhuVuc() == sttKvSuaCaIN) {   //Neu Sua Ca Ngo Vao thi reset ma Nhan vien
                       xSemaphoreGive(xreset_id_nv);  
                     }
                     else { // nêu khong có check 2 lan thi gui mqtt
@@ -124,14 +124,14 @@ void http_re( void * pvParameters ){
                 lastTimeGetQueueRFID_Ro=0;
                 xSemaphoreGive(xreset_id_nv);    
               // if ((inforServer.giaiDoan.arrayType[inforServer.giaiDoan.userSelect] != kvSuaCa)||(inforServer.giaiDoan.cheDoInOut == cheDoOut)){
-                if( getSttKhuVuc() !=  sttKvSuaCaIN ){
+                if( GetSttKhuVuc() !=  sttKvSuaCaIN ){
                   xSemaphoreGive(xSignal_Display_checkdone);
                   }              
           }
 ////////////////////////////////////////////////////////////////
 //// Check giai doan 2: Chi dung cho giai doan sua ca IN ///////
 ///////////////////////////////////////////////////////////////    
-          if( getSttKhuVuc() ==  sttKvSuaCaIN ){
+          if( GetSttKhuVuc() ==  sttKvSuaCaIN ){
               if ((lastTimeGetQueueRFID_NV > lastTimeGetData_RoVaCan)&& (lastTimeGetData_RoVaCan >0)){ 
                   timeCompareMode2 = lastTimeGetQueueRFID_NV - lastTimeGetData_RoVaCan;
 ////////////////////////////////////////////////

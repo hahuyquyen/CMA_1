@@ -129,7 +129,7 @@ void readFile(fs::FS &fs, const char * path, uint32_t len) {
     Serial.print("Send MQTT SDCARD : ");
     Serial.println(msg1);
 #endif
-  sendMQTT(msg1);
+  SendDataMqtt(msg1);
   //if (statusPeripheral.mqtt.statusMqttConnect) { mqttClient.publish("/data", 0, true, inforServer.mqttConfig.dataSend);}
   free(msg1);
 }

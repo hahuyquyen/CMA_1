@@ -55,12 +55,12 @@ void onPressedPower();
 /*
 functions
 */
-uint8_t getSttKhuVuc();
-void set_RTC(uint32_t timestampSave);
+uint8_t GetSttKhuVuc();
+void SetTimeRtc(uint32_t timestampSave);
 /*
 MQTT
 */
-void sendMQTT(char* data);
+void SendDataMqtt(char* data);
 void connectToMqtt();
 void onMqttConnect(bool sessionPresent);
 void onMqttDisconnect(AsyncMqttClientDisconnectReason reason);
@@ -353,7 +353,7 @@ void loop()
 /////////////////////////////////////////////////
 // Send MQTT Con fig                   //////////////
 ////////////////////////////////////////////////
-void sendMQTTConfig(uint8_t loaiconfig = 0 , uint8_t maboxung = 0) {
+void SendDataConfigMqtt(uint8_t loaiconfig = 0 , uint8_t maboxung = 0) {
     StaticJsonDocument<55> doc;
     char buffer[55];
     doc["i"] = stateMachine.idDevice;
@@ -367,11 +367,11 @@ void checkSendMQTTConfig() {
       sendMQTTConfig(1, 0);
     }
     else if (inforServer.giaiDoan.total == 0) {
-      sendMQTTConfig(2, 0);
+      SendDataConfigMqtt(2, 0);
     }
     //Fix loi 01
     else if ((inforServer.giaiDoan.userSelect != 0) && (inforServer.thanhPham.total == 0) && (stateMachine.bottonSelect > 1)) { // Chi gui yeu cau khi da chon khu vuc can và qua buoc chọn thành phảm
-      sendMQTTConfig(3, inforServer.giaiDoan.arrayType[inforServer.giaiDoan.userSelect]);
+      SendDataConfigMqtt(3, inforServer.giaiDoan.arrayType[inforServer.giaiDoan.userSelect]);
     }
 }
 
