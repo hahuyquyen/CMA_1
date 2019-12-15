@@ -7,4 +7,4 @@
 *.d
 *.o
 ##Bo Folder
-CMA_1\Debug/
+**/Debug
