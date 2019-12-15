@@ -33,7 +33,8 @@ void connectToMqtt() {
 //////////////////////////////////////////////////////////////////
 void truyen_mqtt() {
   //DateTime now = rtc.now();
-  StaticJsonDocument<300> doc;
+ // StaticJsonDocument<300> doc;
+  DynamicJsonDocument doc(300);
   doc["k"] = inforServer.giaiDoan.cheDoInOut;
   doc["x"] = inforServer.giaiDoan.arrayType[inforServer.giaiDoan.userSelect];
   doc["b"] = datatruyen_mqtt.id_RFID;
@@ -55,6 +56,7 @@ void truyen_mqtt() {
 #endif
   sendMQTT(msg1);
   free(msg1);
+  doc.clear(); // giai phong bo nho
  // if (statusPeripheral.mqtt.statusMqttConnect) {sendMQTT(inforServer.mqttConfig.dataSend);}
   
 }
@@ -95,7 +97,9 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
 #ifdef debug_UART
   printf("MQTT: %s ,ND: %s \n", topic, payload);
 #endif
-  StaticJsonDocument<1500> jsonBuffer;
+  // Bo nho lon hon 1kb thay vi dung Static chuyen qua dung DynamicJsonDocument no cap phat malloc va free
+ // StaticJsonDocument<1500> jsonBuffer;
+  DynamicJsonDocument jsonBuffer(2048);
   DeserializationError error = deserializeJson(jsonBuffer, payload);
   if (error) {
 #ifdef debug_UART
@@ -168,6 +172,7 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
     // if (statusSaveData == 1)deleteFile(SD,textToWrite); Thay doi tu delete toi rename.
     if (statusSaveData == 1)renameFile(SD, textBegin, textEnd);
   }
+  jsonBuffer.clear(); //giai phong bo nho
 }
 //////////////////////////////////////////////////////////////////
 ////// Callback - Chua Dung //////////////////////////////////////

@@ -8,6 +8,22 @@ const char ramChoDuLieu[] = "Chờ Dữ Liệu"; // dung can lây FPSTR(ramChoDu
 const char ramChuaChon[] = "Chưa Chọn";
 const uint8_t wifi_conf_format[] = WIFI_CONF_FORMAT;
 TickType_t xLastWakeTimeLoop;
+/*
+Thay doi che do cap phat cua DynamicJsonDocument
+*/
+/*
+struct DefaultAllocator {
+    void* allocate(size_t n) {
+        return malloc(n);
+    }
+
+    void deallocate(void* p) {
+        free(p);
+    }
+};
+
+typedef BasicJsonDocument<DefaultAllocator> DynamicJsonDocument;
+*/
 
 struct statusPeripheralConf{
     struct mqttConf{
