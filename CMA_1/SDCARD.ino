@@ -120,24 +120,19 @@ void SdReadFile(fs::FS &fs, const char * path, uint32_t len) {
   }
   char* msg1 = (char*)calloc(len + 1, sizeof(char));
   uint32_t num_ = 0; 
-  boolean startFirst = true;
-  uint8_t numberAck = 0;
+  uint8_t numLineRepeat = 0;
   while (file.available()) {
-      if (startFirst) {
           msg1[num_] = file.read();
-          if (msg1[num_] == '!') {startFirst = false;} // thoat 
+          if (msg1[num_] == 'r') { numLineRepeat = num_;} // vi tri truong r la rêpat
           num_ = num_ + 1;
-      }
-      else { 
-          numberAck = (uint8_t)file.read() - 48;  //ascii 48 là số 0
-          break; 
-      } 
   }
   msg1[num_ - 1] = '\0';
   file.close();
-  if (numberAck < 4) {
-        numberAck = numberAck + 1;
-        SdWriteFile(SD, path, msg1, numberAck);
+  uint8_t numCounterACK = (uint8_t )msg1[numLineRepeat + 3];
+  if (numCounterACK < 4) {
+        numCounterACK = numCounterACK + 1;
+        msg1[numLineRepeat + 3] = numCounterACK;
+        SdWriteFile(SD, path, msg1);
         SendDataMqtt(msg1);
   }
   else { 
@@ -147,21 +142,21 @@ void SdReadFile(fs::FS &fs, const char * path, uint32_t len) {
     Serial.print("Send MQTT SDCARD : ");
     Serial.print(msg1);
     Serial.print(" - Number : ");
-    Serial.println(numberAck);
+    Serial.println(numCounterACK);
 #endif
   free(msg1);
 }
 //////////////////////////////////////////////////////////////////
 ////// Write SD and send MQTT ////////////////////////////////////
 //////////////////////////////////////////////////////////////////
-void SdWriteFile(fs::FS &fs, const char * path, const char * message, uint8_t sttNumber) {
+void SdWriteFile(fs::FS &fs, const char * path, const char * message) {
   File file = fs.open(path, FILE_WRITE);
   if (!file) {
     statusPeripheral.sdCard.statusConnect = false;
     return;
   }
   file.print(message);
-  file.print('!');
-  file.print(sttNumber);
+  //file.print('!');
+  //file.print(sttNumber);
   file.close();
 }
