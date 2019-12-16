@@ -1,9 +1,22 @@
 /*
- Trang ma loi wifi
+  Trang ma loi wifi
 
- https://demo-dijiudu.readthedocs.io/en/latest/api-guides/wifi.html
- [AsyncTCP.cpp:953] _poll(): 0x3ffe16e0 != 0x3ffe2678
- */
+  https://demo-dijiudu.readthedocs.io/en/latest/api-guides/wifi.html
+  [AsyncTCP.cpp:953] _poll(): 0x3ffe16e0 != 0x3ffe2678
+*/
+//////////////////////////////////////
+// GEt RSSI Theo Name Wifi//////////////
+/////////////////////////////////////////
+int32_t getRSSI(const char* target_ssid) {
+  byte available_networks = WiFi.scanNetworks();
+
+  for (int network = 0; network < available_networks; network++) {
+    if (strcmp(WiFi.SSID(network).c_str(), target_ssid) == 0) {
+      return WiFi.RSSI(network);
+    }
+  }
+  return 0;
+}
 //////////////////////////////////////////////////////////////////
 ////// even wifi mat ket noi ////////////////////////////
 //////////////////////////////////////////////////////////////////
@@ -14,31 +27,31 @@ void wifiOnDisconnect(WiFiEventInfo_t info)
   free(time_blink);
   xTimerStop(mqttReconnectTimer, 0); // tat tu dong ket noi mqtt
   statusPeripheral.wifi.statusConnectAP = false ;
-   if (info.disconnected.reason == 6) {
+  if (info.disconnected.reason == 6) {
 #ifdef debug_UART
-      Serial.println("NOT_AUTHED reconnect");
+    Serial.println("NOT_AUTHED reconnect");
 #endif
-      WiFi.reconnect();
-   }
-   else if (info.disconnected.reason == 8) {
+    WiFi.reconnect();
+  }
+  else if (info.disconnected.reason == 8) {
 #ifdef debug_UART
-      Serial.println("assoc leave");
+    Serial.println("assoc leave");
 #endif
-      wifi_connect(0, WIFI_STA,WiFiConf.sta_ssid,WiFiConf.sta_pwd,WiFiConf.ap_ssid);
-   }
-   /*
-    * reason 201 la no AP found
-    */
+    wifi_connect(0, WIFI_STA, WiFiConf.sta_ssid, WiFiConf.sta_pwd, WiFiConf.ap_ssid);
+  }
+  /*
+     reason 201 la no AP found
+  */
 }
 //////////////////////////////////////////////////////////////////
 ////// Event wifi nhan IP ////////////////////////////
 //////////////////////////////////////////////////////////////////
 void wifigotip()
 {
-  if (statusPeripheral.wifi.ApConnect){
+  if (statusPeripheral.wifi.ApConnect) {
     //WiFi.disconnect(true);
     WiFi.softAPdisconnect();
-    wifi_connect(0, WIFI_STA,WiFiConf.sta_ssid,WiFiConf.sta_pwd,WiFiConf.ap_ssid);
+    wifi_connect(0, WIFI_STA, WiFiConf.sta_ssid, WiFiConf.sta_pwd, WiFiConf.ap_ssid);
     return;
   }
   statusPeripheral.wifi.statusConnectAP = true;
@@ -50,7 +63,7 @@ void wifigotip()
   *time_blink = 2000;
   xQueueSend(Queue_Time_blink, time_blink, (TickType_t) 1);
   free(time_blink);
-  connectToMqtt();
+  ConnectToMqtt();
 }
 //////////////////////////////////////////////////////////////////
 ////// event trang thai wifi ////////////////////////////
@@ -74,14 +87,14 @@ void WiFiEvent(WiFiEvent_t event)
 //////////////////////////////////////////////////////////////////
 void parseBytes1(const char* str, char sep, int address, int maxBytes, int base) {
   for (int i = 0; i < maxBytes; i++) {
-    if (address == 1) local_IP[i] = strtoul(str, NULL, base);  
-    else if (address == 2) gateway[i] = strtoul(str, NULL, base);  
-    else if (address == 3) subnet[i] = strtoul(str, NULL, base); 
-    str = strchr(str, sep);           
+    if (address == 1) local_IP[i] = strtoul(str, NULL, base);
+    else if (address == 2) gateway[i] = strtoul(str, NULL, base);
+    else if (address == 3) subnet[i] = strtoul(str, NULL, base);
+    str = strchr(str, sep);
     if (str == NULL || *str == '\0') {
-      break;                            
+      break;
     }
-    str++;                               
+    str++;
   }
 }
 //////////////////////////////////////////////////////////////////

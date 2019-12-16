@@ -14,10 +14,14 @@ void http_re( void * pvParameters ){
     unsigned long lastTimeGetData_RoVaCan = 0;
     unsigned long timeCompareMode1=10000;
     unsigned long timeCompareMode2=10000;
-  //  unsigned long TaskCheck_lastTimeSche=0;
     double canDataOutOld = 0;
-    for (;;){
+    unsigned long lastTimeLED = 0;
+    boolean statusLED = true ;
+    TickType_t xLastWakeTime;
+    xLastWakeTime = xTaskGetTickCount();
 
+    for (;;){
+    boolean baoLed = false;
       /*
        * Nhận Cân
        */
@@ -28,24 +32,54 @@ void http_re( void * pvParameters ){
      * Nhận mã RFID mã Rổ
      * Nếu khu fille thì không nhận mã rỗ.
      */
+
+
     if(xQueueReceive( Queue_RFID, &Data_RFID_TH,  ( TickType_t ) 1 )== pdPASS ){
-      if (inforServer.giaiDoan.arrayType[inforServer.giaiDoan.userSelect] == kvSuaCa) {lastTimeGetQueueRFID_Ro=xTaskGetTickCount();}     
+        if (strcmp(Data_RFID_TH.id_RFID, "000000000000000000000000") != 0) {
+            baoLed = true;
+            if (inforServer.giaiDoan.arrayType[inforServer.giaiDoan.userSelect] == kvSuaCa) {
+                lastTimeGetQueueRFID_Ro = xTaskGetTickCount(); 
+            }
+        }
     }
     /*
      * Nhận mã RFID
      * Nếu là khu Filler chỉ nhận mã rỗ thì swap time tới mã rỗ để khỏi viết lại code
      */
     if(xQueueReceive( Queue_RFID_NV, &Data_RFID_NV,  ( TickType_t ) 1 )== pdPASS ){
-            if (inforServer.giaiDoan.arrayType[inforServer.giaiDoan.userSelect]==kvFille){lastTimeGetQueueRFID_Ro=xTaskGetTickCount();}
-            else lastTimeGetQueueRFID_NV=xTaskGetTickCount();
+        if (strcmp(Data_RFID_NV.id_RFID, "000000000000000000000000") != 0) {
+            baoLed = true;
+            if (inforServer.giaiDoan.arrayType[inforServer.giaiDoan.userSelect] == kvFille) { lastTimeGetQueueRFID_Ro = xTaskGetTickCount(); }
+            else lastTimeGetQueueRFID_NV = xTaskGetTickCount();
+        }
+        else {
+            Serial.println("Loi RFID = 0");
+        }
     }
-    /*
-     * Nếu là Khu Phi Le thì chỉ dùng mã NV để quét
-     * state_Running
-     */
+    //////////////////////////////////////////
+    // Bao LED tin hieu nhan RFID ////////////
+    //////////////////////////////////////////
+    if (baoLed){
+        statusLED = false;
+        digitalWrite(pinLedGreen, statusLED);
+        lastTimeLED = xTaskGetTickCount();
+    }
+    else if ((xTaskGetTickCount() - lastTimeLED > 200) && (statusLED == false)) {
+      statusLED = true;
+      digitalWrite(pinLedGreen, statusLED);
+    }
+///////////////////////////////////////////////////////////////
+////// Device Running //////////////////////////////////////////
+////////////////////////////////////////////////////////////////
     if (stateMachine.deviceStatus == deviceRunning){
+////////////////////////////////////////////////
+//// Check giai doan 1: Nhan ma NV va Kg ///////
+///////////////////////////////////////////////      
           if ((lastTimeGetQueueCan > lastTimeGetQueueRFID_Ro + 300)&&(lastTimeGetQueueRFID_Ro > 0)){ // chỉ nhận khi dữ liệu cân lớn hơn dữ liệu rfid 500 stick
                timeCompareMode1 = lastTimeGetQueueCan - lastTimeGetQueueRFID_Ro;
+////////////////////////////////////////////////
+//// Thoi gian giua 2 lan nhan du lieu ///////
+///////////////////////////////////////////////                 
               if (timeCompareMode1 < time_2_lan_nhan_data){ // 2 dữ liệu phải nhỏ hơn thời gian cài đặt mới là 1 cặp đúng
                if (inforServer.giaiDoan.arrayType[inforServer.giaiDoan.userSelect] == kvFille){
                     strncpy( Data_TH.id_RFID_NV,Data_RFID_NV.id_RFID, sizeof(Data_RFID_NV.id_RFID));
@@ -62,8 +96,7 @@ void http_re( void * pvParameters ){
                  Neu khac ro thi van can binh thuong
                  neu cung ma ro trong 2 lần lien tiep phải khac so kg
                  */
-              // if ((inforServer.giaiDoan.arrayType[inforServer.giaiDoan.userSelect] == kvSuaCa)&&(inforServer.giaiDoan.cheDoInOut == cheDoOut)){
-                if( getSttKhuVuc() ==  sttKvSuaCaOUT ){
+                if( GetSttKhuVuc() ==  sttKvSuaCaOUT ){
                   tt = false;
                   if (strcmp(Data_TH.id_RFID,idRFID_OLD) != 0){
                     strncpy( idRFID_OLD,Data_TH.id_RFID, sizeof(Data_TH.id_RFID));if (Data_CAN_TH.data_can >0.5) tt = true;
@@ -78,7 +111,7 @@ void http_re( void * pvParameters ){
                 if(tt){
                     xQueueSend( Queue_display, &Data_TH, xTicksToWait );
                     //if ((inforServer.giaiDoan.cheDoInOut == cheDoIN)&& (inforServer.giaiDoan.arrayType[inforServer.giaiDoan.userSelect]  == kvSuaCa)) {   //Neu Sua Ca Ngo Vao thi reset ma Nhan vien
-                    if (getSttKhuVuc() == sttKvSuaCaIN) {   //Neu Sua Ca Ngo Vao thi reset ma Nhan vien
+                    if (GetSttKhuVuc() == sttKvSuaCaIN) {   //Neu Sua Ca Ngo Vao thi reset ma Nhan vien
                       xSemaphoreGive(xreset_id_nv);  
                     }
                     else { // nêu khong có check 2 lan thi gui mqtt
@@ -102,14 +135,19 @@ void http_re( void * pvParameters ){
                 lastTimeGetQueueRFID_Ro=0;
                 xSemaphoreGive(xreset_id_nv);    
               // if ((inforServer.giaiDoan.arrayType[inforServer.giaiDoan.userSelect] != kvSuaCa)||(inforServer.giaiDoan.cheDoInOut == cheDoOut)){
-                if( getSttKhuVuc() !=  sttKvSuaCaIN ){
+                if( GetSttKhuVuc() !=  sttKvSuaCaIN ){
                   xSemaphoreGive(xSignal_Display_checkdone);
                   }              
           }
-         // if ((inforServer.giaiDoan.arrayType[inforServer.giaiDoan.userSelect] == kvSuaCa)&&(inforServer.giaiDoan.cheDoInOut == cheDoIN)){ 
-             if( getSttKhuVuc() ==  sttKvSuaCaIN ){
+////////////////////////////////////////////////////////////////
+//// Check giai doan 2: Chi dung cho giai doan sua ca IN ///////
+///////////////////////////////////////////////////////////////    
+          if( GetSttKhuVuc() ==  sttKvSuaCaIN ){
               if ((lastTimeGetQueueRFID_NV > lastTimeGetData_RoVaCan)&& (lastTimeGetData_RoVaCan >0)){ 
                   timeCompareMode2 = lastTimeGetQueueRFID_NV - lastTimeGetData_RoVaCan;
+////////////////////////////////////////////////
+//// Thoi gian giua 2 lan nhan du lieu ///////
+///////////////////////////////////////////////                    
                   if (timeCompareMode2 < time_cho_nhan_RFID_NV){
                     lastTimeGetData_RoVaCan=lastTimeGetQueueRFID_NV;
                     strncpy( Data_TH.id_RFID_NV,Data_RFID_NV.id_RFID, sizeof(Data_RFID_NV.id_RFID));
@@ -144,7 +182,10 @@ void http_re( void * pvParameters ){
       TaskCheck_lastTimeSche=xTaskGetTickCount();
     }
       */
-      vTaskDelayUntil(xTaskGetTickCount(),30);
+      
+    
+                  
+                  vTaskDelayUntil(&xLastWakeTime,30);
     //vTaskDelay(25);  
     }
     vTaskDelete(NULL) ;

@@ -1,3 +1,9 @@
+/*
+ http://192.168.100.86:4999/SetTimeRtc?timestamp=1576032486
+ */
+
+
+
 //////////////////////////////////////////////////////////////////
 ////// Truyen tham so Html ////////////////////////////
 //////////////////////////////////////////////////////////////////
@@ -90,10 +96,19 @@ void setupWiFiConf(void) {
   server.on("/mqtt_conf", HTTP_GET, [](AsyncWebServerRequest * request) {
     request->send(SPIFFS, F("/mqtt_conf.html"), String(), false, processor);
   });
-  server.on("/set_rtc", HTTP_GET, [](AsyncWebServerRequest * request) {
-    if (request->hasParam(F("timestamp"), true)) {
-      set_RTC(strtoul(request->getParam(F("timestamp"), true)->value().c_str(), NULL, 10));
+  server.on("/setTime", HTTP_GET, [](AsyncWebServerRequest * request) {
+    if (request->hasParam(F("t"))) {
+      SetTimeRtc(strtoul(request->getParam(F("t"))->value().c_str(), NULL, 10));
     }
+    request->send(200, F("text/plain"), F("OK ...."));
+  });
+  server.on("/setRf", HTTP_GET, [](AsyncWebServerRequest * request) {
+    if (request->hasParam(F("p"))) {
+      stateMachine.powerRFID = request->getParam(F("p"))->value().toInt();
+      stateMachine.setPowerRFID();
+      Serial.println(stateMachine.powerRFID, HEX);
+    }
+    request->send(200, F("text/plain"), F("OK ...."));
   });
   server.on("/set_wifi_conf", HTTP_POST, [](AsyncWebServerRequest * request) {
     if (request->hasParam(F("html_ssid"), true)) {
@@ -117,11 +132,10 @@ void setupWiFiConf(void) {
     //if (request->hasParam(F("chooseinout"), true)) {request->getParam(F("chooseinout"), true)->value().toCharArray(WiFiConf.mqtt_choose_inout, sizeof(WiFiConf.mqtt_choose_inout));}
     if (saveWiFiConf())request->send(200, F("text/plain"), F("OK BABY"));
     else request->send(200, F("text/plain"), F("Fail Save EEPROM"));
-    
   });
   server.on("/set_id", HTTP_POST, [](AsyncWebServerRequest * request) {
     if (request->hasParam("id", true)) {
-#ifdef debug_UART 
+#ifdef debug_UART
       Serial.println(request->getParam("id", true)->value());
 #endif
       stateMachine.idDevice = strtoul(request->getParam("id", true)->value().c_str(), NULL, 10);
@@ -145,9 +159,8 @@ void setupWiFiConf(void) {
     if (request->hasParam(F("SUBTopic1"), true)) {
       request->getParam(F("SUBTopic1"), true)->value().toCharArray(WiFiConf.mqtt_subto1, sizeof(WiFiConf.mqtt_subto1));
     }
-     if (saveWiFiConf())request->send(200, F("text/plain"), F("OK BABY"));
+    if (saveWiFiConf())request->send(200, F("text/plain"), F("OK BABY"));
     else request->send(200, F("text/plain"), F("Fail Save EEPROM"));
-  //  request->send(200, F("text/plain"), F("OK"));
   });
 
   server.on("/firmware", HTTP_GET, [](AsyncWebServerRequest * request) {

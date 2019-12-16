@@ -109,7 +109,12 @@ void RFID::sendCommand(uint16_t timeOut, boolean waitForResponse)
   msg[messageLength + 1] = crc;
   if (messageLength > 29) messageLength = 29; //tràn bộ nhớ
   while ( _RFIDSERIAL->available()) _RFIDSERIAL->read();
-  for (uint8_t x = 0; x < messageLength + 2; x++) _RFIDSERIAL->write(msg[x]);
+  for (uint8_t x = 0; x < messageLength + 2; x++) { 
+      _RFIDSERIAL->write(msg[x]);
+       // Serial.print(msg[x],HEX);
+      //  Serial.print("-");
+  }
+ // Serial.println("");
   if (waitForResponse == false)
   { _RFIDSERIAL->flush(); 
     return;
@@ -136,6 +141,8 @@ void RFID::sendCommand(uint16_t timeOut, boolean waitForResponse)
     if ( _RFIDSERIAL->available())
     {
       msg[spot] = _RFIDSERIAL->read();
+      //    Serial.print(msg[spot],HEX);
+   // Serial.print("-");
       spot++;
       if (spot == 2) messageLength = msg[1] + 2; 
       else if (spot == MAX_MSG_SIZE) {return;} // Chống tràn bộ nhớ gây reset
@@ -197,15 +204,15 @@ bool IRAM_ATTR RFID::check()
   if ( _RFIDSERIAL->available())
   { 
     uint8_t incomingData = _RFIDSERIAL->read();
-   // Serial.print(incomingData,HEX);
-   // Serial.print("-");
+    //Serial.print(incomingData,HEX);
+    //Serial.print("-");
   	if (incomingData == 0x00 && _head == 0){
   		msg[_head++] = incomingData;
   	}
   	else if ( _head > 0 && incomingData != 0xFF){
       
   		msg[_head++] = incomingData;
-      if( _head == 30) _head = 0; // Chống tràn bộ nhớ gây reset
+      if( _head == 29) _head = 0; // Chống tràn bộ nhớ gây reset
   	}
   	else if (incomingData == 0xFF){
   		msg[_head]=0xFF;

@@ -1,0 +1,12 @@
+*.xml
+*.db
+*.ipch
+*.xml
+*.db
+*.d
+*.o
+##Bo Folder
+**/Debug
+**/Libraries
+**/.vs
+**/Release

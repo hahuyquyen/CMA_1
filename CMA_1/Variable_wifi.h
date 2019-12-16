@@ -7,8 +7,25 @@
 const char ramChoDuLieu[] = "Chờ Dữ Liệu"; // dung can lây FPSTR(ramChoDuLieu) và strlcpy_P  tiet kiem RAM cho heap memory
 const char ramChuaChon[] = "Chưa Chọn";
 const uint8_t wifi_conf_format[] = WIFI_CONF_FORMAT;
+TickType_t xLastWakeTimeLoop;
+/*
+Thay doi che do cap phat cua DynamicJsonDocument
+*/
+/*
+struct DefaultAllocator {
+    void* allocate(size_t n) {
+        return malloc(n);
+    }
 
-struct statusPeripheralConf{
+    void deallocate(void* p) {
+        free(p);
+    }
+};
+
+typedef BasicJsonDocument<DefaultAllocator> DynamicJsonDocument;
+*/
+
+static struct statusPeripheralConf{
     struct mqttConf{
       unsigned long lastTimeGetDataConfig; 
       unsigned long  timeTruyenMQTT;
@@ -22,13 +39,18 @@ struct statusPeripheralConf{
     }wifi ={false,0,0,true};
     struct rtcConf{
       boolean statusConnect;
-    }RTC={false};    
+      unsigned long  lastTimeGetTimeStamp;
+    }RTC={false,0};    
     struct sdCardConf{
       unsigned long lastTimeReadEnd;
+      unsigned long lastTimeReInit;
       unsigned long lastTimeSendMQTT;
       boolean statusConnect;
       boolean statusGetAllFile;
     }sdCard={0,0,false,false};
+    int rssiWifi;
+    int powerValue;
+    uint32_t timeStampServer;
 }statusPeripheral;
 
 struct timeServerConf{
@@ -48,11 +70,17 @@ static struct stateMachineConf {
   uint8_t bottonSelect;
   uint8_t deviceStatus;
   uint32_t idDevice;
-  
+  uint8_t powerRFID;
+  void getPowerRFID(){
+    this->powerRFID=EEPROM.readUInt(810);
+  }
   void getIdControl(){
     this->idDevice=EEPROM.readUInt(800);
   }
-  
+  void setPowerRFID(){
+    EEPROM.write(810, this->powerRFID);
+    EEPROM.commit();
+  }  
   void setIdControl(){
     EEPROM.writeUInt(800, this->idDevice);
     EEPROM.commit();
@@ -102,19 +130,25 @@ static struct inforServerStruct {
   struct mqttConfigConf{
       char topicGetStatusACK[25];
       char topicGetConfig[25];
+      //char dataSend[300];
       void setTopicACK(unsigned long id_device){
         sprintf(this->topicGetStatusACK, "/data/ack/%lu", id_device) ;
       }
      void setTopicGetConfig(unsigned long id_device){
         sprintf(this->topicGetConfig, "/config/%lu", id_device) ;
       }
+
   }mqttConfig;
   void changeData(boolean chedo, uint8_t* userSelect, uint8_t totaldata=0){
     if (chedo) { *userSelect = (*userSelect > (totaldata - 1)) ? 0 : (*userSelect + 1);}
     else *userSelect = *userSelect - 1;
   }
-  
+  //char ssssssss[6533];
 } inforServer;
+/*
+Program size: 904,750 bytes (used 46% of a 1,966,080 byte maximum) (18.03 secs)
+Minimum Memory Usage: 48144 bytes (15% of a 327680 byte maximum)
+*/
 /////////////////////////////////////////////////////////////
 ///// Data wifi, server mqtt           //////////////////////
 ////////////////////////////////////////////////////////////

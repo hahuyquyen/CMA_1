@@ -1,4 +1,7 @@
 #define debug_UART true
+
+#define SerialCan Serial1
+#define SerialRFID Serial2
 #define WIFI_CONF_FORMAT {0, 0, 0, 1}
 #define WIFI_CONF_START 0
 
@@ -30,12 +33,12 @@
 #define button_ok_pin 35
 #define buttonExitPin 39
 #define buttonErrorPin 0
-#define pinPower 33
-#define pinReadPower 32
+#define pinPower 32
+#define pinReadPower 25
+
 #define pinBuzzer 4
-#define pinLedRed 5
-#define pinLedGreen 2
-#define pinAnalogPower 25
+#define pinLedRed 2
+#define pinLedGreen 5
 
 #define cheDoIN 1
 #define cheDoOut 2
@@ -54,6 +57,7 @@
 #define deviceRunning 1
 #define deviceError 2
 #define deviceLowPower 3
+#define deviceTurnOff 4
 
 #define sttKvFillerIN 1
 #define sttKvFillerOUT 2
