@@ -175,7 +175,7 @@ void Check_button( void * pvParameters ) {
     if (xTaskGetTickCount() - lastTimeReadADC > 5000) {
           lastTimeReadADC = xTaskGetTickCount();
           statusPeripheral.powerValue = adc1_get_raw( ADC1_CHANNEL_5);
-          statusPeripheral.powerValue = map(statusPeripheral.powerValue, 0, 4096, 0, 100);
+          statusPeripheral.powerValue = map(statusPeripheral.powerValue, 3200, 4096, 0, 100); // Can Map dien ap tu 2.6->3.3 la 0-<>100
 #ifdef debug_UART          
           Serial.print("POWER : ");
           Serial.print(statusPeripheral.powerValue);

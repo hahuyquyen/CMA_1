@@ -1,5 +1,6 @@
 //static uint8_t UartCanData[11];
 static double can_data = 0;
+static uint8_t UartCanData[11];
 //////////////////////////////////////////////////////////////////
 ////// Task doc du lieu tu can DI28SS ////////////////////////////
 //////////////////////////////////////////////////////////////////
@@ -11,7 +12,7 @@ void TaskCAN( void * pvParameters ) {
   unsigned long lastTimeSendCan = 0;
   TickType_t xLastWakeTime;
   xLastWakeTime = xTaskGetTickCount();
-  static uint8_t UartCanData[11];
+  
   for (;;) {
     if (SerialCan.available()) {
       uint8_t incomingData = SerialCan.read();
@@ -19,7 +20,7 @@ void TaskCAN( void * pvParameters ) {
         tam = 0;
       }
       else if ( incomingData == canStopByte) {
-        if (TachSoKg(UartCanData ,&can_data)) {
+        if (TachSoKg(&can_data)) {
           if (can_data != Data_CAN.data_can) {
             Data_CAN.data_can = can_data;
             if (can_data > 0.5) {
@@ -46,12 +47,12 @@ void TaskCAN( void * pvParameters ) {
 //////////////////////////////////////////////////////////////////
 ////// Task so KG tu Data ////////////////////////////
 //////////////////////////////////////////////////////////////////
-boolean TachSoKg(uint8_t* UartCanData, double* soky) {
+boolean TachSoKg( double* soky) {
   int tam1 = 0;
   int hangtram = 0;
   double soam = 1;
   *soky = 0;
-  /*/ for (int j=0;j<sizeof(UartCanData);j++){
+   /*for (int j=0;j<sizeof(UartCanData);j++){
      Serial.print(UartCanData[j], HEX);Serial.print("-");
     }
     Serial.println("");*/
