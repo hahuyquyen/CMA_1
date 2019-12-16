@@ -77,7 +77,7 @@ void SdReInit(File* masterFile);
 void SdReadFile(fs::FS& fs, const char* path, uint32_t len);
 void SdRenameFile(fs::FS& fs, const char* path1, const char* path2);
 void SdReOpenFolder();
-void SdWriteFile(fs::FS& fs, const char* path, const char* message, uint8_t sttNumber);
+void SdWriteFile(fs::FS& fs, const char* path, const char* message);
 void SdDeleteFile(fs::FS& fs, const char* path);
 /*
 File webserver
