@@ -109,7 +109,12 @@ void RFID::sendCommand(uint16_t timeOut, boolean waitForResponse)
   msg[messageLength + 1] = crc;
   if (messageLength > 29) messageLength = 29; //tràn bộ nhớ
   while ( _RFIDSERIAL->available()) _RFIDSERIAL->read();
-  for (uint8_t x = 0; x < messageLength + 2; x++) _RFIDSERIAL->write(msg[x]);
+  for (uint8_t x = 0; x < messageLength + 2; x++) { 
+      _RFIDSERIAL->write(msg[x]);
+       // Serial.print(msg[x],HEX);
+      //  Serial.print("-");
+  }
+ // Serial.println("");
   if (waitForResponse == false)
   { _RFIDSERIAL->flush(); 
     return;

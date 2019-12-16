@@ -7,7 +7,21 @@
    ESP-> 0xA0-lenght
    Reader->ESP: 0xE4-lenght hoáº·c 0xE0-lenght
 */
-
+/*
+[11:34:31 ---] A0 06 60 00 00 64 00 96 A0 06 60 00 00 CF 01 2A
+[11:34:31 154] A0 06 60 00 00 65 96 FF -> Set nguon trong 
+A0 06 60 00 00 87 00 73   
+[11:34:31 156] A0 06 60 00 00 90 00 6A A0 06 60 00 00 8F 00 6B
+[11:34:31 157] A0 0D 62 00 07 00 92 FF 07 00 C0 DF FF 03 B1 
+[11:35:31 ---] A0 06 60 00 00 64 00 96 A0 06 60 00 00 CF 01 2A
+[11:35:31 156] A0 06 60 00 00 65 1C 79 A0 06 60 00 00 87 00 73
+[11:35:31 156] A0 06 60 00 00 90 00 6A A0 06 60 00 00 8F 00 6B
+[11:35:32 156] A0 0D 62 00 07 00 92 FF 07 00 C0 DF FF 03 B1
+[11:37:08 ---] A0 06 60 00 00 64 00 96 A0 06 60 00 00 CF 01 2A
+[11:37:08 156] A0 06 60 00 00 65 28 6D A0 06 60 00 00 87 00 73
+[11:37:08 156] A0 06 60 00 00 90 00 6A A0 06 60 00 00 8F 00 6B
+[11:37:08 157] A0 0D 62 00 07 00 92 FF 07 00 C0 DF FF 03 B1
+*/
 #include "rfid.h"
 void IRAM_ATTR array_to_string(byte* array, unsigned int len, char* buffer)
 {
@@ -56,6 +70,8 @@ void TaskRFID( void * pvParameters ) {
         Serial.println("");
         if (myEPC[0] == MaRo_RFID) {
           array_to_string(&myEPC[0], 12, Data_rfid.id_RFID); //0->12 5->7
+          
+          
           /*
              nếu là khu vực cân 2 lần thì sẽ lúc nào cũng gửi về
           */
@@ -74,10 +90,12 @@ void TaskRFID( void * pvParameters ) {
 
         else if (myEPC[0] == MaNV_RFID) {
           array_to_string(&myEPC[0], 12, Data_rfid_nv.id_RFID);
-          if (strcmp(Data_rfid_nv.id_RFID, Data_rfid_nv.id_RFID_Old) != 0) {
-            
-            strncpy( Data_rfid_nv.id_RFID_Old, Data_rfid_nv.id_RFID, sizeof(Data_rfid_nv.id_RFID));
-            xQueueSend( Queue_RFID_NV, &Data_rfid_nv, xTicksToWait );
+          if (strcmp(Data_rfid.id_RFID, "000000000000000000000000") != 0) {
+              if (strcmp(Data_rfid_nv.id_RFID, Data_rfid_nv.id_RFID_Old) != 0) {
+
+                  strncpy(Data_rfid_nv.id_RFID_Old, Data_rfid_nv.id_RFID, sizeof(Data_rfid_nv.id_RFID));
+                  xQueueSend(Queue_RFID_NV, &Data_rfid_nv, xTicksToWait);
+              }
           }
         }
 

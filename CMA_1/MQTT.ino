@@ -45,11 +45,11 @@ void EncoderJsonMqtt() {
   doc["c"] = inforServer.nhaCC.arrayType[inforServer.nhaCC.userSelect];
   doc["p"] = inforServer.thanhPham.arrayType[inforServer.thanhPham.userSelect];
   //char buffer[500];
-  char* msg1 = (char*)calloc(500, 1);
-  serializeJson(doc, msg1 , 500);
+  char* msg1 = (char*)calloc(300, 1);
+  serializeJson(doc, msg1 , 300);
   char textToWrite[ 16 ];
   sprintf(textToWrite, "/CMA/%lu", ( unsigned long )timeStamp.unixtime());
-  SdWriteFile(SD, textToWrite, msg1);
+  SdWriteFile(SD, textToWrite, msg1 , 0);
 #ifdef debug_UART
   Serial.print("Send MQTT: ");
   Serial.println(msg1);
@@ -171,7 +171,7 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
     char textBegin[ 18 ];
     sprintf(textBegin, "/CMA/%lu", ( unsigned long )sttData);
     // if (statusSaveData == 1)SdDeleteFile(SD,textToWrite); Thay doi tu delete toi rename.
-    if (statusSaveData == 1)SdRenameFile(SD, textBegin, textEnd);
+    //if (statusSaveData == 1)SdRenameFile(SD, textBegin, textEnd);
   }
   jsonBuffer.clear(); //giai phong bo nho
 }

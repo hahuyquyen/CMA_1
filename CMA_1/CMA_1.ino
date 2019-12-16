@@ -77,7 +77,7 @@ void SdReInit(File* masterFile);
 void SdReadFile(fs::FS& fs, const char* path, uint32_t len);
 void SdRenameFile(fs::FS& fs, const char* path1, const char* path2);
 void SdReOpenFolder();
-void SdWriteFile(fs::FS& fs, const char* path, const char* message);
+void SdWriteFile(fs::FS& fs, const char* path, const char* message, uint8_t sttNumber);
 void SdDeleteFile(fs::FS& fs, const char* path);
 /*
 File webserver
@@ -155,7 +155,7 @@ void setup()
   pinMode(pinBuzzer, OUTPUT);
   pinMode(pinLedGreen, OUTPUT);
   pinMode(pinLedRed, OUTPUT);
- digitalWrite(pinLedGreen, HIGH);
+  digitalWrite(pinLedGreen, HIGH);
   digitalWrite(pinLedRed, HIGH);
   /* Serial.println(statusPeripheral.wifi.statusConnectAP);
     Serial.println(statusPeripheral.mqtt.statusMqttConnect);
@@ -327,7 +327,7 @@ void loop()
     else if (statusPeripheral.sdCard.statusGetAllFile == false) {// open next file
         SdOpenNextFile(&root_CMA);
     }
-    else if ((xTaskGetTickCount() - statusPeripheral.sdCard.lastTimeReadEnd > 3 * 6000 *100 ) && (statusPeripheral.sdCard.statusGetAllFile)) { //30 phut moi mo lai va
+    else if ((xTaskGetTickCount() - statusPeripheral.sdCard.lastTimeReadEnd > 3 * 6000 ) && (statusPeripheral.sdCard.statusGetAllFile)) { //30 phut moi mo lai va
         SdReOpenFolder();
     }
   }

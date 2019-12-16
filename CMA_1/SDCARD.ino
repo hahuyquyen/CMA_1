@@ -112,36 +112,54 @@ void SdRenameFile(fs::FS &fs, const char * path1, const char * path2) {
 ////// Read SD and send MQTT //////////////////////////////////////
 //////////////////////////////////////////////////////////////////
 void SdReadFile(fs::FS &fs, const char * path, uint32_t len) {
-  //Serial.printf("Reading : %s , L %lu \n", path,( unsigned long )len);
+  Serial.printf("Reading : %s , L %lu \n", path,( unsigned long )len);
   File file = fs.open(path);
   if (!file) {
     statusPeripheral.sdCard.statusConnect = false;
     return;
   }
-  char* msg1 = (char*)calloc(len + 1,1);
-  //inforServer.mqttConfig.dataSend
+  char* msg1 = (char*)calloc(len + 1, sizeof(char));
+  //inforServer.mqttConfig.dataSend 
   uint32_t num_ = 0;
-  while (file.available())msg1[num_ ++] = file.read();
+  //uint8_t tam = file.readStringUntil('\n');
+  boolean startFirst = true;
+  uint8_t numberAck = 0;
+  while (file.available()) {
+      if (startFirst) {
+          msg1[num_] = file.read();
+          if (msg1[num_] == '!') {
+              startFirst = false;
+          }
+          num_ = num_ + 1;
+      }
+      else { numberAck = (uint8_t)file.read() - 48;Serial.println(numberAck); break; } //ascii 48 là số 0
+  }
   //while (file.available())inforServer.mqttConfig.dataSend[num_++] = file.read();
-  msg1[num_] = '\0';
+  msg1[num_ - 1] = '\0';
   file.close();
+  numberAck = numberAck + 1;
+  SdWriteFile(SD, path, msg1, numberAck);
 #ifdef debug_UART
     Serial.print("Send MQTT SDCARD : ");
-    Serial.println(msg1);
+    Serial.print(msg1);
+    Serial.print(" - Number : ");
+    Serial.println(numberAck);
 #endif
-  SendDataMqtt(msg1);
-  //if (statusPeripheral.mqtt.statusMqttConnect) { mqttClient.publish("/data", 0, true, inforServer.mqttConfig.dataSend);}
+    if (numberAck < 5) { SendDataMqtt(msg1); }
+    else SdDeleteFile(SD, path);
   free(msg1);
 }
 //////////////////////////////////////////////////////////////////
 ////// Write SD and send MQTT ////////////////////////////////////
 //////////////////////////////////////////////////////////////////
-void SdWriteFile(fs::FS &fs, const char * path, const char * message) {
+void SdWriteFile(fs::FS &fs, const char * path, const char * message, uint8_t sttNumber) {
   File file = fs.open(path, FILE_WRITE);
   if (!file) {
     statusPeripheral.sdCard.statusConnect = false;
     return;
   }
   file.print(message);
+  file.print('!');
+  file.print(sttNumber);
   file.close();
 }

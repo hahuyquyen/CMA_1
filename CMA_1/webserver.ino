@@ -96,15 +96,15 @@ void setupWiFiConf(void) {
   server.on("/mqtt_conf", HTTP_GET, [](AsyncWebServerRequest * request) {
     request->send(SPIFFS, F("/mqtt_conf.html"), String(), false, processor);
   });
-  server.on("/SetTime", HTTP_GET, [](AsyncWebServerRequest * request) {
+  server.on("/setTime", HTTP_GET, [](AsyncWebServerRequest * request) {
     if (request->hasParam(F("t"))) {
       SetTimeRtc(strtoul(request->getParam(F("t"))->value().c_str(), NULL, 10));
     }
     request->send(200, F("text/plain"), F("OK ...."));
   });
-  server.on("/set_powerRF", HTTP_GET, [](AsyncWebServerRequest * request) {
-    if (request->hasParam(F("power"))) {
-      stateMachine.powerRFID = request->getParam(F("power"))->value().toInt();
+  server.on("/setRf", HTTP_GET, [](AsyncWebServerRequest * request) {
+    if (request->hasParam(F("p"))) {
+      stateMachine.powerRFID = request->getParam(F("p"))->value().toInt();
       stateMachine.setPowerRFID();
       Serial.println(stateMachine.powerRFID, HEX);
     }
