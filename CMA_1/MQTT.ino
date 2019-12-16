@@ -104,6 +104,7 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
   if (error) {
 #ifdef debug_UART
     Serial.println("error js");
+    //Serial.
 #endif
   }
   else if ((strcmp(WiFiConf.mqtt_subto1, topic) == 0) || (strcmp(inforServer.mqttConfig.topicGetConfig, topic) == 0)) {
