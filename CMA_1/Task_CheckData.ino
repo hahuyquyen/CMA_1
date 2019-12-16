@@ -32,18 +32,29 @@ void http_re( void * pvParameters ){
      * Nhận mã RFID mã Rổ
      * Nếu khu fille thì không nhận mã rỗ.
      */
+
+
     if(xQueueReceive( Queue_RFID, &Data_RFID_TH,  ( TickType_t ) 1 )== pdPASS ){
-      baoLed = true;
-      if (inforServer.giaiDoan.arrayType[inforServer.giaiDoan.userSelect] == kvSuaCa) {lastTimeGetQueueRFID_Ro=xTaskGetTickCount();}     
+        if (strcmp(Data_RFID_TH.id_RFID, "000000000000000000000000") != 0) {
+            baoLed = true;
+            if (inforServer.giaiDoan.arrayType[inforServer.giaiDoan.userSelect] == kvSuaCa) {
+                lastTimeGetQueueRFID_Ro = xTaskGetTickCount(); 
+            }
+        }
     }
     /*
      * Nhận mã RFID
      * Nếu là khu Filler chỉ nhận mã rỗ thì swap time tới mã rỗ để khỏi viết lại code
      */
     if(xQueueReceive( Queue_RFID_NV, &Data_RFID_NV,  ( TickType_t ) 1 )== pdPASS ){
+        if (strcmp(Data_RFID_NV.id_RFID, "000000000000000000000000") != 0) {
             baoLed = true;
-            if (inforServer.giaiDoan.arrayType[inforServer.giaiDoan.userSelect]==kvFille){lastTimeGetQueueRFID_Ro=xTaskGetTickCount();}
-            else lastTimeGetQueueRFID_NV=xTaskGetTickCount();
+            if (inforServer.giaiDoan.arrayType[inforServer.giaiDoan.userSelect] == kvFille) { lastTimeGetQueueRFID_Ro = xTaskGetTickCount(); }
+            else lastTimeGetQueueRFID_NV = xTaskGetTickCount();
+        }
+        else {
+            Serial.println("Loi RFID = 0");
+        }
     }
     //////////////////////////////////////////
     // Bao LED tin hieu nhan RFID ////////////

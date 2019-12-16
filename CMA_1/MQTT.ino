@@ -153,6 +153,18 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
       }
       statusPeripheral.mqtt.lastTimeGetDataConfig = 0;
     }
+    /////////////////////////////////////////
+    /// Nhan du lieu het ca reset data /////
+    ///////////////////////////////////////
+    else if (jsonBuffer["t"].as<uint8_t>() == 5) {
+        uint8_t statusSaveData = jsonBuffer["s"].as<uint8_t>();
+        if (statusSaveData == 1) {
+            stateMachine.bottonSelect = 0;
+            stateMachine.deviceStatus = deviceSetting;
+            khoiTaoGiaTri(false);
+            if (stateMachine.deviceStatus == deviceSetting) { variLcdUpdate.stateDisplayLCD = 1; }
+        }
+    }
   }
   else if (strcmp(inforServer.mqttConfig.topicGetStatusACK, topic) == 0) {
     /*

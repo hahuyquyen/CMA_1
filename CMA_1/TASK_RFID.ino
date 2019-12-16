@@ -90,12 +90,15 @@ void TaskRFID( void * pvParameters ) {
 
         else if (myEPC[0] == MaNV_RFID) {
           array_to_string(&myEPC[0], 12, Data_rfid_nv.id_RFID);
-          if (strcmp(Data_rfid.id_RFID, "000000000000000000000000") != 0) {
+          if (strcmp(Data_rfid.id_RFID, "000000000000000000000000") != 0) { //00 00 00 00 00 00 00 00 00 00 00 00
               if (strcmp(Data_rfid_nv.id_RFID, Data_rfid_nv.id_RFID_Old) != 0) {
 
                   strncpy(Data_rfid_nv.id_RFID_Old, Data_rfid_nv.id_RFID, sizeof(Data_rfid_nv.id_RFID));
                   xQueueSend(Queue_RFID_NV, &Data_rfid_nv, xTicksToWait);
               }
+          }
+          else {
+              Serial.println("Loi RFID = 0");
           }
         }
 

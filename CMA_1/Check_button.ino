@@ -105,7 +105,6 @@ void onPressedExit() {
 ////////////////////////////////////////////////
 //b Reset de nhan cac thong so lai /////////////
 ///////////////////////////////////////////////
-
   khoiTaoGiaTri(false);
   if (stateMachine.deviceStatus == deviceSetting){variLcdUpdate.stateDisplayLCD = 1; }
 }

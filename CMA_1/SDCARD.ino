@@ -112,41 +112,43 @@ void SdRenameFile(fs::FS &fs, const char * path1, const char * path2) {
 ////// Read SD and send MQTT //////////////////////////////////////
 //////////////////////////////////////////////////////////////////
 void SdReadFile(fs::FS &fs, const char * path, uint32_t len) {
-  Serial.printf("Reading : %s , L %lu \n", path,( unsigned long )len);
+ // Serial.printf("Reading : %s , L %lu \n", path,( unsigned long )len);
   File file = fs.open(path);
   if (!file) {
     statusPeripheral.sdCard.statusConnect = false;
     return;
   }
   char* msg1 = (char*)calloc(len + 1, sizeof(char));
-  //inforServer.mqttConfig.dataSend 
-  uint32_t num_ = 0;
-  //uint8_t tam = file.readStringUntil('\n');
+  uint32_t num_ = 0; 
   boolean startFirst = true;
   uint8_t numberAck = 0;
   while (file.available()) {
       if (startFirst) {
           msg1[num_] = file.read();
-          if (msg1[num_] == '!') {
-              startFirst = false;
-          }
+          if (msg1[num_] == '!') {startFirst = false;} // thoat 
           num_ = num_ + 1;
       }
-      else { numberAck = (uint8_t)file.read() - 48;Serial.println(numberAck); break; } //ascii 48 là số 0
+      else { 
+          numberAck = (uint8_t)file.read() - 48;  //ascii 48 là số 0
+          break; 
+      } 
   }
-  //while (file.available())inforServer.mqttConfig.dataSend[num_++] = file.read();
   msg1[num_ - 1] = '\0';
   file.close();
-  numberAck = numberAck + 1;
-  SdWriteFile(SD, path, msg1, numberAck);
+  if (numberAck < 4) {
+        numberAck = numberAck + 1;
+        SdWriteFile(SD, path, msg1, numberAck);
+        SendDataMqtt(msg1);
+  }
+  else { 
+        SdDeleteFile(SD, path);
+  }
 #ifdef debug_UART
     Serial.print("Send MQTT SDCARD : ");
     Serial.print(msg1);
     Serial.print(" - Number : ");
     Serial.println(numberAck);
 #endif
-    if (numberAck < 5) { SendDataMqtt(msg1); }
-    else SdDeleteFile(SD, path);
   free(msg1);
 }
 //////////////////////////////////////////////////////////////////
