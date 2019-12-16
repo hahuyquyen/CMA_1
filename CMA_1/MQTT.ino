@@ -44,12 +44,13 @@ void EncoderJsonMqtt() {
   doc["t"] = timeStamp.unixtime();
   doc["c"] = inforServer.nhaCC.arrayType[inforServer.nhaCC.userSelect];
   doc["p"] = inforServer.thanhPham.arrayType[inforServer.thanhPham.userSelect];
+  doc["r"] = 0;
   //char buffer[500];
   char* msg1 = (char*)calloc(300, 1);
   serializeJson(doc, msg1 , 300);
   char textToWrite[ 16 ];
   sprintf(textToWrite, "/CMA/%lu", ( unsigned long )timeStamp.unixtime());
-  SdWriteFile(SD, textToWrite, msg1 , 0);
+  SdWriteFile(SD, textToWrite, msg1);
 #ifdef debug_UART
   Serial.print("Send MQTT: ");
   Serial.println(msg1);
