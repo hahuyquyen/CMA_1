@@ -37,7 +37,7 @@ AsyncWebServer server(web_port);
 WiFiClient espClient;
 
 //display_NV Display_NV;
-Data_TH datatruyen_mqtt;
+Data_TH dataEncoderJsonMqtt;
 /*
 SaveData
 */

@@ -37,10 +37,10 @@ void EncoderJsonMqtt() {
   DynamicJsonDocument doc(300);
   doc["k"] = inforServer.giaiDoan.cheDoInOut;
   doc["x"] = inforServer.giaiDoan.arrayType[inforServer.giaiDoan.userSelect];
-  doc["b"] = datatruyen_mqtt.id_RFID;
-  doc["e"] = datatruyen_mqtt.id_RFID_NV;
+  doc["b"] = dataEncoderJsonMqtt.id_RFID;
+  doc["e"] = dataEncoderJsonMqtt.id_RFID_NV;
   doc["s"] = (unsigned long) stateMachine.idDevice;
-  doc["w"] = datatruyen_mqtt.data_weight;
+  doc["w"] = dataEncoderJsonMqtt.data_weight;
   doc["t"] = timeStamp.unixtime();
   doc["c"] = inforServer.nhaCC.arrayType[inforServer.nhaCC.userSelect];
   doc["p"] = inforServer.thanhPham.arrayType[inforServer.thanhPham.userSelect];

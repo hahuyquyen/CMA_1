@@ -63,7 +63,7 @@ void wifigotip()
   *time_blink = 2000;
   xQueueSend(Queue_Time_blink, time_blink, (TickType_t) 1);
   free(time_blink);
-  connectToMqtt();
+  ConnectToMqtt();
 }
 //////////////////////////////////////////////////////////////////
 ////// event trang thai wifi ////////////////////////////
