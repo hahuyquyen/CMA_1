@@ -126,10 +126,10 @@ void SdReadFile(fs::FS &fs, const char * path, uint32_t len) {
           if (msg1[num_] == 'r') { numLineRepeat = num_;} // vi tri truong r la rêpat
           num_ = num_ + 1;
   }
-  msg1[num_ - 1] = '\0';
+  msg1[num_] = '\0';
   file.close();
   uint8_t numCounterACK = (uint8_t )msg1[numLineRepeat + 3];
-  if (numCounterACK < 4) {
+  if (numCounterACK < 52) {
         numCounterACK = numCounterACK + 1;
         msg1[numLineRepeat + 3] = numCounterACK;
         SdWriteFile(SD, path, msg1);

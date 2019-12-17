@@ -379,6 +379,8 @@ void checkSendMQTTConfig() {
 Wire.setClock(400000);  Cai Clock cho RTC
 mac dinh RTC chỉ 100000khz
 
-
+git stash
+git pull <remote name> <remote branch name> (or) switch branch
+git stash apply --index
  
  */
