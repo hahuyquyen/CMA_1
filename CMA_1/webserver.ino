@@ -106,6 +106,7 @@ void setupWiFiConf(void) {
     if (request->hasParam(F("p"))) {
       stateMachine.powerRFID = request->getParam(F("p"))->value().toInt();
       stateMachine.setPowerRFID();
+      statusPeripheral.updateRFID = true;
       Serial.println(stateMachine.powerRFID, HEX);
     }
     request->send(200, F("text/plain"), F("OK ...."));

@@ -51,6 +51,7 @@ static struct statusPeripheralConf{
     int rssiWifi;
     int powerValue;
     uint32_t timeStampServer;
+    boolean updateRFID = false;
 }statusPeripheral;
 
 struct timeServerConf{
