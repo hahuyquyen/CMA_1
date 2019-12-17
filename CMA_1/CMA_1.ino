@@ -240,7 +240,7 @@ void setup()
   xTaskCreatePinnedToCore(
     Display,   /* Function to implement the task */
     "Display", /* Name of the task */
-    8192,      /* Stack size in words */
+    4096,      /* Stack size in words */
     NULL,       /* Task input parameter */
     12,          /* Priority of the task */
     NULL,       /* Task handle. */
@@ -327,7 +327,7 @@ void loop()
     else if (statusPeripheral.sdCard.statusGetAllFile == false) {// open next file
         SdOpenNextFile(&root_CMA);
     }
-    else if ((xTaskGetTickCount() - statusPeripheral.sdCard.lastTimeReadEnd > 3 * 6000 ) && (statusPeripheral.sdCard.statusGetAllFile)) { //30 phut moi mo lai va
+    else if ((xTaskGetTickCount() - statusPeripheral.sdCard.lastTimeReadEnd > 60 * 1000 * 5 ) && (statusPeripheral.sdCard.statusGetAllFile)) { //30 phut moi mo lai va
         SdReOpenFolder();
     }
   }

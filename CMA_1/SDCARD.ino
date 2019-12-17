@@ -65,9 +65,11 @@ void SdOpenNextFile(File* fileMaster){
             if (file.name()[5] == 'O') { //delete
               //  Serial.print("delete file ");
              //   Serial.println(file.name());
-            //    SdDeleteFile(SD, file.name());
+                SdDeleteFile(SD, file.name());
             }
-            else SdReadFile(SD, file.name(), file.size());
+            else {
+                SdReadFile(SD, file.name(), file.size());
+            }
         }
     }
     else {
