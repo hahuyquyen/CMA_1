@@ -36,9 +36,9 @@
 #define MaLoaiCa_RFID 0x01
 
 #define button_left_pin 36
-#define button_right_pin 34
+#define button_right_pin 39
 #define button_ok_pin 35
-#define buttonExitPin 39
+#define buttonExitPin 34
 #define buttonErrorPin 0
 #define pinPower 32
 #define pinReadPower 25
