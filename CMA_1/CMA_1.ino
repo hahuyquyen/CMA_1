@@ -21,12 +21,13 @@ extern "C" {
 #include "RTClib.h"
 #include <SPI.h>
 #include <EasyButton.h>
+#define WEBSOCKET_DISABLED true
 #ifdef debug_Web
     #include <RemoteDebug.h>
     #include <DNSServer.h>
     #include "ESPmDNS.h"
 #endif
-#define WEBSOCKET_DISABLED true
+
 #ifdef debug_Web
     RemoteDebug Debug;
 #endif
