@@ -100,7 +100,11 @@ void onPressedExit() {
   stateMachine.deviceStatus = deviceSetting;
   
 #ifdef debug_UART
-  Serial.println("onPressed_vitri");
+  
+ // Serial.println("onPressed_vitri");
+#endif
+#ifdef debug_Web
+  DebugData("Button - onPressed Exit");
 #endif
 ////////////////////////////////////////////////
 //b Reset de nhan cac thong so lai /////////////
@@ -113,7 +117,10 @@ void onPressedExit() {
 //////////////////////////////////////////////////////////////////
 void onPressedError() {
 #ifdef debug_UART
-  Serial.println("onPressed");
+  //Serial.println("onPressed");
+#endif
+#ifdef debug_Web
+    DebugData("Button - onPressed_Error");
 #endif
   if (stateMachine.deviceStatus == deviceSetting){
     if (variLcdUpdate.stateDisplayLCD == 5){
@@ -148,7 +155,10 @@ void Check_button( void * pvParameters ) {
   int powervalue;
   while (digitalRead(pinReadPower) == LOW){
 #ifdef debug_UART    
-    Serial.println("Wait ");
+    //Serial.println("Wait ");
+#endif
+#ifdef debug_Web
+      DebugData("Wait");
 #endif
     delay(50);
   }
@@ -175,9 +185,13 @@ void Check_button( void * pvParameters ) {
           lastTimeReadADC = xTaskGetTickCount();
           statusPeripheral.powerValue = adc1_get_raw( ADC1_CHANNEL_5);
 #ifdef debug_UART          
-          Serial.print("POWER : ");
-          Serial.print(statusPeripheral.powerValue);
-          Serial.println(" %");
+          
+        //  Serial.print("POWER : ");
+         // Serial.print();
+         // Serial.println(" %");
+#endif
+#ifdef debug_Web
+          DebugData("Power : %d", statusPeripheral.powerValue);
 #endif
           statusPeripheral.powerValue = map(statusPeripheral.powerValue, 2000, 4096, 0, 100); // Can Map dien ap tu 2.6->3.3 la 0-<>100
     }

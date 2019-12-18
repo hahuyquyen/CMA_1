@@ -56,7 +56,9 @@ void TaskRFID( void * pvParameters ) {
     */
     if (statusPeripheral.updateRFID) {
           statusPeripheral.updateRFID = false;
-          Serial.println("Update RFID Data");
+#ifdef debug_Web
+          DebugData("Update RFID = 0");
+#endif
           nano.set_mode_timming(2, 1000); // Set mode eprom 0x70, mode timming
           nano.set_timing_message(0x05, 1000); //0x00 -> 0x64
           nano.set_power(stateMachine.powerRFID, 1000); // 00 -> 95
@@ -67,11 +69,11 @@ void TaskRFID( void * pvParameters ) {
     if (nano.check() == true) {
       myEPClength = sizeof(myEPC);
       if (nano.parseResponse(myEPC, myEPClength)) {
-        Serial.print("Ma RFID : ");
+      /*  Serial.print("Ma RFID : ");
         for (int kj=0;kj<12;kj++){
         Serial.print(myEPC[kj]);
         }
-        Serial.println("");
+        Serial.println("");*/
         if (myEPC[0] == MaRo_RFID) {
           array_to_string(&myEPC[0], 12, Data_rfid.id_RFID); //0->12 5->7
           
@@ -102,7 +104,9 @@ void TaskRFID( void * pvParameters ) {
               }
           }
           else {
-              Serial.println("Loi RFID = 0");
+#ifdef debug_Web
+              DebugData("Error RFID = 0");
+#endif
           }
         }
 

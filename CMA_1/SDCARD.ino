@@ -31,12 +31,18 @@ void SdReInit(File* masterFile){
 #ifdef debug_UART
         Serial.println("Reinit Card : Failed");
 #endif
+#ifdef debug_Web
+        DebugData("Reinit Card : Failed");
+#endif
       }
       else {
         statusPeripheral.sdCard.statusConnect = true;
         statusPeripheral.mqtt.timeTruyenMQTT = 1000;
 #ifdef debug_UART
         Serial.println("Reinit Card : OK");
+#endif
+#ifdef debug_Web
+        DebugData("Reinit Card : OK");
 #endif
       }
 
@@ -103,10 +109,16 @@ void SdRenameFile(fs::FS &fs, const char * path1, const char * path2) {
 #ifdef debug_UART
   Serial.printf("Rename %s to %s\n", path1, path2);
 #endif
+#ifdef debug_Web
+  DebugData("Rename %s to %s", path1, path2);
+#endif
   if (!fs.rename(path1, path2)) {
     statusPeripheral.sdCard.statusConnect = false;
 #ifdef debug_UART
     Serial.println("Rename failed");  
+#endif
+#ifdef debug_Web
+    DebugData("Rename failed");
 #endif
   }
 }
@@ -140,12 +152,13 @@ void SdReadFile(fs::FS &fs, const char * path, uint32_t len) {
   else { 
         SdDeleteFile(SD, path);
   }
-#ifdef debug_UART
+/*#ifdef debug_UART
     Serial.print("Send MQTT SDCARD : ");
     Serial.print(msg1);
     Serial.print(" - Number : ");
     Serial.println(numCounterACK);
-#endif
+#endif*/
+
   free(msg1);
 }
 //////////////////////////////////////////////////////////////////

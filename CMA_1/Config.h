@@ -1,4 +1,11 @@
-#define debug_UART true
+//#define debug_UART true
+#define debug_Web true
+#define DebugData debugD
+#define DebugError debugE
+#define DebugInfor debugI
+#define DebugWarning debugW
+
+
 
 #define SerialCan Serial1
 #define SerialRFID Serial2

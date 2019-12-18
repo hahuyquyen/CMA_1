@@ -31,11 +31,17 @@ void wifiOnDisconnect(WiFiEventInfo_t info)
 #ifdef debug_UART
     Serial.println("NOT_AUTHED reconnect");
 #endif
+#ifdef debug_Web
+    DebugError("Wifi: NOT_AUTHED reconnect");
+#endif
     WiFi.reconnect();
   }
   else if (info.disconnected.reason == 8) {
 #ifdef debug_UART
     Serial.println("assoc leave");
+#endif
+#ifdef debug_Web
+    DebugError("Wifi: assoc leave");
 #endif
     wifi_connect(0, WIFI_STA, WiFiConf.sta_ssid, WiFiConf.sta_pwd, WiFiConf.ap_ssid);
   }
@@ -58,6 +64,9 @@ void wifigotip()
   statusPeripheral.wifi.counterWifiDisconnect = 0;
 #ifdef debug_UART
   printf("Wifi %s\n", WiFi.localIP().toString().c_str());
+#endif
+#ifdef debug_Web
+  DebugData("Wifi %s", WiFi.localIP().toString().c_str());
 #endif
   uint16_t* time_blink = (uint16_t*)malloc(sizeof(uint16_t));
   *time_blink = 2000;

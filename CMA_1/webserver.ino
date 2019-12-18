@@ -139,6 +139,9 @@ void setupWiFiConf(void) {
 #ifdef debug_UART
       Serial.println(request->getParam("id", true)->value());
 #endif
+#ifdef debug_Web
+      DebugData("%s",request->getParam("id", true)->value());
+#endif
       stateMachine.idDevice = strtoul(request->getParam("id", true)->value().c_str(), NULL, 10);
       stateMachine.setIdControl();
     }

@@ -52,8 +52,11 @@ void EncoderJsonMqtt() {
   sprintf(textToWrite, "/CMA/%lu", ( unsigned long )timeStamp.unixtime());
   SdWriteFile(SD, textToWrite, msg1);
 #ifdef debug_UART
-  Serial.print("Send MQTT: ");
-  Serial.println(msg1);
+  Serial.printf("Send MQTT: %s", msg1);
+#endif
+#ifdef debug_Web
+  DebugData("Send MQTT: %s", msg1);
+  Serial.printf("Send MQTT: %s\n", msg1);
 #endif
   SendDataMqtt(msg1);
   free(msg1);
@@ -80,6 +83,9 @@ void onMqttDisconnect(AsyncMqttClientDisconnectReason reason) {
   if (WiFi.isConnected()) {
     xTimerStart(mqttReconnectTimer, 0);
   }
+#ifdef debug_Web
+  DebugError("MQTT: Disconnect");
+#endif
 }
 
 
@@ -96,7 +102,10 @@ void onMqttDisconnect(AsyncMqttClientDisconnectReason reason) {
 //////////////////////////////////////////////////////////////////
 void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties properties, size_t len, size_t index, size_t total) {
 #ifdef debug_UART
-  printf("MQTT: %s ,ND: %s \n", topic, payload);
+    printf("MQTT: %s ,ND: %s \n", topic, payload);
+#endif
+#ifdef debug_Web
+    DebugInfor("MQTT: %s ,ND: %s ", topic, payload);
 #endif
   // Bo nho lon hon 1kb thay vi dung Static chuyen qua dung DynamicJsonDocument no cap phat malloc va free
  // StaticJsonDocument<1500> jsonBuffer;
@@ -105,7 +114,9 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
   if (error) {
 #ifdef debug_UART
     Serial.println("error js");
-    //Serial.
+#endif
+#ifdef debug_Web
+    DebugError("error js");
 #endif
   }
   else if ((strcmp(WiFiConf.mqtt_subto1, topic) == 0) || (strcmp(inforServer.mqttConfig.topicGetConfig, topic) == 0)) {

@@ -4,6 +4,7 @@ extern "C" {
 #include "freertos/FreeRTOS.h"
 #include "freertos/timers.h"
 }
+
 #include <Arduino.h>
 #include "FS.h"
 #include <AsyncMqttClient.h>
@@ -20,8 +21,15 @@ extern "C" {
 #include "RTClib.h"
 #include <SPI.h>
 #include <EasyButton.h>
-
-
+#ifdef debug_Web
+    #include <RemoteDebug.h>
+    #include <DNSServer.h>
+    #include "ESPmDNS.h"
+#endif
+#define WEBSOCKET_DISABLED true
+#ifdef debug_Web
+    RemoteDebug Debug;
+#endif
 // RTC
 RTC_DS3231 rtc;
 DateTime timeStamp;
@@ -113,8 +121,17 @@ void printProgress(size_t prg, size_t sz) {
 #ifdef debug_UART
   printf("Progress: %d%%\n", (prg * 100) / content_len);
 #endif
+#ifdef debug_Web
+  DebugWarning("Progress: %d%%", (prg * 100) / content_len);
+#endif
 }
 
+/*
+#ifndef WEBSOCKET_DISABLED // Only if Web socket enabled (RemoteDebugApp)
+// If enabled, you can change the port here (8232 is default)
+#define WEBSOCKET_PORT 83
+#endif
+*/
 //////////////////////////////////////////////////////////////////
 ////// Khoi tao gia trị mac dinh ////////////////////////////
 //////////////////////////////////////////////////////////////////
@@ -227,7 +244,15 @@ void setup()
   }, WiFiEvent_t::SYSTEM_EVENT_STA_GOT_IP);
   setupWiFiConf();
   server.begin();
+#ifdef debug_Web
+  MDNS.addService("telnet", "tcp", 23);
+  Debug.begin("nhan");
+  Debug.showProfiler(true); // Profiler (Good to measure times, to optimize codes)
+  Debug.showColors(true); // Colors
+#endif
+
   Update.onProgress(printProgress);
+
   //Free RTOS
   xTaskCreatePinnedToCore(
     Check_button,   /* Function to implement the task */
@@ -286,8 +311,11 @@ void setup()
    Main Loop luÃ´n cháº¡y Core 1
 */
 void loop()
-{  
-  
+{
+
+#ifdef debug_Web
+    Debug.handle();
+#endif   
   vTaskDelayUntil(&xLastWakeTimeLoop, 20);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////  Reconnect Wifi        /////////////////////////////
@@ -300,6 +328,9 @@ void loop()
       statusPeripheral.wifi.counterWifiDisconnect ++;
 #ifdef debug_UART
       printf("Wifi 2 che do: AP va STA\n");
+#endif
+#ifdef debug_Web
+      DebugWarning("Wifi 2 che do: AP va STA");
 #endif
     }
     else if ((statusPeripheral.wifi.counterWifiDisconnect < 15) && ( xTaskGetTickCount() - statusPeripheral.wifi.lastTimeConnect > 1000)) {

@@ -185,11 +185,17 @@ void Display( void * pvParameters ) {
 #ifdef debug_UART
             Serial.println("Data : Ro & Can KV Sua Ca - IN");
 #endif
+#ifdef debug_Web
+            DebugData("Data : Ro & Can KV Sua Ca - IN"); 
+#endif
             digitalWrite(pinLedGreen, LOW);
           }
           else if (GetSttKhuVuc() ==  sttKvSuaCaIN) {
-#ifdef debug_UART
+#ifdef debug_UART   
             Serial.println(" Da Nhan du thong tin");
+#endif
+#ifdef debug_Web
+              DebugData("Da Nhan du thong tin");
 #endif
             timeoutDisplay = xTaskGetTickCount();
             statusBuzzer = true ;
@@ -285,12 +291,19 @@ void printDebugHeap() {
     getTimeSendHeapDebug = xTaskGetTickCount();
 
 #ifdef debug_UART
-    Serial.print (statusPeripheral.rssiWifi);
+   /* Serial.print (statusPeripheral.rssiWifi);
     Serial.print (" - " );
-   // DateTime now = rtc.now();
     Serial.print (GetSttKhuVuc());
-    Serial.print (" - " );
-    printf("%lu , %d, Heap %d\n", (unsigned long )timeStamp.unixtime(), uxTaskGetStackHighWaterMark(NULL), ESP.getFreeHeap());
+    Serial.print (" - " );*/
+    
+    /*debugV("* This is a message of debug level VERBOSE");
+    DebugData("* This is a message of debug level DEBUG");
+    debugI("* This is a message of debug level INFO");
+    debugE("* This is a message of debug level ERROR");*/
+    //printf("%lu , %d, Heap %d\n", (unsigned long )timeStamp.unixtime(), uxTaskGetStackHighWaterMark(NULL), ESP.getFreeHeap());
+#endif
+#ifdef debug_Web
+    DebugData("%lu , %d, Heap %d", (unsigned long)timeStamp.unixtime(), uxTaskGetStackHighWaterMark(NULL), ESP.getFreeHeap());
 #endif
   }
 }
