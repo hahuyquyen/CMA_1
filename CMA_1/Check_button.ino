@@ -46,6 +46,9 @@ void onPressed_left() {
     else    variLcdUpdate.stateDisplayLCD = 2;
         
   }
+#ifdef debug_Web
+  DebugData("Button - onPressed Left");
+#endif
 }
 //////////////////////////////////////////////////////////////////
 ////// Button RIGHT ///////////////////////////////////////////////
@@ -70,6 +73,9 @@ void onPressed_right() {
   if (stateMachine.deviceStatus == deviceSetting){variLcdUpdate.stateDisplayLCD = 1; }
   variLcdUpdate.numScroll = 0;
   variLcdUpdate.updateLCD = true;
+#ifdef debug_Web
+  DebugData("Button - onPressed Right");
+#endif
 }
 //////////////////////////////////////////////////////////////////
 ////// Button OK ///////////////////////////////////////////////
