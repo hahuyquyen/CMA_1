@@ -4,7 +4,8 @@ extern "C" {
 #include "freertos/FreeRTOS.h"
 #include "freertos/timers.h"
 }
-
+#include <WiFi.h>
+//#include <ETH.h>
 #include <Arduino.h>
 #include "FS.h"
 #include <AsyncMqttClient.h>
@@ -13,10 +14,8 @@ extern "C" {
 #include "Variable_wifi.h"
 #include <ArduinoJson.h>
 #include <SPIFFS.h>
-#include <WiFi.h>
 #include <ESPAsyncWebServer.h>
 #include <Update.h>
-#include <U8g2lib.h>
 #include "SD.h"
 #include "RTClib.h"
 #include <SPI.h>
@@ -27,7 +26,7 @@ extern "C" {
     #include <DNSServer.h>
     #include "ESPmDNS.h"
 #endif
-
+#include <ModbusRTU.h>
 #ifdef debug_Web
     RemoteDebug Debug;
 #endif
@@ -35,7 +34,7 @@ extern "C" {
 RTC_DS3231 rtc;
 DateTime timeStamp;
 //LCD
-U8G2_ST7920_128X64_F_HW_SPI u8g2(U8G2_R2,/*CS=*/ U8X8_PIN_NONE,/*CS=*/ U8X8_PIN_NONE);
+
 //SD CArd
 SPIClass SDSPI(HSPI);
 File root_CMA ;

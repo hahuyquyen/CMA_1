@@ -1,5 +1,5 @@
 //#define debug_UART true
-#define debug_Web true
+//#define debug_Web true
 #define DebugData debugD
 #define DebugError debugE
 #define DebugInfor debugI

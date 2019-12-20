@@ -1,16 +1,219 @@
+#include "cutf.h"
+  ModbusRTU mb;
+  
 
+bool cb(Modbus::ResultCode event, uint16_t transactionId, void* data) {
+  Serial.printf_P("Request result: 0x%02X, Mem: %d\n", event, ESP.getFreeHeap());
+  return true;
+}
+void LcdDisplayKhuVuc(uint8_t vitri = 48) {
+}
+void LcdDisplayTurnOffPower() {
+}
+void LcdDisplaySetting(char* dataDisplay = NULL, char* dataUserDisplay = NULL) {
+}
+void LcdDisplayInfor(){
+}
+
+void LcdSeclectMode(uint8_t chedo_HT, Data_TH* Data_TH  , uint8_t daucham = 0) {
+  if (chedo_HT == 0) {
+      
+   /*   mb.writeHreg(1,(uint16_t) 7910, (uint16_t)*Data_TH->data_weight, 1, cb); //ID, Offsrt, Data,SL
+      mb.writeHreg(1,(uint16_t) 7911, (uint16_t)(*Data_TH->data_weight >> 16), 1, cb); //ID, Offsrt, Data,SL
+      wmemset(modbusData.nameNvUtf16, 0x0000, sizeof(modbusData.nameNvUtf16) / 2);
+      size_t valuelen = utf8towchar(Data_TH->id_RFID_NV, SIZE_MAX, modbusData.nameNvUtf16, sizeof(modbusData.nameNvUtf16));
+      mb.writeHreg(1,(uint16_t) 8150, (uint16_t)modbusData.nameNvUtf16, sizeof(modbusData.nameNvUtf16) / 2 , cb);
+      mb.writeHreg(1,(uint16_t) 7900, 16, 1, cb); //ID, Offsrt, Data,SL cai dat id man hinh
+      yield();*/
+  }
+  else if (chedo_HT == 1) {
+     /*     mb.writeHreg(1, (uint16_t)7910, (uint16_t)*Data_TH->data_weight, 1, cb); //ID, Offsrt, Data,SL
+      mb.writeHreg(1, (uint16_t)7911, (uint16_t)(*Data_TH->data_weight >> 16), 1, cb); //ID, Offsrt, Data,SL
+      wmemset(modbusData.nameNvUtf16, 0x0000, sizeof(modbusData.nameNvUtf16) / 2);
+      size_t valuelen = utf8towchar(Data_TH->id_RFID_NV, SIZE_MAX, modbusData.nameNvUtf16, sizeof(modbusData.nameNvUtf16));
+      mb.writeHreg(1, (uint16_t)8150, (uint16_t*)modbusData.nameNvUtf16, sizeof(modbusData.nameNvUtf16) / 2 , cb);
+      mb.writeHreg(1, (uint16_t)7900, 15, 1, cb); //ID, Offsrt, Data,SL cai dat id man hinh
+      yield();*/
+  }
+  else if (chedo_HT == 2) {
+  }
+  else if (chedo_HT == 10) {
+  }
+  else if (chedo_HT == 3) {
+  }
+  else if (chedo_HT == 4) { // nha cung cap
+       /*   mb.writeHreg(1, (uint16_t)7910, (uint16_t)Data_TH->data_weight, 1, cb); //ID, Offsrt, Data,SL
+      mb.writeHreg(1, (uint16_t)7911, (uint16_t)(Data_TH->data_weight >> 16), 1, cb); //ID, Offsrt, Data,SL
+      wmemset(modbusData.nameNvUtf16, 0x0000, sizeof(modbusData.nameNvUtf16) / 2);
+      size_t valuelen = utf8towchar(inforServer.nhaCC.arrayName[inforServer.nhaCC.userSelect], SIZE_MAX, modbusData.nameNvUtf16, 32);
+      mb.writeHreg(1,(uint16_t) 8013, modbusData.nameNvUtf16, 32 , cb);
+      mb.writeHreg(1, (uint16_t)7900, 12, 1, cb); //ID, Offsrt, Data,SL cai dat id man hinh
+      yield();*/
+  }
+  else if (chedo_HT == 5) { //loai thanh pham
+    /*      mb.writeHreg(1,(uint16_t) 7910, (uint16_t)Data_TH->data_weight, 1, cb); //ID, Offsrt, Data,SL
+      mb.writeHreg(1,(uint16_t) 7911, (uint16_t)(Data_TH->data_weight >> 16), 1, cb); //ID, Offsrt, Data,SL
+      wmemset(modbusData.nameNvUtf16, 0x0000, sizeof(modbusData.nameNvUtf16) / 2);
+      size_t valuelen = utf8towchar(inforServer.thanhPham.arrayName[inforServer.thanhPham.userSelect], SIZE_MAX, modbusData.nameNvUtf16, 64);
+      mb.writeHreg(1,(uint16_t) 8045, modbusData.nameNvUtf16, 64, cb);
+      mb.writeHreg(1,(uint16_t) 7900, 13, 1, cb); //ID, Offsrt, Data,SL cai dat id man hinh
+      yield();*/
+  }
+  else if (chedo_HT == 6) { //xac nhan
+        mb.writeHreg(1,(uint16_t) 7910, (uint16_t*)Data_TH->data_weight, 1, cb); //ID, Offsrt, Data,SL
+      mb.writeHreg(1, (uint16_t)7911, (uint16_t*)(Data_TH->data_weight >> 16), 1, cb); //ID, Offsrt, Data,SL
+      wmemset(modbusData.nameNvUtf16, 0x0000, sizeof(modbusData.nameNvUtf16) / 2);
+      size_t valuelen = utf8towchar(inforServer.thanhPham.arrayName[inforServer.thanhPham.userSelect], SIZE_MAX, modbusData.nameNvUtf16, 64);
+      mb.writeHreg(1, (uint16_t)8045,(uint16_t*) modbusData.nameNvUtf16, 64, cb);
+      wmemset(modbusData.nameNvUtf16, 0x0000, sizeof(modbusData.nameNvUtf16) / 2);
+      valuelen = utf8towchar(inforServer.nhaCC.arrayName[inforServer.nhaCC.userSelect], SIZE_MAX, modbusData.nameNvUtf16, 32);
+      mb.writeHreg(1,(uint16_t) 8013, (uint16_t*)modbusData.nameNvUtf16, 32 , cb);
+      mb.writeHreg(1,(uint16_t) 7900, (uint16_t*) 14, 1, cb); //ID, Offsrt, Data,SL cai dat id man hinh
+      yield();
+  }
+}
+
+
+void Display( void * pvParameters ) {
+  boolean status_led = true;
+  Data_TH Data_TH;
+  unsigned long lastTimeBlinkLed = 0;
+  unsigned long timeoutDisplay = 0;
+  //  unsigned long timeoutLcdLangDaIn = 0;
+  unsigned long lastBlinkLCD = 0;
+  uint16_t Time_blink = 1000;
+  uint16_t Time_check = 2500;
+
+    //Serial1.begin(9600, SERIAL_8N1, 17, 18);
+  mb.begin(&Serial);
+  mb.master();
+  LcdSeclectMode(2, &Data_TH);
+  variLcdUpdate.stateDisplayLCD = 1;
+  uint8_t daucham_lcd = 0;
+ // u8g2.setAutoPageClear(1);
+  boolean statusBuzzer = false ;
+  digitalWrite(pinLedGreen, HIGH);
+  digitalWrite(pinLedRed, HIGH);
+  TickType_t xLastWakeTime;
+  xLastWakeTime = xTaskGetTickCount();
+  for (;;) {
+    mb.task();
+    switch (stateMachine.deviceStatus) {
+      //////////////////////////////////////////////////////////////////
+      case deviceRunning: //////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////
+        if (xQueueReceive( Queue_display, &Data_TH,  ( TickType_t ) 1 ) == pdPASS ) {
+          variLcdUpdate.stateDisplayLCD = 0;
+          if ((Data_TH.id_RFID_NV[0] == 'x') && (GetSttKhuVuc() ==  sttKvSuaCaIN)) {
+#ifdef debug_UART
+            Serial.println("Data : Ro & Can KV Sua Ca - IN");
+#endif
+#ifdef debug_Web
+            DebugData("Data : Ro & Can KV Sua Ca - IN"); 
+#endif
+            digitalWrite(pinLedGreen, LOW);
+          }
+          else if (GetSttKhuVuc() ==  sttKvSuaCaIN) {
+#ifdef debug_UART   
+            Serial.println(" Da Nhan du thong tin");
+#endif
+#ifdef debug_Web
+              DebugData("Da Nhan du thong tin");
+#endif
+            timeoutDisplay = xTaskGetTickCount();
+            statusBuzzer = true ;
+            digitalWrite(pinBuzzer, statusBuzzer);
+          }
+          else {
+            timeoutDisplay = xTaskGetTickCount();
+            statusBuzzer = true ;
+            digitalWrite(pinBuzzer, statusBuzzer);
+          }
+        }
+        // Turn Off Buzzer, LED
+        if (xSemaphoreTake(xSignal_Display_checkdone, 1)) { //Che do IN qua timeout se tat
+          variLcdUpdate.stateDisplayLCD = 1;
+          statusBuzzer = false ;
+          digitalWrite(pinBuzzer, statusBuzzer);
+          digitalWrite(pinLedGreen, HIGH);
+          timeoutDisplay = 0;
+        }
+        if ((xTaskGetTickCount() - timeoutDisplay > 500) && (timeoutDisplay > 0 ) && (statusBuzzer)) {
+          statusBuzzer = false ;
+          digitalWrite(pinBuzzer, statusBuzzer);
+          digitalWrite(pinLedGreen, HIGH);
+        }
+        if ((xTaskGetTickCount() - timeoutDisplay > Time_check) && (timeoutDisplay > 0 )) {
+          variLcdUpdate.stateDisplayLCD = 1;
+          timeoutDisplay = 0;
+        }
+        xQueueReceive( Queue_Time_blink, &Time_blink,  ( TickType_t ) 1 );
+        if (xTaskGetTickCount() - lastTimeBlinkLed > Time_blink) {
+          lastTimeBlinkLed = xTaskGetTickCount();
+          status_led = !status_led;
+        }
+        printDebugHeap();
+        switch (variLcdUpdate.stateDisplayLCD) {
+          case 0:
+            LcdSeclectMode(0, &Data_TH, daucham_lcd);
+            variLcdUpdate.stateDisplayLCD = 4;
+            break;
+          case 1:
+            if (xTaskGetTickCount() - lastBlinkLCD > 150) {
+            //  daucham_lcd ++ ;
+             // if (daucham_lcd > 3)daucham_lcd = 0;
+              lastBlinkLCD = xTaskGetTickCount();
+              LcdSeclectMode(1, &Data_TH, daucham_lcd);
+            }
+            break;
+          case 2:
+            LcdSeclectMode(10, &Data_TH, daucham_lcd);
+            variLcdUpdate.stateDisplayLCD = 5;
+            break;
+          default: break;
+        }
+        break;
+      //////////////////////////////////////////////////////////////////
+      case deviceSetting: ///////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////
+          switch (variLcdUpdate.stateDisplayLCD) {
+            case 1:
+                if ((xTaskGetTickCount() - lastBlinkLCD > 100) || variLcdUpdate.updateLCD ) {
+                  variLcdUpdate.updateLCD = false;
+                  lastBlinkLCD = xTaskGetTickCount();
+                  LcdSeclectMode(stateMachine.bottonSelect + 2, &Data_TH, daucham_lcd);
+                }
+              break;
+            case 2:
+              LcdSeclectMode(10, &Data_TH, daucham_lcd);
+              variLcdUpdate.stateDisplayLCD = 5;
+              break;
+            default: break;
+          }
+        break;
+      //////////////////////////////////////////////////////////////////
+      case deviceTurnOff: /////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////
+        if ((xTaskGetTickCount() - lastBlinkLCD > 5000)|| variLcdUpdate.updateLCD ) {
+                  LcdDisplayTurnOffPower();
+                  lastBlinkLCD = xTaskGetTickCount();
+        }
+        break;
+      default : 
+        break;
+    }
+    printDebugHeap();
+    vTaskDelayUntil(&xLastWakeTime, 50);
+  }
+  vTaskDelete(NULL) ;
+}
+
+unsigned long getTimeSendHeapDebug = 0;
+void printDebugHeap() {
+}
 
 
 /*
-   CPU cháº¡y 240mhz
-   vTaskDelay (x)  x lÃ  sá»‘ stick muá»‘n trÃ¬ hoÃ£n
-   Trong freertos nÃªn dÃ¹ng hÃ m delay cá»§a RTOS thay vÃ¬ cá»§a arduino
-   VÃ¬ khi dÃ¹ng delay rtos thÃ¬ task sáº½ Ä‘Æ°á»£c chuyá»ƒn Ä‘á»•i trong delay
-
-
-*/
-
-
 
 const char LCD_setting[] = "Cài Đặt";
 void LcdDisplayKhuVuc(uint8_t vitri = 48) {
@@ -159,22 +362,19 @@ void Display( void * pvParameters ) {
   uint16_t Time_blink = 1000;
   uint16_t Time_check = 2500;
   // SPI.setClockDivider( SPI_CLOCK_DIV32 );
-  u8g2.setBusClock(700000);
-  u8g2.begin();
-  u8g2.enableUTF8Print();
+ // u8g2.setBusClock(700000);
+ // u8g2.begin();
+//  u8g2.enableUTF8Print();
   LcdSeclectMode(2, &Data_TH);
   variLcdUpdate.stateDisplayLCD = 1;
   uint8_t daucham_lcd = 0;
-  u8g2.setAutoPageClear(1);
+ // u8g2.setAutoPageClear(1);
   boolean statusBuzzer = false ;
   digitalWrite(pinLedGreen, HIGH);
   digitalWrite(pinLedRed, HIGH);
   TickType_t xLastWakeTime;
   xLastWakeTime = xTaskGetTickCount();
   for (;;) {
-    /*
-       30ms
-    */
     switch (stateMachine.deviceStatus) {
       //////////////////////////////////////////////////////////////////
       case deviceRunning: //////////////////////////////////////////////
@@ -291,15 +491,11 @@ void printDebugHeap() {
     getTimeSendHeapDebug = xTaskGetTickCount();
 
 #ifdef debug_UART
-   /* Serial.print (statusPeripheral.rssiWifi);
+    Serial.print (statusPeripheral.rssiWifi);
     Serial.print (" - " );
     Serial.print (GetSttKhuVuc());
-    Serial.print (" - " );*/
+    Serial.print (" - " );
     
-    /*debugV("* This is a message of debug level VERBOSE");
-    DebugData("* This is a message of debug level DEBUG");
-    debugI("* This is a message of debug level INFO");
-    debugE("* This is a message of debug level ERROR");*/
     //printf("%lu , %d, Heap %d\n", (unsigned long )timeStamp.unixtime(), uxTaskGetStackHighWaterMark(NULL), ESP.getFreeHeap());
 #endif
 #ifdef debug_Web
@@ -307,6 +503,7 @@ void printDebugHeap() {
 #endif
   }
 }
+*/
 /*
 
 

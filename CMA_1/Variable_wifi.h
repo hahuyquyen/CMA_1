@@ -24,7 +24,9 @@ struct DefaultAllocator {
 
 typedef BasicJsonDocument<DefaultAllocator> DynamicJsonDocument;
 */
-
+static struct modbusDataConf{
+  wchar_t nameNvUtf16[64];
+}modbusData;
 static struct statusPeripheralConf{
     struct mqttConf{
       unsigned long lastTimeGetDataConfig; 
