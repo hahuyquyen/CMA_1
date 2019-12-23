@@ -3,13 +3,13 @@
 //////////////////////////////////////////////////////////////////
 uint8_t GetSttKhuVuc(){
   uint8_t bien=0;
-  switch (inforServer.giaiDoan.arrayType[inforServer.giaiDoan.userSelect]){
+  switch (stateMachine.giaidoanKV){
     case kvSuaCa:
-      if (inforServer.giaiDoan.cheDoInOut == cheDoIN) bien = sttKvSuaCaIN;
+      if (stateMachine.giaidoanINOUT == cheDoIN) bien = sttKvSuaCaIN;
       else bien = sttKvSuaCaOUT;
       break;
     case kvFille:
-      if (inforServer.giaiDoan.cheDoInOut == cheDoIN) bien = sttKvFillerIN;
+      if (stateMachine.giaidoanINOUT == cheDoIN) bien = sttKvFillerIN;
       else bien = sttKvFillerOUT;
       break;
     default: break;

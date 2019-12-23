@@ -42,9 +42,15 @@
     <ClInclude Include="Variable_wifi.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="cutf.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="rfid.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cutf.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

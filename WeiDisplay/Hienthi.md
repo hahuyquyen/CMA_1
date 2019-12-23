@@ -1,6 +1,9 @@
 HMI ID Slaver 1
 
  LW 7900 -> Set ID man Hinh
+ LW 7901 -> ID cua Can
+ LW 7902 -> Loai Khu vuc, vao:1, ra 2
+ lw 7903 -> STT khu vuc fillet, sửa cá
  LW 7910 -> So Kg
  
  cafile bo de bo ,mo

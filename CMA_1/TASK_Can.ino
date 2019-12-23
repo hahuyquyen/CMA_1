@@ -6,16 +6,15 @@ static uint8_t UartCanData[11];
 //////////////////////////////////////////////////////////////////
 void TaskCAN( void * pvParameters ) {
   const TickType_t xTicksToWait = pdMS_TO_TICKS(1);
-  SerialCan.begin(9600, SERIAL_8N1, 26, 12); //12 tx 13 lÃ  rx(bau,se,rx,tx)
-  static Data_CAN Data_CAN;
+   static Data_CAN Data_CAN;
   int tam = 0;
   unsigned long lastTimeSendCan = 0;
   TickType_t xLastWakeTime;
   xLastWakeTime = xTaskGetTickCount();
   
   for (;;) {
-    if (SerialCan.available()) {
-      uint8_t incomingData = SerialCan.read();
+    if (Serial.available()) {
+      uint8_t incomingData = Serial.read();
       if ( incomingData == canStartByte) {
         tam = 0;
       }

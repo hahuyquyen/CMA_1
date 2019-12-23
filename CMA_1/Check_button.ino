@@ -21,6 +21,7 @@ void onPressedPower() {
 //////////////////////////////////////////////////////////////////
 ////// Button LEFT ///////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////
+/*
 void onPressed_left() {
   if (stateMachine.deviceStatus == deviceSetting){
         if ((stateMachine.bottonSelect == 0) && (inforServer.giaiDoan.cheDoInOut > 0)) {
@@ -50,6 +51,7 @@ void onPressed_left() {
   DebugData("Button - onPressed Left");
 #endif
 }
+*/
 //////////////////////////////////////////////////////////////////
 ////// Button RIGHT ///////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////
@@ -58,13 +60,14 @@ void onPressed_right() {
     else if ((stateMachine.bottonSelect == 1)&&(inforServer.giaiDoan.total > 0)){ inforServer.giaiDoan.userSelect = (inforServer.giaiDoan.userSelect > (inforServer.giaiDoan.total-1)) ? 0 : (inforServer.giaiDoan.userSelect + 1);}
     else if ((stateMachine.bottonSelect == 2)&&(inforServer.nhaCC.total > 0)){inforServer.nhaCC.userSelect = (inforServer.nhaCC.userSelect > (inforServer.nhaCC.total - 1)) ? 0 : (inforServer.nhaCC.userSelect + 1);}
     else if ((stateMachine.bottonSelect == 3)&&(inforServer.thanhPham.total > 0)){inforServer.thanhPham.userSelect = (inforServer.thanhPham.userSelect > (inforServer.thanhPham.total-1)) ? 0 : (inforServer.thanhPham.userSelect + 1);}*/
-  if (stateMachine.bottonSelect == 0) {
+/* if (stateMachine.bottonSelect == 0) {
     inforServer.changeData(true, &inforServer.giaiDoan.cheDoInOut, (uint8_t) 2);
   }
   else if ((stateMachine.bottonSelect == 1) && (inforServer.giaiDoan.total > 0)) {
     inforServer.changeData(true, &inforServer.giaiDoan.userSelect, inforServer.giaiDoan.total);
   }
-  else if ((stateMachine.bottonSelect == 2) && (inforServer.nhaCC.total > 0)) {
+  else */
+  if ((stateMachine.bottonSelect == 2) && (inforServer.nhaCC.total > 0)) {
     inforServer.changeData(true, &inforServer.nhaCC.userSelect, inforServer.nhaCC.total);
   }
   else if ((stateMachine.bottonSelect == 3) && (inforServer.thanhPham.total > 0)) {
@@ -81,16 +84,27 @@ void onPressed_right() {
 ////// Button OK ///////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////
 void onPressed_ok() {
-  if ((stateMachine.bottonSelect == 0) && (inforServer.giaiDoan.cheDoInOut == 0)) return;
+ /* if ((stateMachine.bottonSelect == 0) && (inforServer.giaiDoan.cheDoInOut == 0)) return;
   else if ((stateMachine.bottonSelect == 1) && (inforServer.giaiDoan.userSelect == 0)) return;
-  else if ((stateMachine.bottonSelect == 2) && (inforServer.nhaCC.userSelect == 0)) return;
+  else */
+  
+  if ((stateMachine.bottonSelect == 2) && (inforServer.nhaCC.userSelect == 0)) return;
   else if ((stateMachine.bottonSelect == 3) && (inforServer.thanhPham.userSelect == 0)) return;
-  if  ((stateMachine.bottonSelect == 1) && (inforServer.giaiDoan.cheDoInOut == cheDoOut )) {
+  if (stateMachine.bottonSelect > 4) return;
+  if (stateMachine.bottonSelect == 0) {
+      if (stateMachine.giaidoanINOUT == cheDoOut) {
+          stateMachine.bottonSelect = 3;
+      }
+      else stateMachine.bottonSelect = 2;
+  }
+  else stateMachine.bottonSelect = stateMachine.bottonSelect + 1;
+ /*- if  ((stateMachine.bottonSelect == 1) && (inforServer.giaiDoan.cheDoInOut == cheDoOut )) {
     stateMachine.bottonSelect = 3;
   }
-  else {
-    stateMachine.bottonSelect = (stateMachine.bottonSelect == 2) ? 4 : (stateMachine.bottonSelect == 0 ) ? 1 : stateMachine.bottonSelect + 1;
-  }
+  else {*/
+    
+ // }
+
   if (stateMachine.bottonSelect > 4) {
     stateMachine.deviceStatus = deviceRunning;
   }
@@ -140,13 +154,13 @@ void onPressedError() {
 //////////////////////////////////////////////////////////////////
 void Check_button( void * pvParameters ) {
   pinMode(pinReadPower, INPUT_PULLUP);
-  button_left.begin();
+ // button_left.begin();
   button_right.begin();
   buttonExit.begin();
   button_ok.begin();
   buttonError.begin();
   buttonPower.begin();
-  button_left.onPressedFor(80, onPressed_left);
+  //button_left.onPressedFor(80, onPressed_left);
   button_right.onPressedFor(80, onPressed_right);
   buttonExit.onPressedFor(80, onPressedExit);
   button_ok.onPressedFor(80, onPressed_ok);
@@ -178,7 +192,7 @@ void Check_button( void * pvParameters ) {
       button_right.read();
       button_ok.read();
     }
-    button_left.read();
+   // button_left.read();
     buttonExit.read();
     buttonError.read();
     buttonPower.read();

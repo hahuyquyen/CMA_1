@@ -102,6 +102,17 @@ void setupWiFiConf(void) {
     }
     request->send(200, F("text/plain"), F("OK ...."));
   });
+  server.on("/setKhuVuc", HTTP_GET, [](AsyncWebServerRequest* request) {
+      if (request->hasParam(F("i"))) {
+          stateMachine.giaidoanINOUT = request->getParam(F("i"))->value().toInt();
+      }
+      if (request->hasParam(F("kv"))) {
+          stateMachine.giaidoanKV = request->getParam(F("kv"))->value().toInt();
+      }
+      stateMachine.setGiaiDoan();
+      stateMachine.setKV();
+      request->send(200, F("text/plain"), F("OK ...."));
+      });
   server.on("/setRf", HTTP_GET, [](AsyncWebServerRequest * request) {
     if (request->hasParam(F("p"))) {
       stateMachine.powerRFID = request->getParam(F("p"))->value().toInt();

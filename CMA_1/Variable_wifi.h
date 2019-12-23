@@ -74,19 +74,43 @@ static struct stateMachineConf {
   uint8_t deviceStatus;
   uint32_t idDevice;
   uint8_t powerRFID;
+  uint8_t giaidoanINOUT;
+  uint8_t giaidoanKV;
   void getPowerRFID(){
     this->powerRFID=EEPROM.readUInt(810);
   }
   void getIdControl(){
-    this->idDevice=EEPROM.readUInt(800);
+    this->powerRFID=EEPROM.readInt(810);
+  }
+  void getKV() {
+      this->giaidoanKV = EEPROM.readInt(812);
+  }
+  void getGiaiDoan() {
+      this->giaidoanINOUT = EEPROM.readInt(811);
+  }
+  void setKV() {
+      setdata8Bit(812, &this->giaidoanKV);
+  }
+  void setGiaiDoan() {
+      setdata8Bit(811, &this->giaidoanINOUT);
   }
   void setPowerRFID(){
-    EEPROM.write(810, this->powerRFID);
-    EEPROM.commit();
+      setdata8Bit(810, &this->powerRFID);
+    /*EEPROM.write(810, this->powerRFID);
+    EEPROM.commit();*/
   }  
   void setIdControl(){
-    EEPROM.writeUInt(800, this->idDevice);
-    EEPROM.commit();
+      setdata32Bit(800, &this->idDevice);
+  /*  EEPROM.writeUInt(800, this->idDevice);
+    EEPROM.commit();*/
+  }
+  void setdata32Bit(uint16_t address, uint32_t* value) {
+      EEPROM.writeUInt(address, *value);
+      EEPROM.commit();
+  }
+  void setdata8Bit(uint16_t address, uint8_t* value) {
+      EEPROM.writeInt(address, *value);
+      EEPROM.commit();
   }
 } stateMachine;
 /////////////////////////////////////////////////////////////
@@ -121,7 +145,7 @@ static struct inforServerStruct {
     uint16_t arrayType[15];
     char arrayName[15][120];
   }thanhPham;
-  
+  /*
   struct giaiDoanConf{
       uint8_t cheDoInOut;
       uint8_t total;
@@ -129,7 +153,7 @@ static struct inforServerStruct {
       uint8_t arrayType[10];
       char arrayName[10][30];
   }giaiDoan;
-  
+  */
   struct mqttConfigConf{
       char topicGetStatusACK[25];
       char topicGetConfig[25];

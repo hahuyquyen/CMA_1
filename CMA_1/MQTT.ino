@@ -35,8 +35,10 @@ void EncoderJsonMqtt() {
   //DateTime now = rtc.now();
  // StaticJsonDocument<300> doc;
   DynamicJsonDocument doc(300);
-  doc["k"] = inforServer.giaiDoan.cheDoInOut;
-  doc["x"] = inforServer.giaiDoan.arrayType[inforServer.giaiDoan.userSelect];
+  //doc["k"] = inforServer.giaiDoan.cheDoInOut;
+ // doc["x"] = inforServer.giaiDoan.arrayType[inforServer.giaiDoan.userSelect];
+  doc["k"] = stateMachine.giaidoanINOUT;
+  doc["x"] = stateMachine.giaidoanKV;
   doc["b"] = dataEncoderJsonMqtt.id_RFID;
   doc["e"] = dataEncoderJsonMqtt.id_RFID_NV;
   doc["s"] = (unsigned long) stateMachine.idDevice;
@@ -140,18 +142,11 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
       }
     }
     else if (jsonBuffer["t"].as<uint8_t>() == 2) {
-        if (!jsonBuffer.containsKey("s")) {return;}
-      strlcpy(inforServer.giaiDoan.arrayName[0], ramChuaChon, sizeof(inforServer.giaiDoan.arrayName[0]));
-      inforServer.giaiDoan.total = jsonBuffer["l"].as<uint8_t>();
-      statusPeripheral.timeStampServer = jsonBuffer["s"].as<uint32_t>();
-      SetTimeRtc(statusPeripheral.timeStampServer);
-      for (int i = 0; i < inforServer.giaiDoan.total; i++) {
-        if (jsonBuffer["d"][i].isNull()) {Serial.println("error key");inforServer.giaiDoan.total = 0;return;} // Fix loi thieu data
-        if (i == 10)break; //qua array cua data
-        inforServer.giaiDoan.arrayType[i + 1] = jsonBuffer["d"][i]["i"].as<uint16_t>();
-        strlcpy(inforServer.giaiDoan.arrayName[i + 1], jsonBuffer["d"][i]["n"], sizeof(inforServer.giaiDoan.arrayName[i + 1]));
-      }
-      
+      if (!jsonBuffer.containsKey("s")) {return;}
+      stateMachine.giaidoanINOUT=jsonBuffer["l"].as<uint8_t>();
+      stateMachine.giaidoanKV = jsonBuffer["u"].as<uint8_t>();
+      stateMachine.setGiaiDoan();
+      stateMachine.setKV();
       statusPeripheral.mqtt.lastTimeGetDataConfig = 0;
     }
     else if (jsonBuffer["t"].as<uint8_t>() == 3) {

@@ -26,6 +26,7 @@ extern "C" {
     #include <DNSServer.h>
     #include "ESPmDNS.h"
 #endif
+#include "cutf.h"
 #include <ModbusRTU.h>
 #ifdef debug_Web
     RemoteDebug Debug;
@@ -149,7 +150,7 @@ void khoiTaoGiaTri(boolean firstTime = true) {
   // inforServer.copyData(inforServer.giaiDoan.arrayName[0], ramChoDuLieu);
   strlcpy(inforServer.thanhPham.arrayName[0], ramChoDuLieu, sizeof(inforServer.thanhPham.arrayName[0]));
   strlcpy(inforServer.nhaCC.arrayName[0], ramChoDuLieu, sizeof(inforServer.nhaCC.arrayName[0]));
-  strlcpy(inforServer.giaiDoan.arrayName[0], ramChoDuLieu, sizeof(inforServer.giaiDoan.arrayName[0]));
+  //strlcpy(inforServer.giaiDoan.arrayName[0], ramChoDuLieu, sizeof(inforServer.giaiDoan.arrayName[0]));
 
   stateMachine.deviceStatus = deviceSetting;
   stateMachine.bottonSelect = 0;
@@ -159,10 +160,12 @@ void khoiTaoGiaTri(boolean firstTime = true) {
   inforServer.nhaCC.total = 0;
   inforServer.nhaCC.arrayType[0] = 0;
   inforServer.thanhPham.arrayType[0] = 0;
-  inforServer.giaiDoan.cheDoInOut = 0;
+ /* inforServer.giaiDoan.cheDoInOut = 0;
   inforServer.giaiDoan.total = 0;
   inforServer.giaiDoan.userSelect = 0;
-  inforServer.giaiDoan.arrayType[0] = 0;
+  inforServer.giaiDoan.arrayType[0] = 0;*/
+  stateMachine.getGiaiDoan();
+  stateMachine.getKV();
   //   statusPeripheral.sdCard.statusConnect = false;
 }
 void setup()
@@ -394,16 +397,19 @@ void SendDataConfigMqtt(uint8_t loaiconfig = 0 , uint8_t maboxung = 0) {
     mqttClient.publish("/config", 0, true, buffer);
   }
 void checkSendMQTTConfig() {
-    if (inforServer.nhaCC.total == 0) {
+    if ((stateMachine.giaidoanINOUT == 1) && (inforServer.nhaCC.total == 0)) {
        SendDataConfigMqtt(1, 0);
     }
-    else if (inforServer.giaiDoan.total == 0) {
+    else if ((stateMachine.giaidoanINOUT == 1)&& (inforServer.thanhPham.total == 0) ){ // laf dau vao
+        SendDataConfigMqtt(3, 0);
+    }
+ /*   else if (inforServer.giaiDoan.total == 0) {
       SendDataConfigMqtt(2, 0);
     }
     //Fix loi 01
     else if ((inforServer.giaiDoan.userSelect != 0) && (inforServer.thanhPham.total == 0) && (stateMachine.bottonSelect > 1)) { // Chi gui yeu cau khi da chon khu vuc can và qua buoc chọn thành phảm
       SendDataConfigMqtt(3, inforServer.giaiDoan.arrayType[inforServer.giaiDoan.userSelect]);
-    }
+    }*/
 }
 
 /*

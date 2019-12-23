@@ -37,7 +37,7 @@ void http_re( void * pvParameters ){
     if(xQueueReceive( Queue_RFID, &Data_RFID_TH,  ( TickType_t ) 1 )== pdPASS ){
         if (strcmp(Data_RFID_TH.id_RFID, "000000000000000000000000") != 0) {
             baoLed = true;
-            if (inforServer.giaiDoan.arrayType[inforServer.giaiDoan.userSelect] == kvSuaCa) {
+            if (stateMachine.giaidoanKV == kvSuaCa) {
                 lastTimeGetQueueRFID_Ro = xTaskGetTickCount(); 
             }
         }
@@ -49,7 +49,7 @@ void http_re( void * pvParameters ){
     if(xQueueReceive( Queue_RFID_NV, &Data_RFID_NV,  ( TickType_t ) 1 )== pdPASS ){
         if (strcmp(Data_RFID_NV.id_RFID, "000000000000000000000000") != 0) {
             baoLed = true;
-            if (inforServer.giaiDoan.arrayType[inforServer.giaiDoan.userSelect] == kvFille) { lastTimeGetQueueRFID_Ro = xTaskGetTickCount(); }
+            if (stateMachine.giaidoanKV == kvFille) { lastTimeGetQueueRFID_Ro = xTaskGetTickCount(); }
             else lastTimeGetQueueRFID_NV = xTaskGetTickCount();
         }
         else {
@@ -83,7 +83,7 @@ void http_re( void * pvParameters ){
 //// Thoi gian giua 2 lan nhan du lieu ///////
 ///////////////////////////////////////////////                 
               if (timeCompareMode1 < time_2_lan_nhan_data){ // 2 dữ liệu phải nhỏ hơn thời gian cài đặt mới là 1 cặp đúng
-               if (inforServer.giaiDoan.arrayType[inforServer.giaiDoan.userSelect] == kvFille){
+               if (stateMachine.giaidoanKV == kvFille){
                     strncpy( Data_TH.id_RFID_NV,Data_RFID_NV.id_RFID, sizeof(Data_RFID_NV.id_RFID));
                     strncpy( Data_TH.id_RFID,"x", sizeof("x"));     
                 }

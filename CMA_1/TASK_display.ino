@@ -1,5 +1,4 @@
-#include "cutf.h"
-  ModbusRTU mb;
+ModbusRTU mb;
   
 
 bool cb(Modbus::ResultCode event, uint16_t transactionId, void* data) {
@@ -60,16 +59,16 @@ void LcdSeclectMode(uint8_t chedo_HT, Data_TH* Data_TH  , uint8_t daucham = 0) {
       yield();*/
   }
   else if (chedo_HT == 6) { //xac nhan
-        mb.writeHreg(1,(uint16_t) 7910, (uint16_t*)Data_TH->data_weight, 1, cb); //ID, Offsrt, Data,SL
-      mb.writeHreg(1, (uint16_t)7911, (uint16_t*)(Data_TH->data_weight >> 16), 1, cb); //ID, Offsrt, Data,SL
-      wmemset(modbusData.nameNvUtf16, 0x0000, sizeof(modbusData.nameNvUtf16) / 2);
+     // mb.writeHreg(1,(uint16_t) 7910, (Data_TH->data_weight), 1, cb); //ID, Offsrt, Data,SL
+     // mb.writeHreg(1,(uint16_t) 7911, (Data_TH->data_weight) >> 16, 1, cb); //ID, Offsrt, Data,SL
+  /*    wmemset(modbusData.nameNvUtf16, 0x0000, sizeof(modbusData.nameNvUtf16) / 2);
       size_t valuelen = utf8towchar(inforServer.thanhPham.arrayName[inforServer.thanhPham.userSelect], SIZE_MAX, modbusData.nameNvUtf16, 64);
       mb.writeHreg(1, (uint16_t)8045,(uint16_t*) modbusData.nameNvUtf16, 64, cb);
       wmemset(modbusData.nameNvUtf16, 0x0000, sizeof(modbusData.nameNvUtf16) / 2);
       valuelen = utf8towchar(inforServer.nhaCC.arrayName[inforServer.nhaCC.userSelect], SIZE_MAX, modbusData.nameNvUtf16, 32);
       mb.writeHreg(1,(uint16_t) 8013, (uint16_t*)modbusData.nameNvUtf16, 32 , cb);
       mb.writeHreg(1,(uint16_t) 7900, (uint16_t*) 14, 1, cb); //ID, Offsrt, Data,SL cai dat id man hinh
-      yield();
+      yield();*/
   }
 }
 
@@ -83,20 +82,32 @@ void Display( void * pvParameters ) {
   unsigned long lastBlinkLCD = 0;
   uint16_t Time_blink = 1000;
   uint16_t Time_check = 2500;
-
-    //Serial1.begin(9600, SERIAL_8N1, 17, 18);
-  mb.begin(&Serial);
+  Serial1.begin(115200, SERIAL_8N1, 26, 25); //12 tx 13 lÃ  rx(bau,se,rx,tx)
+  mb.begin(&Serial1);
   mb.master();
   LcdSeclectMode(2, &Data_TH);
   variLcdUpdate.stateDisplayLCD = 1;
   uint8_t daucham_lcd = 0;
- // u8g2.setAutoPageClear(1);
   boolean statusBuzzer = false ;
   digitalWrite(pinLedGreen, HIGH);
   digitalWrite(pinLedRed, HIGH);
   TickType_t xLastWakeTime;
   xLastWakeTime = xTaskGetTickCount();
+ // mb.writeHreg(1, (uint16_t)8013, (uint16_t*)modbusData.nameNvUtf16, 32, cb);
+ // mb.writeHreg(1, (uint16_t)7900, (uint16_t*)10, 1, cb); //ID man hinh
+
+  uint16_t mahinh = 10;
   for (;;) {
+    //Serial.println("qưeqwwwwwwww");
+    if (!mb.slave()) {
+      Serial.println("Modbus");
+      mb.writeHreg(1, &(uint16_t)7900, (uint16_t)11, 1, cb); //ID man hinh
+   //     mb.writeHreg(1, (uint16_t)7901, (uint16_t*)stateMachine.idDevice, 1, cb); //ID man hinh
+ // mb.writeHreg(1, (uint16_t)7902, (uint16_t) stateMachine.idDevice >>16, 1, cb); //ID man hinh
+ // mb.writeHreg(1, (uint16_t)7903, (uint16_t*)stateMachine.giaidoanINOUT, 1, cb); //ID man hinh
+ // mb.writeHreg(1, (uint16_t)7904, (uint16_t*)stateMachine.giaidoanKV, 1, cb); //ID man hinh
+      
+    }
     mb.task();
     switch (stateMachine.deviceStatus) {
       //////////////////////////////////////////////////////////////////
