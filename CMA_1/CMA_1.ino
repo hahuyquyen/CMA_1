@@ -166,6 +166,10 @@ void khoiTaoGiaTri(boolean firstTime = true) {
   inforServer.giaiDoan.arrayType[0] = 0;*/
   stateMachine.getGiaiDoan();
   stateMachine.getKV();
+    Serial.print("KV ");
+  Serial.println(stateMachine.giaidoanINOUT);
+  Serial.print("KDS  ");
+  Serial.println(stateMachine.giaidoanKV);
   //   statusPeripheral.sdCard.statusConnect = false;
 }
 void setup()

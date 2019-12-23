@@ -1,5 +1,6 @@
 /*
  http://192.168.100.86:4999/SetTimeRtc?timestamp=1576032486
+ http://192.168.100.77:4999/setKhuVuc?i=2&kv=1
  */
 
 

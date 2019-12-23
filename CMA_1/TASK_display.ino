@@ -2,7 +2,7 @@ ModbusRTU mb;
   
 
 bool cb(Modbus::ResultCode event, uint16_t transactionId, void* data) {
-  Serial.printf_P("Request result: 0x%02X, Mem: %d\n", event, ESP.getFreeHeap());
+  //Serial.printf_P("Request result: 0x%02X, Mem: %d\n", event, ESP.getFreeHeap());
   return true;
 }
 void LcdDisplayKhuVuc(uint8_t vitri = 48) {
@@ -82,7 +82,7 @@ void Display( void * pvParameters ) {
   unsigned long lastBlinkLCD = 0;
   uint16_t Time_blink = 1000;
   uint16_t Time_check = 2500;
-  Serial1.begin(115200, SERIAL_8N1, 26, 25); //12 tx 13 lÃ  rx(bau,se,rx,tx)
+  Serial1.begin(38400, SERIAL_8N1, 26, 25); //12 tx 13 lÃ  rx(bau,se,rx,tx)
   mb.begin(&Serial1);
   mb.master();
   LcdSeclectMode(2, &Data_TH);
@@ -100,15 +100,20 @@ void Display( void * pvParameters ) {
   for (;;) {
     //Serial.println("qưeqwwwwwwww");
     if (!mb.slave()) {
-      Serial.println("Modbus");
-      mb.writeHreg(1, &(uint16_t)7900, (uint16_t)11, 1, cb); //ID man hinh
-   //     mb.writeHreg(1, (uint16_t)7901, (uint16_t*)stateMachine.idDevice, 1, cb); //ID man hinh
- // mb.writeHreg(1, (uint16_t)7902, (uint16_t) stateMachine.idDevice >>16, 1, cb); //ID man hinh
- // mb.writeHreg(1, (uint16_t)7903, (uint16_t*)stateMachine.giaidoanINOUT, 1, cb); //ID man hinh
- // mb.writeHreg(1, (uint16_t)7904, (uint16_t*)stateMachine.giaidoanKV, 1, cb); //ID man hinh
+     // Serial.println("Modbus");
+     mb.writeHreg(1, (uint16_t)7904, (uint16_t)stateMachine.giaidoanKV,  cb); //ID man hinh
+     mb.task();
+      mb.writeHreg(1, (uint16_t)7900, (uint16_t)10, cb); //ID man hinh
+      mb.task();
+        mb.writeHreg(1, (uint16_t)7901, (uint16_t)stateMachine.idDevice ,  cb); //ID man hinh
+        mb.task();
+  mb.writeHreg(1, (uint16_t)7902, (uint16_t) stateMachine.idDevice >>16,  cb); //ID man hinh
+  mb.task();
+  mb.writeHreg(1, (uint16_t)7903, (uint16_t)stateMachine.giaidoanINOUT,  cb); //ID man hinh
+ 
       
     }
-    mb.task();
+     mb.task();
     switch (stateMachine.deviceStatus) {
       //////////////////////////////////////////////////////////////////
       case deviceRunning: //////////////////////////////////////////////
