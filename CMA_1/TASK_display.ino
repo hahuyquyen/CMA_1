@@ -40,12 +40,13 @@ void LcdSeclectMode(uint8_t modeDisplay, Data_TH* Data_TH  , uint8_t daucham = 0
     case 0: //running
 
     if (!mb.slave()) {
-      modbusData.dataTruyen[0] = pagePopup;
-      modbusData.dataTruyen[1] = (uint16_t)stateMachine.hardwareId;
-      modbusData.dataTruyen[2] = (uint16_t)stateMachine.hardwareId>>16;
-      modbusData.dataTruyen[3] = (uint16_t)stateMachine.giaidoanINOUT;
-      modbusData.dataTruyen[4] = (uint16_t)stateMachine.giaidoanKV;
-      mb.writeHreg(1, (uint16_t)7900, modbusData.dataTruyen, 5,cb); //ID man hinh
+      
+      uint32_t dataDisplayCan =   (uint32_t)(Data_TH.data_weight * 1000);
+          modbusData.dataTruyen[0] = (uint16_t)dataDisplayCan;
+          modbusData.dataTruyen[1] = (uint16_t)dataDisplayCan >> 16;
+          modbusData.dataTruyen[2] = pagePopup;
+          mb.writeHreg(1, (uint16_t)7998, modbusData.dataTruyen, 3, cb); //ID man hinh
+ 
       while (mb.slave()) {mb.task();}   
       
     }
@@ -168,17 +169,21 @@ void Display( void * pvParameters ) {
         modbusData.timeSendSSID = xTaskGetTickCount();
         sendSSID485();
      }
-     else if (!mb.slave()) { 
-      uint32_t dataDisplayCan =   (uint32_t)(can_data * 1000);
-      modbusData.dataTruyen[0] = (uint16_t)dataDisplayCan;
-      modbusData.dataTruyen[1] = (uint16_t)dataDisplayCan >> 16;
-      mb.writeHreg(1, (uint16_t)7910, modbusData.dataTruyen, 2, cb); //ID man hinh
-      while (mb.slave()) {mb.task();} 
-      Serial.print("truyen kg ");    
-      Serial.print(can_data);
-      Serial.print(" - ");  
-      Serial.println(dataDisplayCan);
-    }
+     else  if ((xTaskGetTickCount() - modbusData.timeSendKg > 500)|| (modbusData.timeSendSSID == 0) ) {
+          modbusData.timeSendKg = xTaskGetTickCount();
+          if (!mb.slave()) { 
+         
+          uint32_t dataDisplayCan =   (uint32_t)(can_data * 1000);
+          modbusData.dataTruyen[0] = (uint16_t)dataDisplayCan;
+          modbusData.dataTruyen[1] = (uint16_t)dataDisplayCan >> 16;
+          mb.writeHreg(1, (uint16_t)7910, modbusData.dataTruyen, 2, cb); //ID man hinh
+          while (mb.slave()) {mb.task();} 
+          Serial.print("truyen kg ");    
+          Serial.print(can_data);
+          Serial.print(" - ");  
+          Serial.println(dataDisplayCan);
+        }
+     }
     switch (stateMachine.deviceStatus) {
       //////////////////////////////////////////////////////////////////
       case deviceRunning: //////////////////////////////////////////////
@@ -237,10 +242,10 @@ void Display( void * pvParameters ) {
         switch (variLcdUpdate.stateDisplayLCD) {
           case 0:
             LcdSeclectMode(0, &Data_TH, daucham_lcd);
-            variLcdUpdate.stateDisplayLCD = 4;
+            //variLcdUpdate.stateDisplayLCD = 4;
             break;
           case 1:
-            if (xTaskGetTickCount() - lastBlinkLCD > 150) {
+            if ((xTaskGetTickCount() - lastBlinkLCD > 5000)|| variLcdUpdate.updateLCD) {
               lastBlinkLCD = xTaskGetTickCount();
               LcdSeclectMode(1, &Data_TH, daucham_lcd);
             }
@@ -257,7 +262,7 @@ void Display( void * pvParameters ) {
         //////////////////////////////////////////////////////////////////
           switch (variLcdUpdate.stateDisplayLCD) {
             case 1:
-                if ((xTaskGetTickCount() - lastBlinkLCD > 300) || variLcdUpdate.updateLCD ) {
+                if ((xTaskGetTickCount() - lastBlinkLCD > 500) || variLcdUpdate.updateLCD ) {
                   variLcdUpdate.updateLCD = false;
                   lastBlinkLCD = xTaskGetTickCount();
                   LcdSeclectMode(stateMachine.bottonSelect + 2, &Data_TH, daucham_lcd);

@@ -28,6 +28,7 @@ static struct modbusDataConf{
   wchar_t nameNvUtf16[64];
   uint16_t dataTruyen[20];
   unsigned long timeSendSSID;
+  unsigned long timeSendKg;
 }modbusData;
 static struct statusPeripheralConf{
     struct mqttConf{
