@@ -163,20 +163,22 @@ void Display( void * pvParameters ) {
   uint16_t mahinh = 10;
   
   for (;;) {
-     if (!mb.slave()) { 
+
+      if ((xTaskGetTickCount() - modbusData.timeSendSSID > 5000)|| (modbusData.timeSendSSID == 0) ) {
+        modbusData.timeSendSSID = xTaskGetTickCount();
+        sendSSID485();
+     }
+     else if (!mb.slave()) { 
       uint32_t dataDisplayCan =   (uint32_t)(can_data * 1000);
       modbusData.dataTruyen[0] = (uint16_t)dataDisplayCan;
       modbusData.dataTruyen[1] = (uint16_t)dataDisplayCan >> 16;
-      mb.writeHreg(1, (uint16_t)7910, dataTruyen, 2, cb); //ID man hinh
+      mb.writeHreg(1, (uint16_t)7910, modbusData.dataTruyen, 2, cb); //ID man hinh
       while (mb.slave()) {mb.task();} 
       Serial.print("truyen kg ");    
       Serial.print(can_data);
       Serial.print(" - ");  
       Serial.println(dataDisplayCan);
     }
-      if ((xTaskGetTickCount() - modbusData.timeSendSSID > 5000)|| (modbusData.timeSendSSID == 0) ) {
-        modbusData.timeSendSSID = xTaskGetTickCount();sendSSID485();
-     }
     switch (stateMachine.deviceStatus) {
       //////////////////////////////////////////////////////////////////
       case deviceRunning: //////////////////////////////////////////////
