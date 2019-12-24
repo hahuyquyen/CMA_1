@@ -8,9 +8,9 @@ HMI ID Slaver 1
  LW 7910 -> So Kg
  
  cafile bo de bo ,mo
- 8000 -> 8012 : teb Che Do Fillet vao, Fillet Ra ...
- 8013->8045 :Ten Nha Cung Cap (32 Word
- 8045->8108 Ten Loai Ca (64
+ 8000 -> 8031 : Ten Nha Cung Cap (32 Word
+ 8031->8095 :Ten Loai Ca (64
+
  
  8110-> 8141 Tên NV
  8150 - >8161 : ma NV

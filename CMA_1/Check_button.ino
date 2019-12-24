@@ -6,7 +6,7 @@ EasyButton button_right(button_right_pin, 50, true);
 EasyButton button_ok(button_ok_pin, 50, true);
 EasyButton buttonExit(buttonExitPin, 50, true);
 EasyButton buttonError(buttonErrorPin, 50, true);
-EasyButton buttonPower(pinReadPower, 500, true);
+//EasyButton buttonPower(pinReadPower, 500, true);
 //////////////////////////////////////////////////////////////////
 ////// Button POWER ///////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////
@@ -90,7 +90,7 @@ void onPressed_ok() {
   
   if ((stateMachine.bottonSelect == 2) && (inforServer.nhaCC.userSelect == 0)) return;
   else if ((stateMachine.bottonSelect == 3) && (inforServer.thanhPham.userSelect == 0)) return;
-  if (stateMachine.bottonSelect > 4) return;
+  if (stateMachine.bottonSelect > 6) return;
   if (stateMachine.bottonSelect == 0) {
       if (stateMachine.giaidoanINOUT == cheDoOut) {
           stateMachine.bottonSelect = 3;
@@ -159,13 +159,13 @@ void Check_button( void * pvParameters ) {
   buttonExit.begin();
   button_ok.begin();
   buttonError.begin();
-  buttonPower.begin();
+ // buttonPower.begin();
   //button_left.onPressedFor(80, onPressed_left);
-  button_right.onPressedFor(80, onPressed_right);
-  buttonExit.onPressedFor(80, onPressedExit);
-  button_ok.onPressedFor(80, onPressed_ok);
-  buttonError.onPressedFor(80, onPressedError);
-  buttonPower.onPressedFor(700, onPressedPower);
+  button_right.onPressedFor(30, onPressed_right);
+  buttonExit.onPressedFor(30, onPressedExit);
+  button_ok.onPressedFor(30, onPressed_ok);
+  buttonError.onPressedFor(30, onPressedError);
+  //uttonPower.onPressedFor(700, onPressedPower);
   pinMode(pinReadPower, INPUT_PULLUP);
   TickType_t xLastWakeTime;
   xLastWakeTime = xTaskGetTickCount();
@@ -173,7 +173,7 @@ void Check_button( void * pvParameters ) {
   unsigned long lastTimeReadADC = 0;
   unsigned long lastTimeGetRSSI = 0;
   int powervalue;
-  while (digitalRead(pinReadPower) == LOW){
+  /*while (digitalRead(pinReadPower) == LOW){
 #ifdef debug_UART    
     //Serial.println("Wait ");
 #endif
@@ -181,7 +181,7 @@ void Check_button( void * pvParameters ) {
       DebugData("Wait");
 #endif
     delay(50);
-  }
+  }*/
   statusPeripheral.powerValue= 200;
   adc1_config_width(ADC_WIDTH_BIT_12);
   adc1_config_channel_atten( ADC1_CHANNEL_5, ADC_ATTEN_11db );
@@ -195,7 +195,7 @@ void Check_button( void * pvParameters ) {
    // button_left.read();
     buttonExit.read();
     buttonError.read();
-    buttonPower.read();
+   // buttonPower.read();
 
     vTaskDelayUntil(&xLastWakeTime, 50);
 ///////////////////////////////////////

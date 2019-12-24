@@ -41,7 +41,7 @@ void EncoderJsonMqtt() {
   doc["x"] = stateMachine.giaidoanKV;
   doc["b"] = dataEncoderJsonMqtt.id_RFID;
   doc["e"] = dataEncoderJsonMqtt.id_RFID_NV;
-  doc["s"] = (unsigned long) stateMachine.idDevice;
+  doc["s"] = (unsigned long) stateMachine.hardwareId;
   doc["w"] = dataEncoderJsonMqtt.data_weight;
   doc["t"] = timeStamp.unixtime();
   doc["c"] = inforServer.nhaCC.arrayType[inforServer.nhaCC.userSelect];
@@ -135,7 +135,10 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
       strlcpy(inforServer.nhaCC.arrayName[0], ramChuaChon, sizeof(inforServer.nhaCC.arrayName[0]));
       inforServer.nhaCC.total = jsonBuffer["l"].as<uint8_t>();
       for (int i = 0; i < inforServer.nhaCC.total; i++) {
-        if (jsonBuffer["d"][i].isNull()) {Serial.println("error key");inforServer.nhaCC.total = 0;return;} // Fix loi thieu data
+        if (jsonBuffer["d"][i].isNull()) {
+         // Serial.println("error key");
+          inforServer.nhaCC.total = 0;return;
+          } // Fix loi thieu data
         if (i == 15)break; //fix tran array cua data
         inforServer.nhaCC.arrayType[i + 1] = jsonBuffer["d"][i]["i"].as<uint16_t>();
         strlcpy(inforServer.nhaCC.arrayName[i + 1], jsonBuffer["d"][i]["n"], sizeof(inforServer.nhaCC.arrayName[i + 1]));
@@ -143,17 +146,20 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
     }
     else if (jsonBuffer["t"].as<uint8_t>() == 2) {
       if (!jsonBuffer.containsKey("s")) {return;}
-      stateMachine.giaidoanINOUT=jsonBuffer["l"].as<uint8_t>();
-      stateMachine.giaidoanKV = jsonBuffer["u"].as<uint8_t>();
-      stateMachine.setGiaiDoan();
-      stateMachine.setKV();
+    //  stateMachine.giaidoanINOUT=jsonBuffer["l"].as<uint8_t>();
+     // stateMachine.giaidoanKV = jsonBuffer["u"].as<uint8_t>();
+    //  stateMachine.setGiaiDoan();
+     // stateMachine.setKV();
       statusPeripheral.mqtt.lastTimeGetDataConfig = 0;
     }
     else if (jsonBuffer["t"].as<uint8_t>() == 3) {
       strlcpy(inforServer.thanhPham.arrayName[0], ramChuaChon, sizeof(inforServer.thanhPham.arrayName[0]));
       inforServer.thanhPham.total = jsonBuffer["l"].as<uint8_t>();
       for (int i = 0; i < inforServer.thanhPham.total; i++) {
-        if (jsonBuffer["d"][i].isNull()) {Serial.println("error key");inforServer.thanhPham.total=0;return;} // Fix loi thieu data
+        if (jsonBuffer["d"][i].isNull()) {
+          //Serial.println("error key");
+          inforServer.thanhPham.total=0;
+          return;} // Fix loi thieu data
         if (i == 15)break; //qua array cua data
         inforServer.thanhPham.arrayType[i + 1] = jsonBuffer["d"][i]["i"].as<uint16_t>();
         strlcpy(inforServer.thanhPham.arrayName[i + 1], jsonBuffer["d"][i]["n"], sizeof(inforServer.thanhPham.arrayName[i + 1]));

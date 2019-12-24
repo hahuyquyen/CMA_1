@@ -138,8 +138,8 @@ void printProgress(size_t prg, size_t sz) {
 //////////////////////////////////////////////////////////////////
 void khoiTaoGiaTri(boolean firstTime = true) {
   if (firstTime){
-  inforServer.mqttConfig.setTopicACK(( unsigned long )stateMachine.idDevice);
-  inforServer.mqttConfig.setTopicGetConfig(( unsigned long )stateMachine.idDevice);
+  inforServer.mqttConfig.setTopicACK(( unsigned long )stateMachine.hardwareId);
+  inforServer.mqttConfig.setTopicGetConfig(( unsigned long )stateMachine.hardwareId);
 #ifdef debug_UART
   Serial.println(inforServer.mqttConfig.topicGetStatusACK); 
   Serial.println(inforServer.mqttConfig.topicGetConfig);
@@ -166,16 +166,16 @@ void khoiTaoGiaTri(boolean firstTime = true) {
   inforServer.giaiDoan.arrayType[0] = 0;*/
   stateMachine.getGiaiDoan();
   stateMachine.getKV();
-    Serial.print("KV ");
-  Serial.println(stateMachine.giaidoanINOUT);
-  Serial.print("KDS  ");
-  Serial.println(stateMachine.giaidoanKV);
+  //  Serial.print("KV ");
+  //Serial.println(stateMachine.giaidoanINOUT);
+ // Serial.print("KDS  ");
+//  Serial.println(stateMachine.giaidoanKV);
   //   statusPeripheral.sdCard.statusConnect = false;
 }
 void setup()
 {   pinMode(pinPower, OUTPUT);
   digitalWrite(pinPower, HIGH);
-  Serial.begin(115200);
+  Serial.begin(38400,SERIAL_8N1);
   pinMode(pinBuzzer, OUTPUT);
   pinMode(pinLedGreen, OUTPUT);
   pinMode(pinLedRed, OUTPUT);
@@ -201,10 +201,10 @@ void setup()
   EEPROM.begin(1024);
   stateMachine.getIdControl();
   stateMachine.getPowerRFID();
-  Serial.println(stateMachine.powerRFID, HEX);
+ // Serial.println(stateMachine.powerRFID, HEX);
 #ifdef debug_UART
   Serial.print("ID Device : ");
-  Serial.println( stateMachine.idDevice);
+  Serial.println( stateMachine.hardwareId);
 #endif
   // Doc Eprom va khoi tao gia tri
 
@@ -394,7 +394,7 @@ void loop()
 void SendDataConfigMqtt(uint8_t loaiconfig = 0 , uint8_t maboxung = 0) {
     StaticJsonDocument<55> doc;
     char buffer[55];
-    doc["i"] = stateMachine.idDevice;
+    doc["i"] = stateMachine.hardwareId;
     doc["t"] = loaiconfig ;
     doc["d"] = maboxung;
     serializeJson(doc, buffer);
@@ -405,7 +405,7 @@ void checkSendMQTTConfig() {
        SendDataConfigMqtt(1, 0);
     }
     else if ((stateMachine.giaidoanINOUT == 1)&& (inforServer.thanhPham.total == 0) ){ // laf dau vao
-        SendDataConfigMqtt(3, 0);
+        SendDataConfigMqtt(3, stateMachine.giaidoanKV);
     }
  /*   else if (inforServer.giaiDoan.total == 0) {
       SendDataConfigMqtt(2, 0);

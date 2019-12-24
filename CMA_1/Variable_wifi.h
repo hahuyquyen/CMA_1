@@ -26,6 +26,8 @@ typedef BasicJsonDocument<DefaultAllocator> DynamicJsonDocument;
 */
 static struct modbusDataConf{
   wchar_t nameNvUtf16[64];
+  uint16_t dataTruyen[20];
+  unsigned long timeSendSSID;
 }modbusData;
 static struct statusPeripheralConf{
     struct mqttConf{
@@ -72,15 +74,25 @@ struct timeServerConf{
 static struct stateMachineConf {
   uint8_t bottonSelect;
   uint8_t deviceStatus;
-  uint32_t idDevice;
+  uint32_t hardwareId;
   uint8_t powerRFID;
   uint8_t giaidoanINOUT;
   uint8_t giaidoanKV;
   void getPowerRFID(){
-    this->powerRFID=EEPROM.readUInt(810);
-  }
-  void getIdControl(){
     this->powerRFID=EEPROM.readInt(810);
+  }
+  void setPowerRFID(){
+      setdata8Bit(810, &this->powerRFID);
+    /*EEPROM.write(810, this->powerRFID);
+    EEPROM.commit();*/
+  } 
+  void getIdControl(){
+    this->hardwareId=EEPROM.readUInt(800);
+  }
+  void setIdControl(){
+      setdata32Bit(800, &this->hardwareId);
+  /*  EEPROM.writeUInt(800, this->hardwareId);
+    EEPROM.commit();*/
   }
   void getKV() {
       this->giaidoanKV = EEPROM.readInt(812);
@@ -94,16 +106,8 @@ static struct stateMachineConf {
   void setGiaiDoan() {
       setdata8Bit(811, &this->giaidoanINOUT);
   }
-  void setPowerRFID(){
-      setdata8Bit(810, &this->powerRFID);
-    /*EEPROM.write(810, this->powerRFID);
-    EEPROM.commit();*/
-  }  
-  void setIdControl(){
-      setdata32Bit(800, &this->idDevice);
-  /*  EEPROM.writeUInt(800, this->idDevice);
-    EEPROM.commit();*/
-  }
+ 
+
   void setdata32Bit(uint16_t address, uint32_t* value) {
       EEPROM.writeUInt(address, *value);
       EEPROM.commit();

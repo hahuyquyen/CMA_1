@@ -70,3 +70,10 @@
 #define sttKvFillerOUT 2
 #define sttKvSuaCaIN 3
 #define sttKvSuaCaOUT 4
+
+#define pageInfor 10
+#define pageNhaCC 12
+#define pageThanhPham 13
+#define pageComfirm 14
+#define pageRunning 15
+#define pagePopup 16

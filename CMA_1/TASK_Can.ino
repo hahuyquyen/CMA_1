@@ -11,10 +11,11 @@ void TaskCAN( void * pvParameters ) {
   unsigned long lastTimeSendCan = 0;
   TickType_t xLastWakeTime;
   xLastWakeTime = xTaskGetTickCount();
-  
+  Serial1.begin(9600, SERIAL_8N1, 26, 12); //12 tx 13 lÃ  rx(bau,se,rx,tx)
+
   for (;;) {
-    if (Serial.available()) {
-      uint8_t incomingData = Serial.read();
+    if (Serial1.available()) {
+      uint8_t incomingData = Serial1.read();
       if ( incomingData == canStartByte) {
         tam = 0;
       }
@@ -22,6 +23,7 @@ void TaskCAN( void * pvParameters ) {
         if (TachSoKg(&can_data)) {
           if (can_data != Data_CAN.data_can) {
             Data_CAN.data_can = can_data;
+            
             if (can_data > 0.5) {
               xQueueSend( Queue_can, &Data_CAN, xTicksToWait );
             }

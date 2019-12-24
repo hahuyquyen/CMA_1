@@ -1,8 +1,8 @@
 ModbusRTU mb;
-  
+  uint16_t dataTruyen[20];
 
 bool cb(Modbus::ResultCode event, uint16_t transactionId, void* data) {
-  //Serial.printf_P("Request result: 0x%02X, Mem: %d\n", event, ESP.getFreeHeap());
+  //Serial.printf_P("Request result: 0x%02X, Mem: %d\n", event, transactionId);
   return true;
 }
 void LcdDisplayKhuVuc(uint8_t vitri = 48) {
@@ -13,62 +13,129 @@ void LcdDisplaySetting(char* dataDisplay = NULL, char* dataUserDisplay = NULL) {
 }
 void LcdDisplayInfor(){
 }
+/*
+ * #define pageInfor 10
+#define pageNhaCC 12
+#define pageThanhPham 13
+#define pageComfirm 14
+#define pageRunning 15
+#define pagePopup 16
+ */
+ void sendSSID485(){
+  if (!mb.slave()) {
+      modbusData.dataTruyen[0] = WiFi.localIP()[0];
+      modbusData.dataTruyen[1] = WiFi.localIP()[1];
+      modbusData.dataTruyen[2] = WiFi.localIP()[2];
+      modbusData.dataTruyen[3] = WiFi.localIP()[3];
+      mb.writeHreg(1, (uint16_t)7920, modbusData.dataTruyen, 4,cb); //ID man hinh
+      while (mb.slave()) {mb.task();}     
+      wmemset(modbusData.nameNvUtf16, 0x0000, sizeof(modbusData.nameNvUtf16) / 2);
+      size_t valuelen = utf8towchar(WiFiConf.sta_ssid, SIZE_MAX, modbusData.nameNvUtf16, sizeof(modbusData.nameNvUtf16));
+      mb.writeHreg(1, (uint16_t)7924, (uint16_t*)modbusData.nameNvUtf16, 16,cb); //ID man hinh
+      while (mb.slave()) {mb.task();}   
+ }
+}
+void LcdSeclectMode(uint8_t modeDisplay, Data_TH* Data_TH  , uint8_t daucham = 0) {
+  switch (modeDisplay){
+    case 0: //running
 
-void LcdSeclectMode(uint8_t chedo_HT, Data_TH* Data_TH  , uint8_t daucham = 0) {
-  if (chedo_HT == 0) {
+    if (!mb.slave()) {
+      modbusData.dataTruyen[0] = pagePopup;
+      modbusData.dataTruyen[1] = (uint16_t)stateMachine.hardwareId;
+      modbusData.dataTruyen[2] = (uint16_t)stateMachine.hardwareId>>16;
+      modbusData.dataTruyen[3] = (uint16_t)stateMachine.giaidoanINOUT;
+      modbusData.dataTruyen[4] = (uint16_t)stateMachine.giaidoanKV;
+      mb.writeHreg(1, (uint16_t)7900, modbusData.dataTruyen, 5,cb); //ID man hinh
+      while (mb.slave()) {mb.task();}   
       
-   /*   mb.writeHreg(1,(uint16_t) 7910, (uint16_t)*Data_TH->data_weight, 1, cb); //ID, Offsrt, Data,SL
-      mb.writeHreg(1,(uint16_t) 7911, (uint16_t)(*Data_TH->data_weight >> 16), 1, cb); //ID, Offsrt, Data,SL
+    }
+    break;
+    case 1: //popup
+                if (!mb.slave()) {
+      modbusData.dataTruyen[0] = pageRunning;
+      modbusData.dataTruyen[1] = (uint16_t)stateMachine.hardwareId;
+      modbusData.dataTruyen[2] = (uint16_t)stateMachine.hardwareId>>16;
+      modbusData.dataTruyen[3] = (uint16_t)stateMachine.giaidoanINOUT;
+      modbusData.dataTruyen[4] = (uint16_t)stateMachine.giaidoanKV;
+      mb.writeHreg(1, (uint16_t)7900, modbusData.dataTruyen, 5,cb); //ID man hinh
+      while (mb.slave()) {mb.task();}     
       wmemset(modbusData.nameNvUtf16, 0x0000, sizeof(modbusData.nameNvUtf16) / 2);
-      size_t valuelen = utf8towchar(Data_TH->id_RFID_NV, SIZE_MAX, modbusData.nameNvUtf16, sizeof(modbusData.nameNvUtf16));
-      mb.writeHreg(1,(uint16_t) 8150, (uint16_t)modbusData.nameNvUtf16, sizeof(modbusData.nameNvUtf16) / 2 , cb);
-      mb.writeHreg(1,(uint16_t) 7900, 16, 1, cb); //ID, Offsrt, Data,SL cai dat id man hinh
-      yield();*/
-  }
-  else if (chedo_HT == 1) {
-     /*     mb.writeHreg(1, (uint16_t)7910, (uint16_t)*Data_TH->data_weight, 1, cb); //ID, Offsrt, Data,SL
-      mb.writeHreg(1, (uint16_t)7911, (uint16_t)(*Data_TH->data_weight >> 16), 1, cb); //ID, Offsrt, Data,SL
+      size_t valuelen = utf8towchar(inforServer.nhaCC.arrayName[inforServer.nhaCC.userSelect], SIZE_MAX, modbusData.nameNvUtf16, sizeof(modbusData.nameNvUtf16));
+      mb.writeHreg(1, (uint16_t)8000, (uint16_t*)modbusData.nameNvUtf16, 32,cb); //ID man hinh
+      while (mb.slave()) {mb.task();}      
       wmemset(modbusData.nameNvUtf16, 0x0000, sizeof(modbusData.nameNvUtf16) / 2);
-      size_t valuelen = utf8towchar(Data_TH->id_RFID_NV, SIZE_MAX, modbusData.nameNvUtf16, sizeof(modbusData.nameNvUtf16));
-      mb.writeHreg(1, (uint16_t)8150, (uint16_t*)modbusData.nameNvUtf16, sizeof(modbusData.nameNvUtf16) / 2 , cb);
-      mb.writeHreg(1, (uint16_t)7900, 15, 1, cb); //ID, Offsrt, Data,SL cai dat id man hinh
-      yield();*/
-  }
-  else if (chedo_HT == 2) {
-  }
-  else if (chedo_HT == 10) {
-  }
-  else if (chedo_HT == 3) {
-  }
-  else if (chedo_HT == 4) { // nha cung cap
-       /*   mb.writeHreg(1, (uint16_t)7910, (uint16_t)Data_TH->data_weight, 1, cb); //ID, Offsrt, Data,SL
-      mb.writeHreg(1, (uint16_t)7911, (uint16_t)(Data_TH->data_weight >> 16), 1, cb); //ID, Offsrt, Data,SL
+      valuelen = utf8towchar(inforServer.thanhPham.arrayName[inforServer.thanhPham.userSelect], SIZE_MAX, modbusData.nameNvUtf16, sizeof(modbusData.nameNvUtf16));
+      mb.writeHreg(1, (uint16_t)8032, (uint16_t*) modbusData.nameNvUtf16, 64,cb); //ID man hinh
+      while (mb.slave()) {mb.task();} 
+    }
+    break;
+    case 2: //infor bat dau
+        if (!mb.slave()) {
+      modbusData.dataTruyen[0] = 10;
+      modbusData.dataTruyen[1] = (uint16_t)stateMachine.hardwareId;
+      modbusData.dataTruyen[2] = (uint16_t)stateMachine.hardwareId>>16;
+      modbusData.dataTruyen[3] = (uint16_t)stateMachine.giaidoanINOUT;
+      modbusData.dataTruyen[4] = (uint16_t)stateMachine.giaidoanKV;
+      mb.writeHreg(1, (uint16_t)7900, modbusData.dataTruyen, 5,cb); //ID man hinh
+      while (mb.slave()) {mb.task();}     
+    }
+    break;
+    case 3: //infor bat dau
+        if (!mb.slave()) {
+      modbusData.dataTruyen[0] = 10;
+      modbusData.dataTruyen[1] = (uint16_t)stateMachine.hardwareId;
+      modbusData.dataTruyen[2] = (uint16_t)stateMachine.hardwareId>>16;
+      modbusData.dataTruyen[3] = (uint16_t)stateMachine.giaidoanINOUT;
+      modbusData.dataTruyen[4] = (uint16_t)stateMachine.giaidoanKV;
+      mb.writeHreg(1, (uint16_t)7900, modbusData.dataTruyen, 5,cb); //ID man hinh
+      while (mb.slave()) {mb.task();}     
+    }
+    break;
+    case 4: //nha cung cap
+      if (!mb.slave()) {
+      modbusData.dataTruyen[0] = pageNhaCC;
+      modbusData.dataTruyen[1] = (uint16_t)stateMachine.hardwareId;
+      modbusData.dataTruyen[2] = (uint16_t)stateMachine.hardwareId>>16;
+      modbusData.dataTruyen[3] = (uint16_t)stateMachine.giaidoanINOUT;
+      modbusData.dataTruyen[4] = (uint16_t)stateMachine.giaidoanKV;
+      mb.writeHreg(1, (uint16_t)7900, modbusData.dataTruyen, 5,cb); //ID man hinh
+      while (mb.slave()) {mb.task();}   
       wmemset(modbusData.nameNvUtf16, 0x0000, sizeof(modbusData.nameNvUtf16) / 2);
-      size_t valuelen = utf8towchar(inforServer.nhaCC.arrayName[inforServer.nhaCC.userSelect], SIZE_MAX, modbusData.nameNvUtf16, 32);
-      mb.writeHreg(1,(uint16_t) 8013, modbusData.nameNvUtf16, 32 , cb);
-      mb.writeHreg(1, (uint16_t)7900, 12, 1, cb); //ID, Offsrt, Data,SL cai dat id man hinh
-      yield();*/
-  }
-  else if (chedo_HT == 5) { //loai thanh pham
-    /*      mb.writeHreg(1,(uint16_t) 7910, (uint16_t)Data_TH->data_weight, 1, cb); //ID, Offsrt, Data,SL
-      mb.writeHreg(1,(uint16_t) 7911, (uint16_t)(Data_TH->data_weight >> 16), 1, cb); //ID, Offsrt, Data,SL
+      size_t valuelen = utf8towchar(inforServer.nhaCC.arrayName[inforServer.nhaCC.userSelect], SIZE_MAX, modbusData.nameNvUtf16, sizeof(modbusData.nameNvUtf16));
+      mb.writeHreg(1, (uint16_t)8000, (uint16_t*)modbusData.nameNvUtf16, 32,cb); //ID man hinh
+      while (mb.slave()) {mb.task();}     
+    }
+    break;
+    case 5: //thanh pham inforServer.thanhPham.arrayName[inforServer.thanhPham.userSelect]
+      if (!mb.slave()) {
+      modbusData.dataTruyen[0] = pageThanhPham;
+      modbusData.dataTruyen[1] = (uint16_t)stateMachine.hardwareId;
+      modbusData.dataTruyen[2] = (uint16_t)stateMachine.hardwareId>>16;
+      modbusData.dataTruyen[3] = (uint16_t)stateMachine.giaidoanINOUT;
+      modbusData.dataTruyen[4] = (uint16_t)stateMachine.giaidoanKV;
+      mb.writeHreg(1, (uint16_t)7900, modbusData.dataTruyen, 5,cb); //ID man hinh
+      while (mb.slave()) {mb.task();}     
       wmemset(modbusData.nameNvUtf16, 0x0000, sizeof(modbusData.nameNvUtf16) / 2);
-      size_t valuelen = utf8towchar(inforServer.thanhPham.arrayName[inforServer.thanhPham.userSelect], SIZE_MAX, modbusData.nameNvUtf16, 64);
-      mb.writeHreg(1,(uint16_t) 8045, modbusData.nameNvUtf16, 64, cb);
-      mb.writeHreg(1,(uint16_t) 7900, 13, 1, cb); //ID, Offsrt, Data,SL cai dat id man hinh
-      yield();*/
-  }
-  else if (chedo_HT == 6) { //xac nhan
-     // mb.writeHreg(1,(uint16_t) 7910, (Data_TH->data_weight), 1, cb); //ID, Offsrt, Data,SL
-     // mb.writeHreg(1,(uint16_t) 7911, (Data_TH->data_weight) >> 16, 1, cb); //ID, Offsrt, Data,SL
-  /*    wmemset(modbusData.nameNvUtf16, 0x0000, sizeof(modbusData.nameNvUtf16) / 2);
-      size_t valuelen = utf8towchar(inforServer.thanhPham.arrayName[inforServer.thanhPham.userSelect], SIZE_MAX, modbusData.nameNvUtf16, 64);
-      mb.writeHreg(1, (uint16_t)8045,(uint16_t*) modbusData.nameNvUtf16, 64, cb);
-      wmemset(modbusData.nameNvUtf16, 0x0000, sizeof(modbusData.nameNvUtf16) / 2);
-      valuelen = utf8towchar(inforServer.nhaCC.arrayName[inforServer.nhaCC.userSelect], SIZE_MAX, modbusData.nameNvUtf16, 32);
-      mb.writeHreg(1,(uint16_t) 8013, (uint16_t*)modbusData.nameNvUtf16, 32 , cb);
-      mb.writeHreg(1,(uint16_t) 7900, (uint16_t*) 14, 1, cb); //ID, Offsrt, Data,SL cai dat id man hinh
-      yield();*/
+      size_t valuelen = utf8towchar(inforServer.thanhPham.arrayName[inforServer.thanhPham.userSelect], SIZE_MAX, modbusData.nameNvUtf16, sizeof(modbusData.nameNvUtf16));
+      mb.writeHreg(1, (uint16_t)8032, (uint16_t*) modbusData.nameNvUtf16, 64,cb); //ID man hinh
+      while (mb.slave()) {mb.task();}   
+    }
+    break;
+    case 6: // xac nhan
+                if (!mb.slave()) {
+      modbusData.dataTruyen[0] = pageComfirm;
+      modbusData.dataTruyen[1] = (uint16_t)stateMachine.hardwareId;
+      modbusData.dataTruyen[2] = (uint16_t)stateMachine.hardwareId>>16;
+      modbusData.dataTruyen[3] = (uint16_t)stateMachine.giaidoanINOUT;
+      modbusData.dataTruyen[4] = (uint16_t)stateMachine.giaidoanKV;
+      mb.writeHreg(1, (uint16_t)7900, modbusData.dataTruyen, 5,cb); //ID man hinh
+      while (mb.slave()) {mb.task();}     
+    }
+    break;
+    case 10: //infor setting
+    break;
+    default:
+    break;
   }
 }
 
@@ -82,8 +149,8 @@ void Display( void * pvParameters ) {
   unsigned long lastBlinkLCD = 0;
   uint16_t Time_blink = 1000;
   uint16_t Time_check = 2500;
-  Serial1.begin(38400, SERIAL_8N1, 26, 25); //12 tx 13 lÃ  rx(bau,se,rx,tx)
-  mb.begin(&Serial1);
+  //Serial1.begin(38400, SERIAL_8N1, 26, 12); //12 tx 13 lÃ  rx(bau,se,rx,tx)
+  mb.begin(&Serial);
   mb.master();
   LcdSeclectMode(2, &Data_TH);
   variLcdUpdate.stateDisplayLCD = 1;
@@ -93,27 +160,23 @@ void Display( void * pvParameters ) {
   digitalWrite(pinLedRed, HIGH);
   TickType_t xLastWakeTime;
   xLastWakeTime = xTaskGetTickCount();
- // mb.writeHreg(1, (uint16_t)8013, (uint16_t*)modbusData.nameNvUtf16, 32, cb);
- // mb.writeHreg(1, (uint16_t)7900, (uint16_t*)10, 1, cb); //ID man hinh
-
   uint16_t mahinh = 10;
+  
   for (;;) {
-    //Serial.println("qưeqwwwwwwww");
-    if (!mb.slave()) {
-     // Serial.println("Modbus");
-     mb.writeHreg(1, (uint16_t)7904, (uint16_t)stateMachine.giaidoanKV,  cb); //ID man hinh
-     mb.task();
-      mb.writeHreg(1, (uint16_t)7900, (uint16_t)10, cb); //ID man hinh
-      mb.task();
-        mb.writeHreg(1, (uint16_t)7901, (uint16_t)stateMachine.idDevice ,  cb); //ID man hinh
-        mb.task();
-  mb.writeHreg(1, (uint16_t)7902, (uint16_t) stateMachine.idDevice >>16,  cb); //ID man hinh
-  mb.task();
-  mb.writeHreg(1, (uint16_t)7903, (uint16_t)stateMachine.giaidoanINOUT,  cb); //ID man hinh
- 
-      
+     if (!mb.slave()) { 
+      uint32_t dataDisplayCan =   (uint32_t)(can_data * 1000);
+      modbusData.dataTruyen[0] = (uint16_t)dataDisplayCan;
+      modbusData.dataTruyen[1] = (uint16_t)dataDisplayCan >> 16;
+      mb.writeHreg(1, (uint16_t)7910, dataTruyen, 2, cb); //ID man hinh
+      while (mb.slave()) {mb.task();} 
+      Serial.print("truyen kg ");    
+      Serial.print(can_data);
+      Serial.print(" - ");  
+      Serial.println(dataDisplayCan);
     }
-     mb.task();
+      if ((xTaskGetTickCount() - modbusData.timeSendSSID > 5000)|| (modbusData.timeSendSSID == 0) ) {
+        modbusData.timeSendSSID = xTaskGetTickCount();sendSSID485();
+     }
     switch (stateMachine.deviceStatus) {
       //////////////////////////////////////////////////////////////////
       case deviceRunning: //////////////////////////////////////////////
@@ -176,8 +239,6 @@ void Display( void * pvParameters ) {
             break;
           case 1:
             if (xTaskGetTickCount() - lastBlinkLCD > 150) {
-            //  daucham_lcd ++ ;
-             // if (daucham_lcd > 3)daucham_lcd = 0;
               lastBlinkLCD = xTaskGetTickCount();
               LcdSeclectMode(1, &Data_TH, daucham_lcd);
             }
@@ -194,7 +255,7 @@ void Display( void * pvParameters ) {
         //////////////////////////////////////////////////////////////////
           switch (variLcdUpdate.stateDisplayLCD) {
             case 1:
-                if ((xTaskGetTickCount() - lastBlinkLCD > 100) || variLcdUpdate.updateLCD ) {
+                if ((xTaskGetTickCount() - lastBlinkLCD > 300) || variLcdUpdate.updateLCD ) {
                   variLcdUpdate.updateLCD = false;
                   lastBlinkLCD = xTaskGetTickCount();
                   LcdSeclectMode(stateMachine.bottonSelect + 2, &Data_TH, daucham_lcd);

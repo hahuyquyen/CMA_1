@@ -49,7 +49,7 @@ void TaskRFID( void * pvParameters ) {
 
   TickType_t xLastWakeTime;
   xLastWakeTime = xTaskGetTickCount();
-  Serial.println(stateMachine.powerRFID, HEX);
+  //Serial.println(stateMachine.powerRFID, HEX);
   for (;;) {
     /*
        Chuyển task 24ms
