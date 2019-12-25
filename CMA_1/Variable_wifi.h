@@ -32,10 +32,13 @@ static struct modbusDataConf{
 }modbusData;
 static struct statusPeripheralConf{
     struct mqttConf{
+      
       unsigned long lastTimeGetDataConfig; 
       unsigned long  timeTruyenMQTT;
-      boolean statusMqttConnect ;  
-    }mqtt={0,1000,false};
+      boolean statusMqttConnect ; 
+      boolean updateName;
+      char nameNhanVien[64]; 
+    }mqtt={0,1000,false,false,""};
     struct wifiConf{
       boolean ApConnect; 
       unsigned long lastTimeConnect;

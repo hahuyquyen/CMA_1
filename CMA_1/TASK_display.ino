@@ -1,17 +1,9 @@
 ModbusRTU mb;
-  uint16_t dataTruyen[20];
+ // uint16_t dataTruyen[20];
 
 bool cb(Modbus::ResultCode event, uint16_t transactionId, void* data) {
   //Serial.printf_P("Request result: 0x%02X, Mem: %d\n", event, transactionId);
   return true;
-}
-void LcdDisplayKhuVuc(uint8_t vitri = 48) {
-}
-void LcdDisplayTurnOffPower() {
-}
-void LcdDisplaySetting(char* dataDisplay = NULL, char* dataUserDisplay = NULL) {
-}
-void LcdDisplayInfor(){
 }
 /*
  * #define pageInfor 10
@@ -35,101 +27,123 @@ void LcdDisplayInfor(){
       while (mb.slave()) {mb.task();}   
  }
 }
-void LcdSeclectMode(uint8_t modeDisplay, Data_TH* Data_TH  , uint8_t daucham = 0) {
+void send485Utf16(uint16_t address, char* kytu , uint8_t numByte){
+   wmemset(modbusData.nameNvUtf16, 0x0000, sizeof(modbusData.nameNvUtf16) / 2);
+   size_t valuelen = utf8towchar(kytu, SIZE_MAX, modbusData.nameNvUtf16, sizeof(modbusData.nameNvUtf16));
+   mb.writeHreg(1, address, (uint16_t*)modbusData.nameNvUtf16, numByte ,cb); //ID man hinh
+   while (mb.slave()) {mb.task();}  
+}
+void send485char(uint16_t address, char* kytu , uint8_t numByte){
+          for (int j = 0 ; j < numByte*2 ; j = j+2) {
+              modbusData.dataTruyen[j/2] =  (((uint16_t)kytu[j+1]<< 8 )|((uint16_t)kytu[j]));
+          }
+          mb.writeHreg(1, address, modbusData.dataTruyen, numByte,cb); //ID man hinh
+          while (mb.slave()) {mb.task();}   
+}
+void sendPage(uint16_t page){
+      modbusData.dataTruyen[0] = page;
+      modbusData.dataTruyen[1] = 0;
+      modbusData.dataTruyen[2] = (uint16_t)stateMachine.hardwareId;
+      modbusData.dataTruyen[3] = (uint16_t)stateMachine.hardwareId>>16;
+      modbusData.dataTruyen[4] = (uint16_t)stateMachine.giaidoanINOUT;
+      modbusData.dataTruyen[5] = (uint16_t)stateMachine.giaidoanKV;
+      mb.writeHreg(1, (uint16_t)7900, modbusData.dataTruyen, 6,cb); //ID man hinh
+      while (mb.slave()) {mb.task();}   
+}
+void LcdSeclectMode(uint8_t modeDisplay, Data_TH* Data_TH ) {
   switch (modeDisplay){
-    case 0: //running
-
-    if (!mb.slave()) {
-      
-      uint32_t dataDisplayCan =   (uint32_t)(Data_TH.data_weight * 1000);
+    case 0: //popup
+        if (!mb.slave()) {
+          if (statusPeripheral.mqtt.updateName){
+            send485Utf16(8162,statusPeripheral.mqtt.nameNhanVien,28);
+          }
+          char textTam[ 12 ];
+          //Mã NV
+          wmemset(modbusData.nameNvUtf16, 0x0000, 6);
+          memset(textTam, 0x00, sizeof(textTam) );
+          if (Data_TH->id_RFID_NV[0] != 'x') {    
+            memcpy(textTam, & Data_TH->id_RFID_NV[16], 8);    
+          }
+          else memcpy(textTam, "x", 1); 
+          send485char(8150,textTam,6);
+          /*
+          for (int j = 0 ; j < sizeof(textTam) ; j = j+2) {
+              modbusData.dataTruyen[j/2] =  (((uint16_t)textTam[j+1]<< 8 )|((uint16_t)textTam[j]));
+          }
+          mb.writeHreg(1, (uint16_t)8150, modbusData.dataTruyen, 6,cb); //ID man hinh
+          while (mb.slave()) {mb.task();}   */
+        //Ma Ro
+          //wmemset(modbusData.dataTruyen, 0x00, 10);
+          memset(textTam, 0x00, sizeof(textTam) );
+          if (Data_TH->id_RFID[0] != 'x') {    
+            memcpy(textTam, & Data_TH->id_RFID[16], 8);    
+            textTam[9] = '\0';
+          }
+          else memcpy(textTam, "x", 1); 
+          send485char(8156,textTam,6);
+          /*for (int j = 0 ; j < sizeof(textTam) ; j = j+2) {
+              modbusData.dataTruyen[j/2] =  (((uint16_t)textTam[j+1]<< 8 )|((uint16_t)textTam[j]));
+              //if ((textTam[j] == '\0')||(textTam[j + 1] == '\0')) break;
+          }
+          mb.writeHreg(1, (uint16_t)8156, modbusData.dataTruyen, 6,cb); //ID man hinh
+          while (mb.slave()) {mb.task();}   */
+          // So Kg va Page
+          uint32_t dataDisplayCan =  (uint32_t)(Data_TH->data_weight * 1000);
           modbusData.dataTruyen[0] = (uint16_t)dataDisplayCan;
           modbusData.dataTruyen[1] = (uint16_t)dataDisplayCan >> 16;
           modbusData.dataTruyen[2] = pagePopup;
-          mb.writeHreg(1, (uint16_t)7998, modbusData.dataTruyen, 3, cb); //ID man hinh
- 
-      while (mb.slave()) {mb.task();}   
-      
-    }
+          mb.writeHreg(1, (uint16_t)7898, modbusData.dataTruyen, 3, cb); //ID man hinh
+          while (mb.slave()) {mb.task();}   
+        }
     break;
-    case 1: //popup
-                if (!mb.slave()) {
+    case 1: //running
+     if (!mb.slave()) {
+      if (statusPeripheral.mqtt.updateName){
+            statusPeripheral.mqtt.updateName = false;
+            wmemset(modbusData.nameNvUtf16, 0x0000, sizeof(modbusData.nameNvUtf16) / 2);
+            mb.writeHreg(1, (uint16_t)8162, (uint16_t*)modbusData.nameNvUtf16, 28 ,cb); //ID man hinh
+            while (mb.slave()) {mb.task();}      
+      }
+      send485Utf16(8000,inforServer.nhaCC.arrayName[inforServer.nhaCC.userSelect],32);
+      send485Utf16(8032,inforServer.thanhPham.arrayName[inforServer.thanhPham.userSelect],64);
       modbusData.dataTruyen[0] = pageRunning;
-      modbusData.dataTruyen[1] = (uint16_t)stateMachine.hardwareId;
-      modbusData.dataTruyen[2] = (uint16_t)stateMachine.hardwareId>>16;
-      modbusData.dataTruyen[3] = (uint16_t)stateMachine.giaidoanINOUT;
-      modbusData.dataTruyen[4] = (uint16_t)stateMachine.giaidoanKV;
-      mb.writeHreg(1, (uint16_t)7900, modbusData.dataTruyen, 5,cb); //ID man hinh
-      while (mb.slave()) {mb.task();}     
-      wmemset(modbusData.nameNvUtf16, 0x0000, sizeof(modbusData.nameNvUtf16) / 2);
-      size_t valuelen = utf8towchar(inforServer.nhaCC.arrayName[inforServer.nhaCC.userSelect], SIZE_MAX, modbusData.nameNvUtf16, sizeof(modbusData.nameNvUtf16));
-      mb.writeHreg(1, (uint16_t)8000, (uint16_t*)modbusData.nameNvUtf16, 32,cb); //ID man hinh
-      while (mb.slave()) {mb.task();}      
-      wmemset(modbusData.nameNvUtf16, 0x0000, sizeof(modbusData.nameNvUtf16) / 2);
-      valuelen = utf8towchar(inforServer.thanhPham.arrayName[inforServer.thanhPham.userSelect], SIZE_MAX, modbusData.nameNvUtf16, sizeof(modbusData.nameNvUtf16));
-      mb.writeHreg(1, (uint16_t)8032, (uint16_t*) modbusData.nameNvUtf16, 64,cb); //ID man hinh
-      while (mb.slave()) {mb.task();} 
+      mb.writeHreg(1, (uint16_t)7900, modbusData.dataTruyen, 1,cb); //ID man hinh
+      while (mb.slave()) {mb.task();}    
     }
     break;
     case 2: //infor bat dau
         if (!mb.slave()) {
-      modbusData.dataTruyen[0] = 10;
-      modbusData.dataTruyen[1] = (uint16_t)stateMachine.hardwareId;
-      modbusData.dataTruyen[2] = (uint16_t)stateMachine.hardwareId>>16;
-      modbusData.dataTruyen[3] = (uint16_t)stateMachine.giaidoanINOUT;
-      modbusData.dataTruyen[4] = (uint16_t)stateMachine.giaidoanKV;
-      mb.writeHreg(1, (uint16_t)7900, modbusData.dataTruyen, 5,cb); //ID man hinh
-      while (mb.slave()) {mb.task();}     
+          sendPage(10);      
     }
     break;
     case 3: //infor bat dau
         if (!mb.slave()) {
-      modbusData.dataTruyen[0] = 10;
-      modbusData.dataTruyen[1] = (uint16_t)stateMachine.hardwareId;
-      modbusData.dataTruyen[2] = (uint16_t)stateMachine.hardwareId>>16;
-      modbusData.dataTruyen[3] = (uint16_t)stateMachine.giaidoanINOUT;
-      modbusData.dataTruyen[4] = (uint16_t)stateMachine.giaidoanKV;
-      mb.writeHreg(1, (uint16_t)7900, modbusData.dataTruyen, 5,cb); //ID man hinh
-      while (mb.slave()) {mb.task();}     
+      sendPage(10);
     }
     break;
     case 4: //nha cung cap
       if (!mb.slave()) {
-      modbusData.dataTruyen[0] = pageNhaCC;
-      modbusData.dataTruyen[1] = (uint16_t)stateMachine.hardwareId;
-      modbusData.dataTruyen[2] = (uint16_t)stateMachine.hardwareId>>16;
-      modbusData.dataTruyen[3] = (uint16_t)stateMachine.giaidoanINOUT;
-      modbusData.dataTruyen[4] = (uint16_t)stateMachine.giaidoanKV;
-      mb.writeHreg(1, (uint16_t)7900, modbusData.dataTruyen, 5,cb); //ID man hinh
-      while (mb.slave()) {mb.task();}   
-      wmemset(modbusData.nameNvUtf16, 0x0000, sizeof(modbusData.nameNvUtf16) / 2);
-      size_t valuelen = utf8towchar(inforServer.nhaCC.arrayName[inforServer.nhaCC.userSelect], SIZE_MAX, modbusData.nameNvUtf16, sizeof(modbusData.nameNvUtf16));
-      mb.writeHreg(1, (uint16_t)8000, (uint16_t*)modbusData.nameNvUtf16, 32,cb); //ID man hinh
-      while (mb.slave()) {mb.task();}     
-    }
+        send485Utf16(8000,inforServer.nhaCC.arrayName[inforServer.nhaCC.userSelect],32);
+        modbusData.dataTruyen[0] = pageNhaCC;
+        mb.writeHreg(1, (uint16_t)7900, modbusData.dataTruyen, 1,cb); //ID man hinh
+        while (mb.slave()) {mb.task();}   
+      }
     break;
     case 5: //thanh pham inforServer.thanhPham.arrayName[inforServer.thanhPham.userSelect]
-      if (!mb.slave()) {
+      if (!mb.slave()) {  
+      send485Utf16(8032,inforServer.thanhPham.arrayName[inforServer.thanhPham.userSelect],64); 
       modbusData.dataTruyen[0] = pageThanhPham;
-      modbusData.dataTruyen[1] = (uint16_t)stateMachine.hardwareId;
-      modbusData.dataTruyen[2] = (uint16_t)stateMachine.hardwareId>>16;
-      modbusData.dataTruyen[3] = (uint16_t)stateMachine.giaidoanINOUT;
-      modbusData.dataTruyen[4] = (uint16_t)stateMachine.giaidoanKV;
-      mb.writeHreg(1, (uint16_t)7900, modbusData.dataTruyen, 5,cb); //ID man hinh
+      mb.writeHreg(1, (uint16_t)7900, modbusData.dataTruyen, 1,cb); //ID man hinh
       while (mb.slave()) {mb.task();}     
-      wmemset(modbusData.nameNvUtf16, 0x0000, sizeof(modbusData.nameNvUtf16) / 2);
-      size_t valuelen = utf8towchar(inforServer.thanhPham.arrayName[inforServer.thanhPham.userSelect], SIZE_MAX, modbusData.nameNvUtf16, sizeof(modbusData.nameNvUtf16));
-      mb.writeHreg(1, (uint16_t)8032, (uint16_t*) modbusData.nameNvUtf16, 64,cb); //ID man hinh
-      while (mb.slave()) {mb.task();}   
     }
     break;
     case 6: // xac nhan
-                if (!mb.slave()) {
+     if (!mb.slave()) {
+      send485Utf16(8000,inforServer.nhaCC.arrayName[inforServer.nhaCC.userSelect],32);
+      send485Utf16(8032,inforServer.thanhPham.arrayName[inforServer.thanhPham.userSelect],64);
       modbusData.dataTruyen[0] = pageComfirm;
-      modbusData.dataTruyen[1] = (uint16_t)stateMachine.hardwareId;
-      modbusData.dataTruyen[2] = (uint16_t)stateMachine.hardwareId>>16;
-      modbusData.dataTruyen[3] = (uint16_t)stateMachine.giaidoanINOUT;
-      modbusData.dataTruyen[4] = (uint16_t)stateMachine.giaidoanKV;
-      mb.writeHreg(1, (uint16_t)7900, modbusData.dataTruyen, 5,cb); //ID man hinh
+      modbusData.dataTruyen[1] = 0;
+      mb.writeHreg(1, (uint16_t)7900, modbusData.dataTruyen, 1,cb); //ID man hinh
       while (mb.slave()) {mb.task();}     
     }
     break;
@@ -165,15 +179,15 @@ void Display( void * pvParameters ) {
   
   for (;;) {
 
-      if ((xTaskGetTickCount() - modbusData.timeSendSSID > 5000)|| (modbusData.timeSendSSID == 0) ) {
+     if ((xTaskGetTickCount() - modbusData.timeSendSSID > 20000)|| (modbusData.timeSendSSID == 0) ) {
         modbusData.timeSendSSID = xTaskGetTickCount();
         sendSSID485();
      }
-     else  if ((xTaskGetTickCount() - modbusData.timeSendKg > 500)|| (modbusData.timeSendSSID == 0) ) {
+     else  if ((xTaskGetTickCount() - modbusData.timeSendKg > 800)|| (modbusData.timeSendSSID == 0) ) {
           modbusData.timeSendKg = xTaskGetTickCount();
           if (!mb.slave()) { 
          
-          uint32_t dataDisplayCan =   (uint32_t)(can_data * 1000);
+          uint32_t dataDisplayCan =   (can_data > 0)? ((uint32_t)(can_data * 1000)):0;
           modbusData.dataTruyen[0] = (uint16_t)dataDisplayCan;
           modbusData.dataTruyen[1] = (uint16_t)dataDisplayCan >> 16;
           mb.writeHreg(1, (uint16_t)7910, modbusData.dataTruyen, 2, cb); //ID man hinh
@@ -189,7 +203,8 @@ void Display( void * pvParameters ) {
       case deviceRunning: //////////////////////////////////////////////
         //////////////////////////////////////////////////////////////////
         if (xQueueReceive( Queue_display, &Data_TH,  ( TickType_t ) 1 ) == pdPASS ) {
-          variLcdUpdate.stateDisplayLCD = 0;
+          variLcdUpdate.stateDisplayLCD = 0;  //popup man hinh
+          variLcdUpdate.updateLCD = true;  // popup tuc thi
           if ((Data_TH.id_RFID_NV[0] == 'x') && (GetSttKhuVuc() ==  sttKvSuaCaIN)) {
 #ifdef debug_UART
             Serial.println("Data : Ro & Can KV Sua Ca - IN");
@@ -219,6 +234,7 @@ void Display( void * pvParameters ) {
         // Turn Off Buzzer, LED
         if (xSemaphoreTake(xSignal_Display_checkdone, 1)) { //Che do IN qua timeout se tat
           variLcdUpdate.stateDisplayLCD = 1;
+          variLcdUpdate.updateLCD = true;  // popup tuc thi
           statusBuzzer = false ;
           digitalWrite(pinBuzzer, statusBuzzer);
           digitalWrite(pinLedGreen, HIGH);
@@ -231,6 +247,7 @@ void Display( void * pvParameters ) {
         }
         if ((xTaskGetTickCount() - timeoutDisplay > Time_check) && (timeoutDisplay > 0 )) {
           variLcdUpdate.stateDisplayLCD = 1;
+          variLcdUpdate.updateLCD = true;  // popup tuc thi
           timeoutDisplay = 0;
         }
         xQueueReceive( Queue_Time_blink, &Time_blink,  ( TickType_t ) 1 );
@@ -240,19 +257,20 @@ void Display( void * pvParameters ) {
         }
         printDebugHeap();
         switch (variLcdUpdate.stateDisplayLCD) {
-          case 0:
-            LcdSeclectMode(0, &Data_TH, daucham_lcd);
+          case 0: //Hien thi popUp 
+             if ((xTaskGetTickCount() - lastBlinkLCD > 500)|| variLcdUpdate.updateLCD) {
+               LcdSeclectMode(0, &Data_TH);
+              variLcdUpdate.updateLCD = false;
+            }
+           
             //variLcdUpdate.stateDisplayLCD = 4;
             break;
-          case 1:
-            if ((xTaskGetTickCount() - lastBlinkLCD > 5000)|| variLcdUpdate.updateLCD) {
+          case 1: // hien thi running
+            if ((xTaskGetTickCount() - lastBlinkLCD > 15000)|| variLcdUpdate.updateLCD) {
               lastBlinkLCD = xTaskGetTickCount();
-              LcdSeclectMode(1, &Data_TH, daucham_lcd);
+              LcdSeclectMode(1, &Data_TH);
+              variLcdUpdate.updateLCD = false;
             }
-            break;
-          case 2:
-            LcdSeclectMode(10, &Data_TH, daucham_lcd);
-            variLcdUpdate.stateDisplayLCD = 5;
             break;
           default: break;
         }
@@ -260,26 +278,16 @@ void Display( void * pvParameters ) {
       //////////////////////////////////////////////////////////////////
       case deviceSetting: ///////////////////////////////////////////////
         //////////////////////////////////////////////////////////////////
-          switch (variLcdUpdate.stateDisplayLCD) {
-            case 1:
-                if ((xTaskGetTickCount() - lastBlinkLCD > 500) || variLcdUpdate.updateLCD ) {
+                if ((xTaskGetTickCount() - lastBlinkLCD > 5000) || variLcdUpdate.updateLCD || lastBlinkLCD == 0 ) {
                   variLcdUpdate.updateLCD = false;
                   lastBlinkLCD = xTaskGetTickCount();
-                  LcdSeclectMode(stateMachine.bottonSelect + 2, &Data_TH, daucham_lcd);
+                  LcdSeclectMode(stateMachine.bottonSelect + 2, &Data_TH);
                 }
-              break;
-            case 2:
-              LcdSeclectMode(10, &Data_TH, daucham_lcd);
-              variLcdUpdate.stateDisplayLCD = 5;
-              break;
-            default: break;
-          }
-        break;
       //////////////////////////////////////////////////////////////////
       case deviceTurnOff: /////////////////////////////////////////////
         //////////////////////////////////////////////////////////////////
         if ((xTaskGetTickCount() - lastBlinkLCD > 5000)|| variLcdUpdate.updateLCD ) {
-                  LcdDisplayTurnOffPower();
+                //  LcdDisplayTurnOffPower();
                   lastBlinkLCD = xTaskGetTickCount();
         }
         break;

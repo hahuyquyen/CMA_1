@@ -196,7 +196,13 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
     char textBegin[ 18 ];
     sprintf(textBegin, "/CMA/%lu", ( unsigned long )sttData);
     // if (statusSaveData == 1)SdDeleteFile(SD,textToWrite); Thay doi tu delete toi rename.
-    if (statusSaveData == 1)SdRenameFile(SD, textBegin, textEnd);
+    if (statusSaveData == 1){
+      SdRenameFile(SD, textBegin, textEnd);
+      if (jsonBuffer.containsKey("e")) {
+        statusPeripheral.mqtt.updateName = true;
+        strlcpy(statusPeripheral.mqtt.nameNhanVien, jsonBuffer["e"], sizeof(statusPeripheral.mqtt.nameNhanVien));
+    }
+    }
   }
   jsonBuffer.clear(); //giai phong bo nho
 }

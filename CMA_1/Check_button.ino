@@ -93,7 +93,7 @@ void onPressed_ok() {
   if (stateMachine.bottonSelect > 6) return;
   if (stateMachine.bottonSelect == 0) {
       if (stateMachine.giaidoanINOUT == cheDoOut) {
-          stateMachine.bottonSelect = 3;
+          stateMachine.bottonSelect = 4;
       }
       else stateMachine.bottonSelect = 2;
   }
@@ -117,10 +117,8 @@ void onPressed_ok() {
 //////////////////////////////////////////////////////////////////
 void onPressedExit() {
   stateMachine.bottonSelect = 0 ;
-  stateMachine.deviceStatus = deviceSetting;
-  
+  stateMachine.deviceStatus = deviceSetting; 
 #ifdef debug_UART
-  
  // Serial.println("onPressed_vitri");
 #endif
 #ifdef debug_Web
@@ -129,8 +127,9 @@ void onPressedExit() {
 ////////////////////////////////////////////////
 //b Reset de nhan cac thong so lai /////////////
 ///////////////////////////////////////////////
-  khoiTaoGiaTri(false);
+  khoiTaoGiaTri(false);  
   if (stateMachine.deviceStatus == deviceSetting){variLcdUpdate.stateDisplayLCD = 1; }
+  variLcdUpdate.updateLCD = true;
 }
 //////////////////////////////////////////////////////////////////
 ////// Button Error ///////////////////////////////////////////////

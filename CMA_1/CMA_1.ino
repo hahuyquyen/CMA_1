@@ -148,8 +148,14 @@ void khoiTaoGiaTri(boolean firstTime = true) {
   // inforServer.copyData(inforServer.thanhPham.arrayName[0], ramChoDuLieu);
   // inforServer.copyData(inforServer.nhaCC.arrayName[0], ramChoDuLieu);
   // inforServer.copyData(inforServer.giaiDoan.arrayName[0], ramChoDuLieu);
+  if (stateMachine.giaidoanINOUT == 1) {
   strlcpy(inforServer.thanhPham.arrayName[0], ramChoDuLieu, sizeof(inforServer.thanhPham.arrayName[0]));
   strlcpy(inforServer.nhaCC.arrayName[0], ramChoDuLieu, sizeof(inforServer.nhaCC.arrayName[0]));
+  }
+  else {
+      strlcpy(inforServer.thanhPham.arrayName[0], "Bỏ Qua", sizeof(inforServer.thanhPham.arrayName[0]));
+      strlcpy(inforServer.nhaCC.arrayName[0], "Bỏ Qua", sizeof(inforServer.nhaCC.arrayName[0]));
+  }
   //strlcpy(inforServer.giaiDoan.arrayName[0], ramChoDuLieu, sizeof(inforServer.giaiDoan.arrayName[0]));
 
   stateMachine.deviceStatus = deviceSetting;
