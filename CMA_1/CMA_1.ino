@@ -181,7 +181,7 @@ void khoiTaoGiaTri(boolean firstTime = true) {
 void setup()
 {   pinMode(pinPower, OUTPUT);
   digitalWrite(pinPower, HIGH);
-  Serial.begin(38400,SERIAL_8N1);
+  Serial.begin(187500,SERIAL_8N1);
   pinMode(pinBuzzer, OUTPUT);
   pinMode(pinLedGreen, OUTPUT);
   pinMode(pinLedRed, OUTPUT);

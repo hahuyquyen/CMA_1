@@ -1,6 +1,19 @@
 /*
  http://192.168.100.86:4999/SetTimeRtc?timestamp=1576032486
  http://192.168.100.77:4999/setKhuVuc?i=2&kv=1
+
+
+ Mna Lan Dung 
+
+ Using DM9051
+DM9051 Ethernet module consumes one SPI interface plus an interrupt and reset GPIO. By default they're connected as follows:
+GPIO DM9051
+GPIO19  SPI_CLK
+GPIO23  SPI_MOSI
+GPIO25  SPI_MISO
+GPIO22  SPI_CS
+GPIO4 Interrupt
+GPIO5 Reset
  */
 
 
