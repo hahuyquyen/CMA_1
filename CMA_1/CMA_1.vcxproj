@@ -153,6 +153,7 @@
     <ClInclude Include="Variable_wifi.h">
       <FileType>CppCode</FileType>
     </ClInclude>
+    <ClInclude Include="VarriableData.h" />
     <ClInclude Include="__vm\.CMA_1.vsarduino.h" />
   </ItemGroup>
   <ItemGroup>
