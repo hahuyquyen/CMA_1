@@ -103,6 +103,11 @@ void getVariHtml(AsyncWebServerRequest* request, const __FlashStringHelper* id, 
 		request->getParam(id, true)->value().toCharArray(dataget, chieudai);
 	}
 }
+void getVariIntHtml(AsyncWebServerRequest* request, const __FlashStringHelper* id, uint8_t* dataget) {
+	if (request->hasParam(id, true)) {
+		*dataget = request->getParam(id)->value().toInt();
+	}
+}
 void setupWiFiConf(void) {
 	server.on("/2.css", HTTP_GET, [](AsyncWebServerRequest* request) {
 		request->send(SPIFFS, "/2.css", F("text/css"));
@@ -123,17 +128,20 @@ void setupWiFiConf(void) {
 		request->send(200, PSTR(dataHtmlType), F("OK ...."));
 		});
 	server.on("/setKhuVuc", HTTP_GET, [](AsyncWebServerRequest* request) {
-		if (request->hasParam(F("i"))) {
+		getVariIntHtml(request, F("i"), &stateMachine.giaidoanINOUT);
+		getVariIntHtml(request, F("kv"), &stateMachine.giaidoanKV);
+		/*if (request->hasParam(F("i"))) {
 			stateMachine.giaidoanINOUT = request->getParam(F("i"))->value().toInt();
 		}
 		if (request->hasParam(F("kv"))) {
 			stateMachine.giaidoanKV = request->getParam(F("kv"))->value().toInt();
-		}
+		}*/
 		stateMachine.setGiaiDoan();
 		stateMachine.setKV();
 		request->send(200, PSTR(dataHtmlType), F("OK ...."));
 		});
 	server.on("/setRf", HTTP_GET, [](AsyncWebServerRequest* request) {
+		getVariIntHtml(request, F("p"), &stateMachine.powerRFID);
 		if (request->hasParam(F("p"))) {
 			stateMachine.powerRFID = request->getParam(F("p"))->value().toInt();
 			stateMachine.setPowerRFID();
@@ -143,27 +151,12 @@ void setupWiFiConf(void) {
 		request->send(200, PSTR(dataHtmlType), F("OK ...."));
 		});
 	server.on("/set_wifi_conf", HTTP_POST, [](AsyncWebServerRequest* request) {
-		if (request->hasParam(F("html_ssid"), true)) {
-			request->getParam(F("html_ssid"), true)->value().toCharArray(WiFiConf.sta_ssid, sizeof(WiFiConf.sta_ssid));
-		}
-		// getVariHtml(AsyncWebServerRequest * request, char* id, char* dataget, size_t chieudai) {
-	//	getVariHtml(request, F("html_wpa_password"), WiFiConf.sta_pwd, sizeof(WiFiConf.sta_pwd));
-		if (request->hasParam(F("html_wpa_password"), true)) {
-			request->getParam(F("html_wpa_password"), true)->value().toCharArray(WiFiConf.sta_pwd, sizeof(WiFiConf.sta_pwd));
-		}
+		getVariHtml(request, F("html_ssid"), WiFiConf.sta_ssid, sizeof(WiFiConf.sta_ssid));
+		getVariHtml(request, F("html_wpa_password"), WiFiConf.sta_pwd, sizeof(WiFiConf.sta_pwd));
 		getVariHtml(request, F("html_ip_wifi"), WiFiConf.sta_ip, sizeof(WiFiConf.sta_ip));
-	/*	if (request->hasParam(F("html_ip_wifi"), true)) {
-			request->getParam(F("html_ip_wifi"), true)->value().toCharArray(WiFiConf.sta_ip, sizeof(WiFiConf.sta_ip));
-		}*/
-		if (request->hasParam(F("html_gateway_wifi"), true)) {
-			request->getParam(F("html_gateway_wifi"), true)->value().toCharArray(WiFiConf.sta_gateway, sizeof(WiFiConf.sta_gateway));
-		}
-		if (request->hasParam(F("html_sub_wifi"), true)) {
-			request->getParam(F("html_sub_wifi"), true)->value().toCharArray(WiFiConf.sta_subnet, sizeof(WiFiConf.sta_subnet));
-		}
-		if (request->hasParam(F("button"), true)) {
-			request->getParam(F("button"), true)->value().toCharArray(WiFiConf.choose_dhcp, sizeof(WiFiConf.choose_dhcp));
-		}
+		getVariHtml(request, F("html_gateway_wifi"), WiFiConf.sta_gateway, sizeof(WiFiConf.sta_gateway));
+		getVariHtml(request, F("html_sub_wifi"), WiFiConf.sta_subnet, sizeof(WiFiConf.sta_subnet));
+		getVariHtml(request, F("button"), WiFiConf.choose_dhcp, sizeof(WiFiConf.choose_dhcp));
 		//if (request->hasParam(F("chooseinout"), true)) {request->getParam(F("chooseinout"), true)->value().toCharArray(WiFiConf.mqtt_choose_inout, sizeof(WiFiConf.mqtt_choose_inout));}
 		if (saveWiFiConf())request->send(200, F("text/plain"), F("OK BABY"));
 		else request->send(200, PSTR(dataHtmlType), F("Fail Save EEPROM"));
@@ -173,31 +166,17 @@ void setupWiFiConf(void) {
 #ifdef debug_UART
 			Serial.println(request->getParam("id", true)->value());
 #endif
-			/*
-			#ifdef debug_Web
-				  DebugData("%s",request->getParam("id", true)->value());
-			#endif*/
 			stateMachine.hardwareId = strtoul(request->getParam("id", true)->value().c_str(), NULL, 10);
 			stateMachine.setIdControl();
 		}
 		request->send(200, PSTR(dataHtmlType), F("OK ...."));
 		});
 	server.on("/set_mqtt_conf", HTTP_POST, [](AsyncWebServerRequest* request) {
-		if (request->hasParam(PSTR(ServerMQTT), true)) {
-			request->getParam(PSTR(ServerMQTT), true)->value().toCharArray(WiFiConf.mqtt_server, sizeof(WiFiConf.mqtt_server));
-		}
-		if (request->hasParam(PSTR(PortMQTT), true)) {
-			request->getParam(PSTR(PortMQTT), true)->value().toCharArray(WiFiConf.mqtt_port, sizeof(WiFiConf.mqtt_port));
-		}
-		if (request->hasParam(PSTR(USERMQTT), true)) {
-			request->getParam(PSTR(USERMQTT), true)->value().toCharArray(WiFiConf.mqtt_user, sizeof(WiFiConf.mqtt_user));
-		}
-		if (request->hasParam(PSTR(PASSMQTT), true)) {
-			request->getParam(PSTR(PASSMQTT), true)->value().toCharArray(WiFiConf.mqtt_pass, sizeof(WiFiConf.mqtt_pass));
-		}
-		if (request->hasParam(PSTR(SUBTopic1), true)) {
-			request->getParam(PSTR(SUBTopic1), true)->value().toCharArray(WiFiConf.mqtt_subto1, sizeof(WiFiConf.mqtt_subto1));
-		}
+		getVariHtml(request, F("ServerMQTT"), WiFiConf.mqtt_server, sizeof(WiFiConf.mqtt_server));
+		getVariHtml(request, F("PortMQTT"), WiFiConf.mqtt_port, sizeof(WiFiConf.mqtt_port));
+		getVariHtml(request, F("USERMQTT"), WiFiConf.mqtt_user, sizeof(WiFiConf.mqtt_user));
+		getVariHtml(request, F("PASSMQTT"), WiFiConf.mqtt_pass, sizeof(WiFiConf.mqtt_pass));
+		getVariHtml(request, F("SUBTopic1"), WiFiConf.mqtt_subto1, sizeof(WiFiConf.mqtt_subto1));
 		if (saveWiFiConf())request->send(200, PSTR(dataHtmlType), F("OK BABY"));
 		else request->send(200, PSTR(dataHtmlType), F("Fail Save EEPROM"));
 		});

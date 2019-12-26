@@ -7,7 +7,7 @@ extern "C" {
 #include <EEPROM.h>
 //#include <ETH.h>
 #include "Config.h"
-//#include <Arduino.h>
+#include <Arduino.h>
 #include "FS.h"
 #include <SPIFFS.h>
 #include <ESPAsyncWebServer.h>
@@ -101,6 +101,7 @@ File webserver
 void handleDoUpdate(AsyncWebServerRequest* request, const String& filename, size_t index, uint8_t* data, size_t len, bool final);
 String processor(const String& var);
 void setupWiFiConf(void);
+void getVariHtml(AsyncWebServerRequest* request, const __FlashStringHelper* id, char* dataget, size_t chieudai);
 /*
 trong File WifiSetting
 */
