@@ -40,8 +40,10 @@ void IRAM_ATTR array_to_string(byte* array, unsigned int len, char* buffer)
 void TaskRFID( void * pvParameters ) {
   static byte myEPC[12];
   static byte myEPClength;
-  Data_RFID Data_rfid;
-  Data_RFID Data_rfid_nv;
+  Data_RFID dataRfidRo;
+  //Data_RFID Data_rfid;
+  //Data_RFID Data_rfid_nv;
+  Data_RFID dataRfidNV;
   RFID nano;
   const TickType_t xTicksToWait = pdMS_TO_TICKS(1);
   SerialRFID.begin(9600);
@@ -75,7 +77,7 @@ void TaskRFID( void * pvParameters ) {
         }
         Serial.println("");*/
         if (myEPC[0] == MaRo_RFID) {
-          array_to_string(&myEPC[0], 12, Data_rfid.id_RFID); //0->12 5->7
+          array_to_string(&myEPC[0], 12, dataRfidRo.id_RFID); //0->12 5->7
           
           
           /*
@@ -84,23 +86,23 @@ void TaskRFID( void * pvParameters ) {
           // if (inforServer.PhanLoaiKV == PhanLoai::LANG_OUT){
           //  if ((inforServer.giaiDoan.arrayType[inforServer.giaiDoan.userSelect] == kvSuaCa)&&(inforServer.giaiDoan.cheDoInOut == cheDoOut)){
           if ( GetSttKhuVuc() ==  sttKvSuaCaOUT ) {
-            strncpy( Data_rfid.id_RFID_Old, Data_rfid.id_RFID, sizeof(Data_rfid.id_RFID));
-            xQueueSend( Queue_RFID, &Data_rfid, xTicksToWait );
+            strncpy(dataRfidRo.id_RFID_Old, dataRfidRo.id_RFID, sizeof(dataRfidRo.id_RFID));
+            xQueueSend( QueueRfidRo, &dataRfidRo, xTicksToWait );
             
           }
-          else if (strcmp(Data_rfid.id_RFID, Data_rfid.id_RFID_Old) != 0) {
-            strncpy( Data_rfid.id_RFID_Old, Data_rfid.id_RFID, sizeof(Data_rfid.id_RFID));
-            xQueueSend( Queue_RFID, &Data_rfid, xTicksToWait );
+          else if (strcmp(dataRfidRo.id_RFID, dataRfidRo.id_RFID_Old) != 0) {
+            strncpy(dataRfidRo.id_RFID_Old, dataRfidRo.id_RFID, sizeof(dataRfidRo.id_RFID));
+            xQueueSend( QueueRfidRo, &dataRfidRo, xTicksToWait );
           }
         }
 
         else if (myEPC[0] == MaNV_RFID) {
-          array_to_string(&myEPC[0], 12, Data_rfid_nv.id_RFID);
-          if (strcmp(Data_rfid.id_RFID, "000000000000000000000000") != 0) { //00 00 00 00 00 00 00 00 00 00 00 00
-              if (strcmp(Data_rfid_nv.id_RFID, Data_rfid_nv.id_RFID_Old) != 0) {
+          array_to_string(&myEPC[0], 12, dataRfidNV.id_RFID);
+          if (strcmp(dataRfidNV.id_RFID, "000000000000000000000000") != 0) { //00 00 00 00 00 00 00 00 00 00 00 00
+              if (strcmp(dataRfidNV.id_RFID, dataRfidNV.id_RFID_Old) != 0) {
 
-                  strncpy(Data_rfid_nv.id_RFID_Old, Data_rfid_nv.id_RFID, sizeof(Data_rfid_nv.id_RFID));
-                  xQueueSend(Queue_RFID_NV, &Data_rfid_nv, xTicksToWait);
+                  strncpy(dataRfidNV.id_RFID_Old, dataRfidNV.id_RFID, sizeof(dataRfidNV.id_RFID));
+                  xQueueSend(QueueRfidNV, &dataRfidNV, xTicksToWait);
               }
           }
           else {
@@ -114,10 +116,10 @@ void TaskRFID( void * pvParameters ) {
     }
 
     if (xSemaphoreTake(xreset_id_nv, 1)) {
-      strncpy( Data_rfid_nv.id_RFID_Old, "", sizeof(""));
+      strncpy(dataRfidNV.id_RFID_Old, "", sizeof(""));
     }
     if (xSemaphoreTake(xResetRfidMaRo, 1)) {
-      strncpy( Data_rfid.id_RFID_Old, "", sizeof(""));
+      strncpy(dataRfidRo.id_RFID_Old, "", sizeof(""));
     }
 
     vTaskDelayUntil(&xLastWakeTime, 20);

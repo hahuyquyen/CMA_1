@@ -1,7 +1,5 @@
 /*
    cma2018LHP515
-
-
 */
 
 const char ramChoDuLieu[] = "Chờ Dữ Liệu"; // dung can lây FPSTR(ramChoDuLieu) và strlcpy_P  tiet kiem RAM cho heap memory
@@ -30,9 +28,9 @@ static struct modbusDataConf{
   unsigned long timeSendSSID;
   unsigned long timeSendKg;
 }modbusData;
+
 static struct statusPeripheralConf{
-    struct mqttConf{
-      
+    struct mqttConf{  
       unsigned long lastTimeGetDataConfig; 
       unsigned long  timeTruyenMQTT;
       boolean statusMqttConnect ; 
@@ -58,7 +56,7 @@ static struct statusPeripheralConf{
     }sdCard={0,0,false,false};
     int rssiWifi;
     int powerValue;
-    uint32_t timeStampServer;
+    uint32_t timeStampServer = 0;
     boolean updateRFID = false;
 }statusPeripheral;
 
@@ -82,36 +80,14 @@ static struct stateMachineConf {
   uint8_t powerRFID;
   uint8_t giaidoanINOUT;
   uint8_t giaidoanKV;
-  void getPowerRFID(){
-    this->powerRFID=EEPROM.readInt(810);
-  }
-  void setPowerRFID(){
-      setdata8Bit(810, &this->powerRFID);
-    /*EEPROM.write(810, this->powerRFID);
-    EEPROM.commit();*/
-  } 
-  void getIdControl(){
-    this->hardwareId=EEPROM.readUInt(800);
-  }
-  void setIdControl(){
-      setdata32Bit(800, &this->hardwareId);
-  /*  EEPROM.writeUInt(800, this->hardwareId);
-    EEPROM.commit();*/
-  }
-  void getKV() {
-      this->giaidoanKV = EEPROM.readInt(812);
-  }
-  void getGiaiDoan() {
-      this->giaidoanINOUT = EEPROM.readInt(811);
-  }
-  void setKV() {
-      setdata8Bit(812, &this->giaidoanKV);
-  }
-  void setGiaiDoan() {
-      setdata8Bit(811, &this->giaidoanINOUT);
-  }
- 
-
+  void getPowerRFID(){ this->powerRFID=EEPROM.readInt(810); }
+  void setPowerRFID(){ setdata8Bit(810, &this->powerRFID);} 
+  void getIdControl(){ this->hardwareId=EEPROM.readUInt(800);}
+  void setIdControl(){ setdata32Bit(800, &this->hardwareId);  }
+  void getKV() {this->giaidoanKV = EEPROM.readInt(812);}
+  void getGiaiDoan() { this->giaidoanINOUT = EEPROM.readInt(811);}
+  void setKV() {setdata8Bit(812, &this->giaidoanKV);}
+  void setGiaiDoan() {setdata8Bit(811, &this->giaidoanINOUT);}
   void setdata32Bit(uint16_t address, uint32_t* value) {
       EEPROM.writeUInt(address, *value);
       EEPROM.commit();
@@ -165,7 +141,8 @@ static struct inforServerStruct {
   struct mqttConfigConf{
       char topicGetStatusACK[25];
       char topicGetConfig[25];
-      //char dataSend[300];
+      char topicSenData[6] = "/data";
+      char topicSenConfig[8] = "/config";
       void setTopicACK(unsigned long id_device){
         sprintf(this->topicGetStatusACK, "/data/ack/%lu", id_device) ;
       }
@@ -178,7 +155,7 @@ static struct inforServerStruct {
     if (chedo) { *userSelect = (*userSelect > (totaldata - 1)) ? 0 : (*userSelect + 1);}
     else *userSelect = *userSelect - 1;
   }
-  //char ssssssss[6533];
+  //char ssssssss[6533];inforServer.mqttConfig.topicSenData
 } inforServer;
 /*
 Program size: 904,750 bytes (used 46% of a 1,966,080 byte maximum) (18.03 secs)
@@ -227,8 +204,8 @@ SemaphoreHandle_t xSignal_Display_checkdone;
 SemaphoreHandle_t xreset_id_nv;
 SemaphoreHandle_t xResetRfidMaRo;
 QueueHandle_t Queue_can;
-QueueHandle_t Queue_RFID;
-QueueHandle_t Queue_RFID_NV;
+QueueHandle_t QueueRfidRo;
+QueueHandle_t QueueRfidNV;
 QueueHandle_t Queue_mqtt;
 QueueHandle_t Queue_display;
 QueueHandle_t Queue_Time_blink;
@@ -249,10 +226,10 @@ typedef struct Data_CAN {
 /////////////////////////////////////////////////////////////
 ///// Data RFID           //////////////////////
 ////////////////////////////////////////////////////////////
-typedef struct Data_RFID {
-  char id_RFID[25];
-  char id_RFID_Old[25];
-} Data_RFID;
+struct Data_RFID {
+    char id_RFID[25];
+    char id_RFID_Old[25];
+};
 
 
 /*

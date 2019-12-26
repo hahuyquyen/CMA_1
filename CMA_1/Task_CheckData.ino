@@ -6,7 +6,7 @@ void http_re( void * pvParameters ){
     Data_CAN Data_CAN_TH;
     Data_RFID Data_RFID_TH;
     Data_RFID Data_RFID_NV;
-    Data_TH Data_TH;
+    Data_TH dataTHSend;
     char idRFID_OLD[25];
     unsigned long lastTimeGetQueueCan = 0;
     unsigned long lastTimeGetQueueRFID_Ro = 0;
@@ -34,7 +34,7 @@ void http_re( void * pvParameters ){
      */
 
 
-    if(xQueueReceive( Queue_RFID, &Data_RFID_TH,  ( TickType_t ) 1 )== pdPASS ){
+    if(xQueueReceive( QueueRfidRo, &Data_RFID_TH,  ( TickType_t ) 1 )== pdPASS ){
         if (strcmp(Data_RFID_TH.id_RFID, "000000000000000000000000") != 0) {
             baoLed = true;
             if (stateMachine.giaidoanKV == kvSuaCa) {
@@ -46,7 +46,7 @@ void http_re( void * pvParameters ){
      * Nhận mã RFID
      * Nếu là khu Filler chỉ nhận mã rỗ thì swap time tới mã rỗ để khỏi viết lại code
      */
-    if(xQueueReceive( Queue_RFID_NV, &Data_RFID_NV,  ( TickType_t ) 1 )== pdPASS ){
+    if(xQueueReceive( QueueRfidNV, &Data_RFID_NV,  ( TickType_t ) 1 )== pdPASS ){
         if (strcmp(Data_RFID_NV.id_RFID, "000000000000000000000000") != 0) {
             baoLed = true;
             if (stateMachine.giaidoanKV == kvFille) { lastTimeGetQueueRFID_Ro = xTaskGetTickCount(); }
@@ -84,14 +84,14 @@ void http_re( void * pvParameters ){
 ///////////////////////////////////////////////                 
               if (timeCompareMode1 < time_2_lan_nhan_data){ // 2 dữ liệu phải nhỏ hơn thời gian cài đặt mới là 1 cặp đúng
                if (stateMachine.giaidoanKV == kvFille){
-                    strncpy( Data_TH.id_RFID_NV,Data_RFID_NV.id_RFID, sizeof(Data_RFID_NV.id_RFID));
-                    strncpy( Data_TH.id_RFID,"x", sizeof("x"));     
+                    strncpy(dataTHSend.id_RFID_NV,Data_RFID_NV.id_RFID, sizeof(Data_RFID_NV.id_RFID));
+                    strncpy(dataTHSend.id_RFID,"x", sizeof("x"));
                 }
                 else {
-                      strncpy( Data_TH.id_RFID,Data_RFID_TH.id_RFID, sizeof(Data_RFID_TH.id_RFID));
-                      strncpy( Data_TH.id_RFID_NV,"x", sizeof("x"));
+                      strncpy(dataTHSend.id_RFID,Data_RFID_TH.id_RFID, sizeof(Data_RFID_TH.id_RFID));
+                      strncpy(dataTHSend.id_RFID_NV,"x", sizeof("x"));
                 }
-                Data_TH.data_weight=Data_CAN_TH.data_can;
+               dataTHSend.data_weight=Data_CAN_TH.data_can;
                 boolean tt = true;
                 /*
                  Kiem tra giai doan sua ca ngo ra, co can 2 lan
@@ -100,8 +100,8 @@ void http_re( void * pvParameters ){
                  */
                 if( GetSttKhuVuc() ==  sttKvSuaCaOUT ){
                   tt = false;
-                  if (strcmp(Data_TH.id_RFID,idRFID_OLD) != 0){
-                    strncpy( idRFID_OLD,Data_TH.id_RFID, sizeof(Data_TH.id_RFID));if (Data_CAN_TH.data_can >0.5) tt = true;
+                  if (strcmp(dataTHSend.id_RFID,idRFID_OLD) != 0){
+                    strncpy( idRFID_OLD, dataTHSend.id_RFID, sizeof(dataTHSend.id_RFID));if (Data_CAN_TH.data_can >0.5) tt = true;
                     canDataOutOld=Data_CAN_TH.data_can;
                  }
                   else {  
@@ -111,7 +111,7 @@ void http_re( void * pvParameters ){
                     }
                 }
                 if(tt){
-                    xQueueSend( Queue_display, &Data_TH, xTicksToWait );
+                    xQueueSend( Queue_display, &dataTHSend, xTicksToWait );
                     //if ((inforServer.giaiDoan.cheDoInOut == cheDoIN)&& (inforServer.giaiDoan.arrayType[inforServer.giaiDoan.userSelect]  == kvSuaCa)) {   //Neu Sua Ca Ngo Vao thi reset ma Nhan vien
                     if (GetSttKhuVuc() == sttKvSuaCaIN) {   //Neu Sua Ca Ngo Vao thi reset ma Nhan vien
                       xSemaphoreGive(xreset_id_nv);  
@@ -119,12 +119,12 @@ void http_re( void * pvParameters ){
                     else { // nêu khong có check 2 lan thi gui mqtt
 #ifdef debug_UART  
                         
-                      //printf("CHECK OUT: Time: %ld - Kg: %f - RFID: %s \n",timeCompareMode1,Data_TH.data_weight,Data_TH.id_RFID);
+                      //printf("CHECK OUT: Time: %ld - Kg: %f - RFID: %s \n",timeCompareMode1,dataTHSend.data_weight,dataTHSend.id_RFID);
 #endif 
 #ifdef debug_Web
-                        DebugData("CHECK OUT: Time: %ld - Kg: %f - RFID: %s", timeCompareMode1, Data_TH.data_weight, Data_TH.id_RFID);
+                        DebugData("CHECK OUT: Time: %ld - Kg: %f - RFID: %s", timeCompareMode1, dataTHSend.data_weight, dataTHSend.id_RFID);
 #endif
-                        xQueueSend( Queue_mqtt, &Data_TH, xTicksToWait );
+                        xQueueSend( Queue_mqtt, &dataTHSend, xTicksToWait );
                     }      
                 }   
                 timeCompareMode1 = 10000;
@@ -159,15 +159,15 @@ void http_re( void * pvParameters ){
 ///////////////////////////////////////////////                    
                   if (timeCompareMode2 < time_cho_nhan_RFID_NV){
                     lastTimeGetData_RoVaCan=lastTimeGetQueueRFID_NV;
-                    strncpy( Data_TH.id_RFID_NV,Data_RFID_NV.id_RFID, sizeof(Data_RFID_NV.id_RFID));
+                    strncpy(dataTHSend.id_RFID_NV,Data_RFID_NV.id_RFID, sizeof(Data_RFID_NV.id_RFID));
 #ifdef debug_UART
-                    printf("CHECK IN: Time: %ld - Kg: %f - RFID: %s - RFID NV: %s\n",timeCompareMode2,Data_TH.data_weight,Data_TH.id_RFID,Data_TH.id_RFID_NV);
+                    printf("CHECK IN: Time: %ld - Kg: %f - RFID: %s - RFID NV: %s\n",timeCompareMode2, dataTHSend.data_weight, dataTHSend.id_RFID, dataTHSend.id_RFID_NV);
 #endif
 #ifdef debug_Web
-                    DebugData("CHECK IN: Time: %ld - Kg: %f - RFID: %s - RFID NV: %s", timeCompareMode2, Data_TH.data_weight, Data_TH.id_RFID, Data_TH.id_RFID_NV);
+                    DebugData("CHECK IN: Time: %ld - Kg: %f - RFID: %s - RFID NV: %s", timeCompareMode2, dataTHSend.data_weight, dataTHSend.id_RFID, dataTHSend.id_RFID_NV);
 #endif
-                    xQueueSend( Queue_display, &Data_TH, xTicksToWait );
-                    xQueueSend( Queue_mqtt, &Data_TH, xTicksToWait );
+                    xQueueSend( Queue_display, &dataTHSend, xTicksToWait );
+                    xQueueSend( Queue_mqtt, &dataTHSend, xTicksToWait );
                     timeCompareMode2=10000;
                     lastTimeGetQueueRFID_NV=0;
                     lastTimeGetData_RoVaCan = 0;

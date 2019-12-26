@@ -1,41 +1,42 @@
-
 extern "C" {
 //#include <dummy.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/timers.h"
 }
 #include <WiFi.h>
-//#include <ETH.h>
-#include <Arduino.h>
-#include "FS.h"
-#include <AsyncMqttClient.h>
 #include <EEPROM.h>
+//#include <ETH.h>
 #include "Config.h"
-#include "Variable_wifi.h"
-#include <ArduinoJson.h>
+//#include <Arduino.h>
+#include "FS.h"
 #include <SPIFFS.h>
 #include <ESPAsyncWebServer.h>
+#include <AsyncMqttClient.h>
+#include <ArduinoJson.h>
 #include <Update.h>
 #include "SD.h"
 #include "RTClib.h"
 #include <SPI.h>
 #include <EasyButton.h>
-#define WEBSOCKET_DISABLED true
-#ifdef debug_Web
-    #include <RemoteDebug.h>
-    #include <DNSServer.h>
-    #include "ESPmDNS.h"
-#endif
 #include "cutf.h"
 #include <ModbusRTU.h>
+#include "Variable_wifi.h"
+#define WEBSOCKET_DISABLED true
 #ifdef debug_Web
-    RemoteDebug Debug;
+#include <RemoteDebug.h>
+#include <DNSServer.h>
+#include "ESPmDNS.h"
+RemoteDebug Debug;
 #endif
+//#include "Header.h"
+
+
+ModbusRTU mb;
 // RTC
 RTC_DS3231 rtc;
 DateTime timeStamp;
+Data_TH dataEncoderJsonMqtt;
 //LCD
-
 //SD CArd
 SPIClass SDSPI(HSPI);
 File root_CMA ;
@@ -46,7 +47,8 @@ AsyncWebServer server(web_port);
 WiFiClient espClient;
 
 //display_NV Display_NV;
-Data_TH dataEncoderJsonMqtt;
+
+//#pragma once
 /*
 SaveData
 */
@@ -55,7 +57,7 @@ bool saveWiFiConf(void);
 /*
 Button
 */
-void onPressed_left();
+//void onPressed_left();
 void onPressed_ok();
 void onPressed_right();
 void onPressedError();
@@ -69,15 +71,19 @@ void SetTimeRtc(uint32_t timestampSave);
 /*
 MQTT
 */
-void SendDataMqtt(char* data);
+
+void SendDataMqtt(char* topic, char* data);
+void EncoderJsonMqtt();
 void ConnectToMqtt();
 void onMqttConnect(bool sessionPresent);
 void onMqttDisconnect(AsyncMqttClientDisconnectReason reason);
 void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties properties, size_t len, size_t index, size_t total);
 void onMqttPublish(uint16_t packetId);
 void onMqttSubscribe(uint16_t packetId, uint8_t qos);
-void onMqttSubscribe(uint16_t packetId, uint8_t qos);
 void onMqttUnsubscribe(uint16_t packetId);
+void SendDataConfigMqtt(uint8_t loaiconfig, uint8_t maboxung);
+void checkSendMQTTConfig();
+
 /*
 SD Card
 */
@@ -105,16 +111,22 @@ void wifi_connect(byte _mode, wifi_mode_t wifi_mode, char* ssid, char* password,
 void wifi_staticip(char* ip_in, char* gateway_in, char* subnet_in);
 int32_t getRSSI(const char* target_ssid);
 
-
-
-
-
+/*
+*/
+bool cb(Modbus::ResultCode event, uint16_t transactionId, void* data);
+void send485PageKg(uint16_t page, uint32_t kg);
+void send485Kg(uint32_t kg);
+void send485char(uint16_t address, char* kytu, uint8_t numByte);
+void send485Utf16(uint16_t address, char* kytu, uint8_t numByte);
+void sendSSID485();
+void send485PageAndData(uint16_t page, boolean dataSend = true);
+void LcdSeclectMode(uint8_t modeDisplay, Data_TH* dataLCDTH);
 
 void Check_button(void* pvParameters);
-void TaskRFID( void * pvParameters );
-void TaskCAN( void * pvParameters );
-void Display( void * pvParameters );
-void http_re( void * pvParameters );
+void TaskRFID(void* pvParameters);
+void TaskCAN(void* pvParameters);
+void Display(void* pvParameters);
+void http_re(void* pvParameters);
 
 
 size_t content_len;
@@ -123,7 +135,7 @@ void printProgress(size_t prg, size_t sz) {
   printf("Progress: %d%%\n", (prg * 100) / content_len);
 #endif
 #ifdef debug_Web
-  DebugWarning("Progress: %d%%", (prg * 100) / content_len);
+  DebugData("Progress: %d%%", (prg * 100) / content_len);
 #endif
 }
 
@@ -145,19 +157,17 @@ void khoiTaoGiaTri(boolean firstTime = true) {
   Serial.println(inforServer.mqttConfig.topicGetConfig);
 #endif
   }
-  // inforServer.copyData(inforServer.thanhPham.arrayName[0], ramChoDuLieu);
-  // inforServer.copyData(inforServer.nhaCC.arrayName[0], ramChoDuLieu);
-  // inforServer.copyData(inforServer.giaiDoan.arrayName[0], ramChoDuLieu);
-  if (stateMachine.giaidoanINOUT == 1) {
-  strlcpy(inforServer.thanhPham.arrayName[0], ramChoDuLieu, sizeof(inforServer.thanhPham.arrayName[0]));
-  strlcpy(inforServer.nhaCC.arrayName[0], ramChoDuLieu, sizeof(inforServer.nhaCC.arrayName[0]));
+  statusPeripheral.timeStampServer = 0;
+  stateMachine.getGiaiDoan();
+  stateMachine.getKV();
+  if (stateMachine.giaidoanINOUT == cheDoIN) {
+      strlcpy(inforServer.thanhPham.arrayName[0], ramChoDuLieu, sizeof(inforServer.thanhPham.arrayName[0]));
+      strlcpy(inforServer.nhaCC.arrayName[0], ramChoDuLieu, sizeof(inforServer.nhaCC.arrayName[0]));
   }
   else {
       strlcpy(inforServer.thanhPham.arrayName[0], "Bỏ Qua", sizeof(inforServer.thanhPham.arrayName[0]));
       strlcpy(inforServer.nhaCC.arrayName[0], "Bỏ Qua", sizeof(inforServer.nhaCC.arrayName[0]));
   }
-  //strlcpy(inforServer.giaiDoan.arrayName[0], ramChoDuLieu, sizeof(inforServer.giaiDoan.arrayName[0]));
-
   stateMachine.deviceStatus = deviceSetting;
   stateMachine.bottonSelect = 0;
   inforServer.nhaCC.userSelect = 0;
@@ -166,17 +176,6 @@ void khoiTaoGiaTri(boolean firstTime = true) {
   inforServer.nhaCC.total = 0;
   inforServer.nhaCC.arrayType[0] = 0;
   inforServer.thanhPham.arrayType[0] = 0;
- /* inforServer.giaiDoan.cheDoInOut = 0;
-  inforServer.giaiDoan.total = 0;
-  inforServer.giaiDoan.userSelect = 0;
-  inforServer.giaiDoan.arrayType[0] = 0;*/
-  stateMachine.getGiaiDoan();
-  stateMachine.getKV();
-  //  Serial.print("KV ");
-  //Serial.println(stateMachine.giaidoanINOUT);
- // Serial.print("KDS  ");
-//  Serial.println(stateMachine.giaidoanKV);
-  //   statusPeripheral.sdCard.statusConnect = false;
 }
 void setup()
 {   pinMode(pinPower, OUTPUT);
@@ -192,8 +191,8 @@ void setup()
     Serial.println(statusPeripheral.mqtt.statusMqttConnect);
     Serial.println(statusPeripheral.mqtt.timeTruyenMQTT);*/
   Queue_can = xQueueCreate(3, sizeof(Data_CAN));
-  Queue_RFID = xQueueCreate(3, sizeof(Data_RFID));
-  Queue_RFID_NV = xQueueCreate(3, sizeof(Data_RFID));
+  QueueRfidRo = xQueueCreate(3, sizeof(Data_RFID));
+  QueueRfidNV = xQueueCreate(3, sizeof(Data_RFID));
   Queue_mqtt = xQueueCreate(5, sizeof(Data_TH));
   Queue_display = xQueueCreate(3, sizeof(Data_TH));
   Queue_Time_blink = xQueueCreate(3, sizeof(uint16_t));
@@ -343,7 +342,7 @@ void loop()
       printf("Wifi 2 che do: AP va STA\n");
 #endif
 #ifdef debug_Web
-      DebugWarning("Wifi 2 che do: AP va STA");
+      DebugData("Wifi 2 che do: AP va STA");
 #endif
     }
     else if ((statusPeripheral.wifi.counterWifiDisconnect < 15) && ( xTaskGetTickCount() - statusPeripheral.wifi.lastTimeConnect > 1000)) {
@@ -394,33 +393,6 @@ void loop()
      }
 }
 
-/////////////////////////////////////////////////
-// Send MQTT Con fig                   //////////////
-////////////////////////////////////////////////
-void SendDataConfigMqtt(uint8_t loaiconfig = 0 , uint8_t maboxung = 0) {
-    StaticJsonDocument<55> doc;
-    char buffer[55];
-    doc["i"] = stateMachine.hardwareId;
-    doc["t"] = loaiconfig ;
-    doc["d"] = maboxung;
-    serializeJson(doc, buffer);
-    mqttClient.publish("/config", 0, true, buffer);
-  }
-void checkSendMQTTConfig() {
-    if ((stateMachine.giaidoanINOUT == 1) && (inforServer.nhaCC.total == 0)) {
-       SendDataConfigMqtt(1, 0);
-    }
-    else if ((stateMachine.giaidoanINOUT == 1)&& (inforServer.thanhPham.total == 0) ){ // laf dau vao
-        SendDataConfigMqtt(3, stateMachine.giaidoanKV);
-    }
- /*   else if (inforServer.giaiDoan.total == 0) {
-      SendDataConfigMqtt(2, 0);
-    }
-    //Fix loi 01
-    else if ((inforServer.giaiDoan.userSelect != 0) && (inforServer.thanhPham.total == 0) && (stateMachine.bottonSelect > 1)) { // Chi gui yeu cau khi da chon khu vuc can và qua buoc chọn thành phảm
-      SendDataConfigMqtt(3, inforServer.giaiDoan.arrayType[inforServer.giaiDoan.userSelect]);
-    }*/
-}
 
 /*
 Wire.setClock(400000);  Cai Clock cho RTC

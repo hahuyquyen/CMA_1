@@ -20,11 +20,20 @@
    t: Thời gian gửi,
   }
 */
-void SendDataMqtt(char* data) {
+/*
+
+Gui data to topic MQTT
+*/
+void SendDataMqtt(char* topic, char* data) {
     if (statusPeripheral.mqtt.statusMqttConnect) {
-        mqttClient.publish("/data", 0, true, data);
+        mqttClient.publish(topic, 0, true, data);
     }
 }
+
+
+/*
+Connect to MQTT
+*/
 void ConnectToMqtt() {
   mqttClient.connect();
 }
@@ -32,8 +41,6 @@ void ConnectToMqtt() {
 ////// Config data MQTT ///////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////
 void EncoderJsonMqtt() {
-  //DateTime now = rtc.now();
- // StaticJsonDocument<300> doc;
   DynamicJsonDocument doc(300);
   //doc["k"] = inforServer.giaiDoan.cheDoInOut;
  // doc["x"] = inforServer.giaiDoan.arrayType[inforServer.giaiDoan.userSelect];
@@ -60,11 +67,10 @@ void EncoderJsonMqtt() {
   DebugData("Send MQTT: %s", msg1);
   Serial.printf("Send MQTT: %s\n", msg1);
 #endif
-  SendDataMqtt(msg1);
+  //char tam[] = "/data";
+  SendDataMqtt(inforServer.mqttConfig.topicSenData,msg1);
   free(msg1);
   doc.clear(); // giai phong bo nho
- // if (statusPeripheral.mqtt.statusMqttConnect) {SendDataMqtt(inforServer.mqttConfig.dataSend);}
-  
 }
 //////////////////////////////////////////////////////////////////
 ////// Setting MQTT ///////////////////////////////////////////////
@@ -131,28 +137,29 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
     if (!jsonBuffer.containsKey("d")) {
       return;
     }
-    if (jsonBuffer["t"].as<uint8_t>() == 1) {
-      strlcpy(inforServer.nhaCC.arrayName[0], ramChuaChon, sizeof(inforServer.nhaCC.arrayName[0]));
-      inforServer.nhaCC.total = jsonBuffer["l"].as<uint8_t>();
-      for (int i = 0; i < inforServer.nhaCC.total; i++) {
-        if (jsonBuffer["d"][i].isNull()) {
-         // Serial.println("error key");
-          inforServer.nhaCC.total = 0;return;
-          } // Fix loi thieu data
-        if (i == 15)break; //fix tran array cua data
-        inforServer.nhaCC.arrayType[i + 1] = jsonBuffer["d"][i]["i"].as<uint16_t>();
-        strlcpy(inforServer.nhaCC.arrayName[i + 1], jsonBuffer["d"][i]["n"], sizeof(inforServer.nhaCC.arrayName[i + 1]));
-      }
-    }
-    else if (jsonBuffer["t"].as<uint8_t>() == 2) {
-      if (!jsonBuffer.containsKey("s")) {return;}
-    //  stateMachine.giaidoanINOUT=jsonBuffer["l"].as<uint8_t>();
-     // stateMachine.giaidoanKV = jsonBuffer["u"].as<uint8_t>();
-    //  stateMachine.setGiaiDoan();
-     // stateMachine.setKV();
-      statusPeripheral.mqtt.lastTimeGetDataConfig = 0;
-    }
-    else if (jsonBuffer["t"].as<uint8_t>() == 3) {
+    switch (jsonBuffer["t"].as<uint8_t>()) {
+    case mqttGetNhaCC:
+          strlcpy(inforServer.nhaCC.arrayName[0], ramChuaChon, sizeof(inforServer.nhaCC.arrayName[0]));
+          inforServer.nhaCC.total = jsonBuffer["l"].as<uint8_t>();
+          for (int i = 0; i < inforServer.nhaCC.total; i++) {
+            if (jsonBuffer["d"][i].isNull()) {
+             // Serial.println("error key");
+              inforServer.nhaCC.total = 0;return;
+              } // Fix loi thieu data
+            if (i == 15)break; //fix tran array cua data
+            inforServer.nhaCC.arrayType[i + 1] = jsonBuffer["d"][i]["i"].as<uint16_t>();
+            strlcpy(inforServer.nhaCC.arrayName[i + 1], jsonBuffer["d"][i]["n"], sizeof(inforServer.nhaCC.arrayName[i + 1]));
+          }
+            break;
+    case mqttGetKV:
+          if (!jsonBuffer.containsKey("s")) {return;}
+        //  stateMachine.giaidoanINOUT=jsonBuffer["l"].as<uint8_t>();
+         // stateMachine.giaidoanKV = jsonBuffer["u"].as<uint8_t>();
+        //  stateMachine.setGiaiDoan();
+         // stateMachine.setKV();
+          statusPeripheral.mqtt.lastTimeGetDataConfig = 0;
+        break;
+    case mqttGetThanhPham:
       strlcpy(inforServer.thanhPham.arrayName[0], ramChuaChon, sizeof(inforServer.thanhPham.arrayName[0]));
       inforServer.thanhPham.total = jsonBuffer["l"].as<uint8_t>();
       for (int i = 0; i < inforServer.thanhPham.total; i++) {
@@ -165,18 +172,21 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
         strlcpy(inforServer.thanhPham.arrayName[i + 1], jsonBuffer["d"][i]["n"], sizeof(inforServer.thanhPham.arrayName[i + 1]));
       }
       statusPeripheral.mqtt.lastTimeGetDataConfig = 0;
-    }
-    /////////////////////////////////////////
-    /// Nhan du lieu het ca reset data /////
-    ///////////////////////////////////////
-    else if (jsonBuffer["t"].as<uint8_t>() == 5) {
-        uint8_t statusSaveData = jsonBuffer["s"].as<uint8_t>();
-        if (statusSaveData == 1) {
+      break;
+    case mqttGetTimeStamp:
+      if (!jsonBuffer.containsKey("s")) {return;}
+      statusPeripheral.timeStampServer = jsonBuffer["s"].as<uint32_t>();
+      SetTimeRtc(statusPeripheral.timeStampServer);
+      break;
+    case mqttGetResetCa:
+        if (jsonBuffer["s"].as<uint8_t>() == 1) {
             stateMachine.bottonSelect = 0;
             stateMachine.deviceStatus = deviceSetting;
             khoiTaoGiaTri(false);
             if (stateMachine.deviceStatus == deviceSetting) { variLcdUpdate.stateDisplayLCD = 1; }
         }
+        break;
+    default: break;
     }
   }
   else if (strcmp(inforServer.mqttConfig.topicGetStatusACK, topic) == 0) {
@@ -214,4 +224,32 @@ void onMqttPublish(uint16_t packetId) {//printf("Publish acknowledged: %d \n",pa
 void onMqttSubscribe(uint16_t packetId, uint8_t qos) {//printf("Subscribe acknowledged: %f\n",packetId);
 }
 void onMqttUnsubscribe(uint16_t packetId) {// printf("Unsubscribe acknowledged: %f\n",packetId);
+}
+
+
+/////////////////////////////////////////////////
+// Send MQTT Con fig                   //////////////
+////////////////////////////////////////////////
+void SendDataConfigMqtt(uint8_t loaiconfig=0, uint8_t maboxung=0) {
+    StaticJsonDocument<55> doc;
+    char buffer[55];
+    doc["i"] = stateMachine.hardwareId;
+    doc["t"] = loaiconfig;
+    doc["d"] = maboxung;
+    serializeJson(doc, buffer);
+    SendDataMqtt(inforServer.mqttConfig.topicSenConfig, buffer);
+}
+/////////////////////////////////////////////////////
+//Check Get Config /////////////////////////////////
+///////////////////////////////////////////////////
+void checkSendMQTTConfig() {
+    if (statusPeripheral.timeStampServer == 0) {
+        SendDataConfigMqtt(mqttGetTimeStamp, 0);
+    }
+    else if ((stateMachine.giaidoanINOUT == 1) && (inforServer.nhaCC.total == 0)) {
+        SendDataConfigMqtt(mqttGetNhaCC, 0);
+    }
+    else if ((stateMachine.giaidoanINOUT == 1) && (inforServer.thanhPham.total == 0)) { // laf dau vao
+        SendDataConfigMqtt(mqttGetThanhPham, stateMachine.giaidoanKV);
+    }
 }

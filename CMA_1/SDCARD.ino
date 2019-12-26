@@ -147,7 +147,7 @@ void SdReadFile(fs::FS &fs, const char * path, uint32_t len) {
         numCounterACK = numCounterACK + 1;
         msg1[numLineRepeat + 3] = numCounterACK;
         SdWriteFile(SD, path, msg1);
-        SendDataMqtt(msg1);
+        SendDataMqtt(inforServer.mqttConfig.topicSenData,msg1);
   }
   else { 
         SdDeleteFile(SD, path);

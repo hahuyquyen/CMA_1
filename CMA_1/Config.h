@@ -1,9 +1,9 @@
 //#define debug_UART true
-//#define debug_Web true
+#define debug_Web true
 #define DebugData debugD
 #define DebugError debugE
 #define DebugInfor debugI
-#define DebugWarning debugW
+//#define DebugWarning debugW
 
 
 
@@ -27,9 +27,6 @@
 #define canStartByte 0x3D
 #define canStopByte 0x0D
 #define canNULLByte 0x20
-
-//#define uart_rfid_baud_rate 9600
-//#define time_out_display_data 5000
 
 #define MaRo_RFID 0xE2
 #define MaNV_RFID 0x00
@@ -77,3 +74,9 @@
 #define pageComfirm 14
 #define pageRunning 15
 #define pagePopup 16
+
+#define mqttGetNhaCC 1
+#define mqttGetKV 2
+#define mqttGetThanhPham 3
+#define mqttGetTimeStamp 4
+#define mqttGetResetCa 5

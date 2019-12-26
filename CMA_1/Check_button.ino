@@ -1,7 +1,7 @@
-#include <driver/adc.h>
+//#include <driver/adc.h>
 
 
-EasyButton button_left(button_left_pin, 50, true);
+//EasyButton button_left(button_left_pin, 50, true);
 EasyButton button_right(button_right_pin, 50, true);
 EasyButton button_ok(button_ok_pin, 50, true);
 EasyButton buttonExit(buttonExitPin, 50, true);
@@ -93,7 +93,7 @@ void onPressed_ok() {
   if (stateMachine.bottonSelect > 6) return;
   if (stateMachine.bottonSelect == 0) {
       if (stateMachine.giaidoanINOUT == cheDoOut) {
-          stateMachine.bottonSelect = 4;
+          stateMachine.bottonSelect = 5;
       }
       else stateMachine.bottonSelect = 2;
   }
@@ -181,9 +181,9 @@ void Check_button( void * pvParameters ) {
 #endif
     delay(50);
   }*/
-  statusPeripheral.powerValue= 200;
-  adc1_config_width(ADC_WIDTH_BIT_12);
-  adc1_config_channel_atten( ADC1_CHANNEL_5, ADC_ATTEN_11db );
+ // statusPeripheral.powerValue= 200;
+ // adc1_config_width(ADC_WIDTH_BIT_12);
+ // adc1_config_channel_atten( ADC1_CHANNEL_5, ADC_ATTEN_11db );
   for (;;) {
     
     if (stateMachine.deviceStatus == deviceSetting) {
@@ -202,17 +202,13 @@ void Check_button( void * pvParameters ) {
  //////////////////////////////////////
     if (xTaskGetTickCount() - lastTimeReadADC > 5000) {
           lastTimeReadADC = xTaskGetTickCount();
-          statusPeripheral.powerValue = adc1_get_raw( ADC1_CHANNEL_5);
+        //  statusPeripheral.powerValue = adc1_get_raw( ADC1_CHANNEL_5);
 #ifdef debug_UART          
-          
-        //  Serial.print("POWER : ");
-         // Serial.print();
-         // Serial.println(" %");
 #endif
 #ifdef debug_Web
-          DebugData("Power : %d", statusPeripheral.powerValue);
+       //   DebugData("Power : %d", statusPeripheral.powerValue);
 #endif
-          statusPeripheral.powerValue = map(statusPeripheral.powerValue, 2000, 4096, 0, 100); // Can Map dien ap tu 2.6->3.3 la 0-<>100
+    //      statusPeripheral.powerValue = map(statusPeripheral.powerValue, 2000, 4096, 0, 100); // Can Map dien ap tu 2.6->3.3 la 0-<>100
     }
 ///////////////////////////////////
 //////// 30s get RSSI ////////////
