@@ -14,60 +14,78 @@ bool cb(Modbus::ResultCode event, uint16_t transactionId, void* data) {
 #define pagePopup 16
  */
 void sendSSID485() {
-	if (!mb.slave()) {
-		modbusData.dataTruyen[0] = WiFi.localIP()[0];
-		modbusData.dataTruyen[1] = WiFi.localIP()[1];
-		modbusData.dataTruyen[2] = WiFi.localIP()[2];
-		modbusData.dataTruyen[3] = WiFi.localIP()[3];
-		mb.writeHreg(1, (uint16_t)7920, modbusData.dataTruyen, 4, cb); //ID man hinh
-		while (mb.slave()) { mb.task(); }
-		wmemset(modbusData.nameNvUtf16, 0x0000, sizeof(modbusData.nameNvUtf16) / 2);
-		size_t valuelen = utf8towchar(WiFiConf.sta_ssid, SIZE_MAX, modbusData.nameNvUtf16, sizeof(modbusData.nameNvUtf16));
-		mb.writeHreg(1, (uint16_t)7924, (uint16_t*)modbusData.nameNvUtf16, 16, cb); //ID man hinh
-		while (mb.slave()) { mb.task(); }
+	if (xSemaphoreTake(xMutexRS485, 1)) {
+		if (!mb.slave()) {
+			modbusData.dataTruyen[0] = WiFi.localIP()[0];
+			modbusData.dataTruyen[1] = WiFi.localIP()[1];
+			modbusData.dataTruyen[2] = WiFi.localIP()[2];
+			modbusData.dataTruyen[3] = WiFi.localIP()[3];
+			mb.writeHreg(1, (uint16_t)7920, modbusData.dataTruyen, 4, cb); //ID man hinh
+			while (mb.slave()) { mb.task(); }
+			wmemset(modbusData.nameNvUtf16, 0x0000, sizeof(modbusData.nameNvUtf16) / 2);
+			size_t valuelen = utf8towchar(WiFiConf.sta_ssid, SIZE_MAX, modbusData.nameNvUtf16, sizeof(modbusData.nameNvUtf16));
+			mb.writeHreg(1, (uint16_t)7924, (uint16_t*)modbusData.nameNvUtf16, 16, cb); //ID man hinh
+			while (mb.slave()) { mb.task(); }
+		}
+		xSemaphoreGive(xMutexRS485);
 	}
 }
 void send485Utf16(uint16_t address, char* kytu, uint8_t numByte) {
-	wmemset(modbusData.nameNvUtf16, 0x0000, numByte);
-	size_t valuelen = utf8towchar(kytu, SIZE_MAX, modbusData.nameNvUtf16, sizeof(modbusData.nameNvUtf16));
-	mb.writeHreg(1, address, (uint16_t*)modbusData.nameNvUtf16, numByte, cb); //ID man hinh
-	while (mb.slave()) { mb.task(); }
+	if (xSemaphoreTake(xMutexRS485, 1)) {
+		wmemset(modbusData.nameNvUtf16, 0x0000, numByte);
+		size_t valuelen = utf8towchar(kytu, SIZE_MAX, modbusData.nameNvUtf16, sizeof(modbusData.nameNvUtf16));
+		mb.writeHreg(1, address, (uint16_t*)modbusData.nameNvUtf16, numByte, cb); //ID man hinh
+		while (mb.slave()) { mb.task(); }
+		xSemaphoreGive(xMutexRS485);
+	}
 }
 void send485char(uint16_t address, char* kytu, uint8_t numByte) {
-	for (int j = 0; j < numByte * 2; j = j + 2) {
-		modbusData.dataTruyen[j / 2] = (((uint16_t)kytu[j + 1] << 8) | ((uint16_t)kytu[j]));
+	if (xSemaphoreTake(xMutexRS485, 1)) {
+		for (int j = 0; j < numByte * 2; j = j + 2) {
+			modbusData.dataTruyen[j / 2] = (((uint16_t)kytu[j + 1] << 8) | ((uint16_t)kytu[j]));
+		}
+		mb.writeHreg(1, address, modbusData.dataTruyen, numByte, cb); //ID man hinh
+		while (mb.slave()) { mb.task(); }
+		xSemaphoreGive(xMutexRS485);
 	}
-	mb.writeHreg(1, address, modbusData.dataTruyen, numByte, cb); //ID man hinh
-	while (mb.slave()) { mb.task(); }
 }
 void send485PageAndData(uint16_t page, boolean dataSend) {
-	modbusData.dataTruyen[0] = page;
-	modbusData.dataTruyen[1] = 0;
-	if (dataSend) {
-		modbusData.dataTruyen[2] = (uint16_t)stateMachine.hardwareId;
-		modbusData.dataTruyen[3] = (uint16_t)stateMachine.hardwareId >> 16;
-		modbusData.dataTruyen[4] = (uint16_t)stateMachine.giaidoanINOUT;
-		modbusData.dataTruyen[5] = (uint16_t)stateMachine.giaidoanKV;
-		mb.writeHreg(1, (uint16_t)7900, modbusData.dataTruyen, 6, cb); //ID man hinh
+	if (xSemaphoreTake(xMutexRS485, 1)) {
+		modbusData.dataTruyen[0] = page;
+		modbusData.dataTruyen[1] = 0;
+		if (dataSend) {
+			modbusData.dataTruyen[2] = (uint16_t)stateMachine.hardwareId;
+			modbusData.dataTruyen[3] = (uint16_t)stateMachine.hardwareId >> 16;
+			modbusData.dataTruyen[4] = (uint16_t)stateMachine.giaidoanINOUT;
+			modbusData.dataTruyen[5] = (uint16_t)stateMachine.giaidoanKV;
+			mb.writeHreg(1, (uint16_t)7900, modbusData.dataTruyen, 6, cb); //ID man hinh
+		}
+		else {
+			mb.writeHreg(1, (uint16_t)7900, modbusData.dataTruyen, 1, cb); //ID man hinh
+		}
+		while (mb.slave()) { mb.task(); }
+		xSemaphoreGive(xMutexRS485);
 	}
-	else {
-		mb.writeHreg(1, (uint16_t)7900, modbusData.dataTruyen, 1, cb); //ID man hinh
-	}
-	while (mb.slave()) { mb.task(); }
 }
 void send485PageKg(uint16_t page, uint32_t kg) {
-	modbusData.dataTruyen[0] = (uint16_t)kg;
-	modbusData.dataTruyen[1] = (uint16_t)kg >> 16;
-	modbusData.dataTruyen[2] = page;
-	mb.writeHreg(1, (uint16_t)7898, modbusData.dataTruyen, 3, cb); //ID man hinh
-	while (mb.slave()) { mb.task(); }
-}
-void send485Kg(uint32_t kg) { //
-	if (!mb.slave()) {
+	if (xSemaphoreTake(xMutexRS485, 1)) {
 		modbusData.dataTruyen[0] = (uint16_t)kg;
 		modbusData.dataTruyen[1] = (uint16_t)kg >> 16;
-		mb.writeHreg(1, (uint16_t)7910, modbusData.dataTruyen, 2, cb); //ID man hinh
+		modbusData.dataTruyen[2] = page;
+		mb.writeHreg(1, (uint16_t)7898, modbusData.dataTruyen, 3, cb); //ID man hinh
 		while (mb.slave()) { mb.task(); }
+		xSemaphoreGive(xMutexRS485);
+	}
+}
+void send485Kg(uint32_t kg) { //
+	if (xSemaphoreTake(xMutexRS485, 1)) {
+		if (!mb.slave()) {
+			modbusData.dataTruyen[0] = (uint16_t)kg;
+			modbusData.dataTruyen[1] = (uint16_t)kg >> 16;
+			mb.writeHreg(1, (uint16_t)7910, modbusData.dataTruyen, 2, cb); //ID man hinh
+			while (mb.slave()) { mb.task(); }
+		}
+		xSemaphoreGive(xMutexRS485);
 	}
 }
 void LcdSeclectMode(uint8_t modeDisplay, Data_TH* dataLCDTH) {

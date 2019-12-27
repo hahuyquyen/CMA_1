@@ -206,6 +206,13 @@ void setup()
 	xSignal_Display_checkdone = xSemaphoreCreateCounting(2, 0);
 	xreset_id_nv = xSemaphoreCreateCounting(2, 0);
 	xResetRfidMaRo = xSemaphoreCreateCounting(2, 0);
+	xMutexRS485 = xSemaphoreCreateMutex();
+	xMutexMQTT= xSemaphoreCreateMutex();
+	/*
+	if ((xSemaphoreTake( xMutexRS485, 1 )){
+		xSemaphoreGive(xMutexRS485);
+	}
+	*/
 	//Get ID device
 	EEPROM.begin(1024);
 	stateMachine.getIdControl();

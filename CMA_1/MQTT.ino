@@ -24,9 +24,14 @@
 
 Gui data to topic MQTT
 */
+
+
 void SendDataMqtt(char* topic, char* data) {
-	if (statusPeripheral.mqtt.statusMqttConnect) {
-		mqttClient.publish(topic, 0, true, data);
+	if (xSemaphoreTake(xMutexMQTT, 1)) {
+		if (statusPeripheral.mqtt.statusMqttConnect) {
+			mqttClient.publish(topic, 0, true, data);
+		}
+		xSemaphoreGive(xMutexMQTT);
 	}
 }
 

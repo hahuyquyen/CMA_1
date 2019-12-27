@@ -144,6 +144,8 @@ static struct inforServerStruct {
 ///// Data Queue  FreeRTOS          //////////////////////
 ////////////////////////////////////////////////////////////
 
+SemaphoreHandle_t xMutexRS485;
+SemaphoreHandle_t xMutexMQTT;
 SemaphoreHandle_t xCountingSemaphore;
 SemaphoreHandle_t xSignal_FromRFID;
 SemaphoreHandle_t xSignal_Display_check;
