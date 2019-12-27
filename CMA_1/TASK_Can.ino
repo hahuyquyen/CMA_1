@@ -70,13 +70,13 @@ boolean TachSoKg( double* soky) {
     }
   }
   for (int j = tam1; j < sizeof(UartCanData); j++) {
-    if ((UartCanData[j] == 0x41) || (UartCanData[j] == 0x40) || (UartCanData[j] == 0x48) || (UartCanData[j] == 0x44) || (UartCanData[j] == 0x45)) {
+    if ((UartCanData[j] == canNOD1) || (UartCanData[j] == canNOD2) || (UartCanData[j] == canNOD3) || (UartCanData[j] == canNOD4) || (UartCanData[j] == canNOD5)) {
      // *soky = 0;  //Serial.println(" ");
       *soky = *soky * soam;
       return false;
       break;
     }
-    if ((UartCanData[j] == 0x43) || (UartCanData[j] == 0x47) || (UartCanData[j] == 0x42) || (UartCanData[j] == 0x46)) {
+    if ((UartCanData[j] == canOD1) || (UartCanData[j] == canOD2) || (UartCanData[j] == canOD3) || (UartCanData[j] == canOD4)) {
       *soky = *soky * soam;  // so on dinh
       return true;
       break;

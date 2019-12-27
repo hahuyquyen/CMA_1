@@ -19,6 +19,15 @@
 #define time_cho_nhan_RFID_NV 8000
 
 
+#define canNOD1 0x40
+#define canNOD2 0x41
+#define canNOD3 0x44
+#define canNOD4 0x45
+#define canNOD5 0x48
+#define canOD1 0x42
+#define canOD2 0x43
+#define canOD3 0x47
+#define canOD4 0x46
 #define can_dau_cham 0x2C
 #define can_dau_phay 0x2E
 #define can_LF 0x0A

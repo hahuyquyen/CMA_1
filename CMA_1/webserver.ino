@@ -105,7 +105,7 @@ void getVariHtml(AsyncWebServerRequest* request, const __FlashStringHelper* id, 
 }
 void getVariIntHtml(AsyncWebServerRequest* request, const __FlashStringHelper* id, uint8_t* dataget) {
 	if (request->hasParam(id, true)) {
-		*dataget = request->getParam(id)->value().toInt();
+		* dataget = request->getParam(id)->value().toInt();
 	}
 }
 void setupWiFiConf(void) {
@@ -142,12 +142,13 @@ void setupWiFiConf(void) {
 		});
 	server.on("/setRf", HTTP_GET, [](AsyncWebServerRequest* request) {
 		getVariIntHtml(request, F("p"), &stateMachine.powerRFID);
-		if (request->hasParam(F("p"))) {
+		stateMachine.setPowerRFID();
+		statusPeripheral.updateRFID = true;
+      //Serial.println(stateMachine.powerRFID, HEX);
+		/*if (request->hasParam(F("p"))) {
 			stateMachine.powerRFID = request->getParam(F("p"))->value().toInt();
-			stateMachine.setPowerRFID();
-			statusPeripheral.updateRFID = true;
-			Serial.println(stateMachine.powerRFID, HEX);
-		}
+
+		}*/
 		request->send(200, PSTR(dataHtmlType), F("OK ...."));
 		});
 	server.on("/set_wifi_conf", HTTP_POST, [](AsyncWebServerRequest* request) {

@@ -102,6 +102,7 @@ void handleDoUpdate(AsyncWebServerRequest* request, const String& filename, size
 String processor(const String& var);
 void setupWiFiConf(void);
 void getVariHtml(AsyncWebServerRequest* request, const __FlashStringHelper* id, char* dataget, size_t chieudai);
+void getVariIntHtml(AsyncWebServerRequest* request, const __FlashStringHelper* id, uint8_t* dataget);
 /*
 trong File WifiSetting
 */
