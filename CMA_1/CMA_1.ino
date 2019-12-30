@@ -20,7 +20,23 @@ extern "C" {
 #include "RTClib.h"
 #include <SPI.h>
 #include <EasyButton.h>
+<<<<<<< Updated upstream
 
+=======
+#include "cutf.h"
+#include <ModbusRTU.h>
+#include "Variable_wifi.h"
+#include "VarriableData.h"
+#define WEBSOCKET_DISABLED true
+#ifdef debug_Web
+#include <RemoteDebug.h>
+#include <DNSServer.h>
+#include "ESPmDNS.h"
+RemoteDebug Debug;
+#endif
+//#include "Header.h"
+#include "TASK_Can.h"
+>>>>>>> Stashed changes
 
 // RTC
 RTC_DS3231 rtc;

@@ -42,10 +42,34 @@
     <ClInclude Include="Variable_wifi.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+<<<<<<< Updated upstream
+=======
+    <ClInclude Include="cutf.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VarriableData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TASK_Can.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StructCan.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+>>>>>>> Stashed changes
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="rfid.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+<<<<<<< Updated upstream
+=======
+    <ClCompile Include="cutf.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TASK_Can.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+>>>>>>> Stashed changes
   </ItemGroup>
 </Project>

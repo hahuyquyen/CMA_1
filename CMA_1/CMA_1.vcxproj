@@ -145,9 +145,15 @@
     <ClInclude Include="Config.h">
       <FileType>CppCode</FileType>
     </ClInclude>
+<<<<<<< Updated upstream
+=======
+    <ClInclude Include="cutf.h" />
+    <ClInclude Include="StructCan.h" />
+>>>>>>> Stashed changes
     <ClInclude Include="rfid.h">
       <FileType>CppCode</FileType>
     </ClInclude>
+    <ClInclude Include="TASK_Can.h" />
     <ClInclude Include="Variable_wifi.h">
       <FileType>CppCode</FileType>
     </ClInclude>
@@ -155,6 +161,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="rfid.cpp" />
+    <ClCompile Include="TASK_Can.cpp" />
   </ItemGroup>
   <PropertyGroup>
     <DebuggerFlavor>VisualMicroDebugger</DebuggerFlavor>
