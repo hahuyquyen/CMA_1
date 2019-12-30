@@ -126,7 +126,6 @@ void SdRenameFile(fs::FS& fs, const char* path1, const char* path2) {
 ////// Read SD and send MQTT //////////////////////////////////////
 //////////////////////////////////////////////////////////////////
 void SdReadFile(fs::FS& fs, const char* path, uint32_t len) {
-	// Serial.printf("Reading : %s , L %lu \n", path,( unsigned long )len);
 	File file = fs.open(path);
 	if (!file) {
 		statusPeripheral.sdCard.statusConnect = false;
@@ -152,13 +151,6 @@ void SdReadFile(fs::FS& fs, const char* path, uint32_t len) {
 	else {
 		SdDeleteFile(SD, path);
 	}
-	/*#ifdef debug_UART
-		Serial.print("Send MQTT SDCARD : ");
-		Serial.print(msg1);
-		Serial.print(" - Number : ");
-		Serial.println(numCounterACK);
-	#endif*/
-
 	free(msg1);
 }
 //////////////////////////////////////////////////////////////////
@@ -171,7 +163,5 @@ void SdWriteFile(fs::FS& fs, const char* path, const char* message) {
 		return;
 	}
 	file.print(message);
-	//file.print('!');
-	//file.print(sttNumber);
 	file.close();
 }

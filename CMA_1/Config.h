@@ -40,6 +40,7 @@
 #define MaRo_RFID 0xE2
 #define MaNV_RFID 0x00
 #define MaLoaiCa_RFID 0x01
+#define rfidTimeOut 1000
 
 #define button_left_pin 39
 #define button_right_pin 34

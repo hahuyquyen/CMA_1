@@ -10,6 +10,8 @@ Program CMA_1 size: 916,010 bytes (used 47% of a 1,966,080 byte maximum) (27.93 
 Minimum Memory Usage: 47920 bytes (15% of a 327680 byte maximum)
 Program CMA_1 size: 915,034 bytes (used 47% of a 1,966,080 byte maximum) (28.26 secs)
 Minimum Memory Usage: 47920 bytes (15% of a 327680 byte maximum)
+Program CMA_1 size: 914,970 bytes (used 47% of a 1,966,080 byte maximum) (27.99 secs)
+Minimum Memory Usage: 47928 bytes (15% of a 327680 byte maximum)
 */
 /*const char ServerMQTT[] PROGMEM = "ServerMQTT";
 const char PortMQTT[] PROGMEM = "PortMQTT";

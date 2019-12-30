@@ -67,6 +67,7 @@ void onPressedPower();
 /*
 functions
 */
+boolean compareWithZero(uint8_t* data);
 uint8_t GetSttKhuVuc();
 void SetTimeRtc(uint32_t timestampSave);
 /*
@@ -116,6 +117,7 @@ int32_t getRSSI(const char* target_ssid);
 
 /*
 */
+void send485HMI(uint16_t address, uint16_t* kytu, uint8_t numByte);
 bool cb(Modbus::ResultCode event, uint16_t transactionId, void* data);
 void send485PageKg(uint16_t page, uint32_t kg);
 void send485Kg(uint32_t kg);
@@ -190,10 +192,6 @@ void setup()
 	pinMode(pinLedRed, OUTPUT);
 	digitalWrite(pinLedGreen, HIGH);
 	digitalWrite(pinLedRed, HIGH);
-	/* Serial.println(statusPeripheral.wifi.statusConnectAP);
-	  Serial.println(statusPeripheral.mqtt.statusMqttConnect);
-	  Serial.println(statusPeripheral.mqtt.statusMqttConnect);
-	  Serial.println(statusPeripheral.mqtt.timeTruyenMQTT);*/
 	Queue_can = xQueueCreate(3, sizeof(Data_CAN));
 	QueueRfidRo = xQueueCreate(3, sizeof(Data_RFID));
 	QueueRfidNV = xQueueCreate(3, sizeof(Data_RFID));
@@ -208,16 +206,11 @@ void setup()
 	xResetRfidMaRo = xSemaphoreCreateCounting(2, 0);
 	xMutexRS485 = xSemaphoreCreateMutex();
 	xMutexMQTT= xSemaphoreCreateMutex();
-	/*
-	if ((xSemaphoreTake( xMutexRS485, 1 )){
-		xSemaphoreGive(xMutexRS485);
-	}
-	*/
-	//Get ID device
+
 	EEPROM.begin(1024);
 	stateMachine.getIdControl();
 	stateMachine.getPowerRFID();
-	// Serial.println(stateMachine.powerRFID, HEX);
+
 #ifdef debug_UART
 	Serial.print("ID Device : ");
 	Serial.println(stateMachine.hardwareId);
@@ -233,7 +226,6 @@ void setup()
 #endif
 	}
 	//SD CArd
-
 	SDSPI.begin(14, 27, 13, 15); ///SCK,MISO,MOSI,ss
 	if (!SD.begin(15, SDSPI, 10000000)) {
 #ifdef debug_UART

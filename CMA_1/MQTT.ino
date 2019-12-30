@@ -136,19 +136,13 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
 		/*
 		  Nhan thong tin server cai dat ca lam viec
 		*/
-		if (!jsonBuffer.containsKey("t")) {
-			return;
-		}
-		if (!jsonBuffer.containsKey("d")) {
-			return;
-		}
+		if ((!jsonBuffer.containsKey("t")) || (!jsonBuffer.containsKey("d"))) {return;}
 		switch (jsonBuffer["t"].as<uint8_t>()) {
 		case mqttGetNhaCC:
 			strlcpy(inforServer.nhaCC.arrayName[0], ramChuaChon, sizeof(inforServer.nhaCC.arrayName[0]));
 			inforServer.nhaCC.total = jsonBuffer["l"].as<uint8_t>();
 			for (int i = 0; i < inforServer.nhaCC.total; i++) {
 				if (jsonBuffer["d"][i].isNull()) {
-					// Serial.println("error key");
 					inforServer.nhaCC.total = 0;return;
 				} // Fix loi thieu data
 				if (i == 15)break; //fix tran array cua data
@@ -158,10 +152,10 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
 			break;
 		case mqttGetKV:
 			if (!jsonBuffer.containsKey("s")) { return; }
-			//  stateMachine.giaidoanINOUT=jsonBuffer["l"].as<uint8_t>();
-			 // stateMachine.giaidoanKV = jsonBuffer["u"].as<uint8_t>();
-			//  stateMachine.setGiaiDoan();
-			 // stateMachine.setKV();
+			stateMachine.giaidoanINOUT=jsonBuffer["l"].as<uint8_t>();
+			stateMachine.giaidoanKV = jsonBuffer["u"].as<uint8_t>();
+			stateMachine.setGiaiDoan();
+			stateMachine.setKV();
 			statusPeripheral.mqtt.lastTimeGetDataConfig = 0;
 			break;
 		case mqttGetThanhPham:
@@ -169,7 +163,6 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
 			inforServer.thanhPham.total = jsonBuffer["l"].as<uint8_t>();
 			for (int i = 0; i < inforServer.thanhPham.total; i++) {
 				if (jsonBuffer["d"][i].isNull()) {
-					//Serial.println("error key");
 					inforServer.thanhPham.total = 0;
 					return;
 				} // Fix loi thieu data
@@ -199,10 +192,7 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
 		/*
 		  Khi Nhan duoc data server bao luu thanh cong goi tin thi sẽ xoa file luu trong sd card
 		*/
-		if (!jsonBuffer.containsKey("i")) {
-			return;
-		}
-		else if (!jsonBuffer.containsKey("s")) {
+		if ((!jsonBuffer.containsKey("i")) || (!jsonBuffer.containsKey("s"))) {
 			return;
 		}
 		uint32_t sttData = jsonBuffer["i"].as<uint32_t>();

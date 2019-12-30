@@ -110,7 +110,6 @@ void http_re(void* pvParameters) {
 					}
 					if (tt) {
 						xQueueSend(Queue_display, &dataTHSend, xTicksToWait);
-						//if ((inforServer.giaiDoan.cheDoInOut == cheDoIN)&& (inforServer.giaiDoan.arrayType[inforServer.giaiDoan.userSelect]  == kvSuaCa)) {   //Neu Sua Ca Ngo Vao thi reset ma Nhan vien
 						if (GetSttKhuVuc() == sttKvSuaCaIN) {   //Neu Sua Ca Ngo Vao thi reset ma Nhan vien
 							xSemaphoreGive(xreset_id_nv);
 						}

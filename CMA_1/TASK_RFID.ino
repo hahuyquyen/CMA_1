@@ -41,36 +41,29 @@ void TaskRFID(void* pvParameters) {
 	static byte myEPC[12];
 	static byte myEPClength;
 	Data_RFID dataRfidRo;
-	//Data_RFID Data_rfid;
-	//Data_RFID Data_rfid_nv;
 	Data_RFID dataRfidNV;
-	RFID nano;
+	RFID JT2850;
 	const TickType_t xTicksToWait = pdMS_TO_TICKS(1);
 	SerialRFID.begin(9600);
-	nano.begin(SerialRFID);
-
+	JT2850.begin(SerialRFID);
 	TickType_t xLastWakeTime;
 	xLastWakeTime = xTaskGetTickCount();
-	//Serial.println(stateMachine.powerRFID, HEX);
 	for (;;) {
-		/*
-		   Chuyển task 24ms
-		*/
 		if (statusPeripheral.updateRFID) {
 			statusPeripheral.updateRFID = false;
 #ifdef debug_Web
 			DebugData("Update RFID = 0");
 #endif
-			nano.set_mode_timming(2, 1000); // Set mode eprom 0x70, mode timming
-			nano.set_timing_message(0x05, 1000); //0x00 -> 0x64
-			nano.set_power(stateMachine.powerRFID, 1000); // 00 -> 95
-			nano.set_out_mode(1, 1000);
-			nano.set_time_ner(0x05, 1000); // tna so gui 1->255s
-			nano.set_reset_reader(1000);
+			JT2850.set_mode_timming(2, rfidTimeOut); // Set mode eprom 0x70, mode timming
+			JT2850.set_timing_message(0x05, rfidTimeOut); //0x00 -> 0x64
+			JT2850.set_power(stateMachine.powerRFID, rfidTimeOut); // 00 -> 95
+			JT2850.set_out_mode(1, rfidTimeOut);
+			JT2850.set_time_ner(0x05, rfidTimeOut); // tna so gui 1->255s
+			JT2850.set_reset_reader(rfidTimeOut);
 		}
-		if (nano.check() == true) {
+		if (JT2850.check() == true) {
 			myEPClength = sizeof(myEPC);
-			if (nano.parseResponse(myEPC, myEPClength)) {
+			if (JT2850.parseResponse(myEPC, myEPClength)) {
 				/*  Serial.print("Ma RFID : ");
 				  for (int kj=0;kj<12;kj++){
 				  Serial.print(myEPC[kj]);
@@ -78,13 +71,9 @@ void TaskRFID(void* pvParameters) {
 				  Serial.println("");*/
 				if (myEPC[0] == MaRo_RFID) {
 					array_to_string(&myEPC[0], 12, dataRfidRo.id_RFID); //0->12 5->7
-
-
 					/*
 					   nếu là khu vực cân 2 lần thì sẽ lúc nào cũng gửi về
 					*/
-					// if (inforServer.PhanLoaiKV == PhanLoai::LANG_OUT){
-					//  if ((inforServer.giaiDoan.arrayType[inforServer.giaiDoan.userSelect] == kvSuaCa)&&(inforServer.giaiDoan.cheDoInOut == cheDoOut)){
 					if (GetSttKhuVuc() == sttKvSuaCaOUT) {
 						strncpy(dataRfidRo.id_RFID_Old, dataRfidRo.id_RFID, sizeof(dataRfidRo.id_RFID));
 						xQueueSend(QueueRfidRo, &dataRfidRo, xTicksToWait);
@@ -95,12 +84,10 @@ void TaskRFID(void* pvParameters) {
 						xQueueSend(QueueRfidRo, &dataRfidRo, xTicksToWait);
 					}
 				}
-
 				else if (myEPC[0] == MaNV_RFID) {
 					array_to_string(&myEPC[0], 12, dataRfidNV.id_RFID);
 					if (strcmp(dataRfidNV.id_RFID, "000000000000000000000000") != 0) { //00 00 00 00 00 00 00 00 00 00 00 00
 						if (strcmp(dataRfidNV.id_RFID, dataRfidNV.id_RFID_Old) != 0) {
-
 							strncpy(dataRfidNV.id_RFID_Old, dataRfidNV.id_RFID, sizeof(dataRfidNV.id_RFID));
 							xQueueSend(QueueRfidNV, &dataRfidNV, xTicksToWait);
 						}
@@ -115,15 +102,9 @@ void TaskRFID(void* pvParameters) {
 			}
 		}
 
-		if (xSemaphoreTake(xreset_id_nv, 1)) {
-			strncpy(dataRfidNV.id_RFID_Old, "", sizeof(""));
-		}
-		if (xSemaphoreTake(xResetRfidMaRo, 1)) {
-			strncpy(dataRfidRo.id_RFID_Old, "", sizeof(""));
-		}
-
+		if (xSemaphoreTake(xreset_id_nv, 1)) {strncpy(dataRfidNV.id_RFID_Old, "", sizeof(""));}
+		if (xSemaphoreTake(xResetRfidMaRo, 1)) {strncpy(dataRfidRo.id_RFID_Old, "", sizeof(""));}
 		vTaskDelayUntil(&xLastWakeTime, 20);
-		// vTaskDelay(10);
 	}
 	vTaskDelete(NULL);
 }
