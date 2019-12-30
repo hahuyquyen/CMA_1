@@ -36,16 +36,16 @@
     <ClInclude Include="Config.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="rfid.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Variable_wifi.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="cutf.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Header.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="rfid.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Variable_wifi.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="VarriableData.h">
@@ -53,10 +53,10 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="rfid.cpp">
+    <ClCompile Include="cutf.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="cutf.cpp">
+    <ClCompile Include="rfid.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

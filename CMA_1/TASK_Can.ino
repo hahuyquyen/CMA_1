@@ -1,3 +1,4 @@
+/*
 //static uint8_t UartCanData[11];
 static double can_data = 0;
 static uint8_t UartCanData[11];
@@ -53,10 +54,6 @@ boolean TachSoKg( double* soky) {
   int hangtram = 0;
   double soam = 1;
   *soky = 0;
-   /*for (int j=0;j<sizeof(UartCanData);j++){
-     Serial.print(UartCanData[j], HEX);Serial.print("-");
-    }
-    Serial.println("");*/
   for (int j = 0; j < sizeof(UartCanData); j++) {
     if (UartCanData[j] != canNULLByte) {
       tam1 = j;
@@ -92,7 +89,7 @@ boolean TachSoKg( double* soky) {
   return false;
 }
 
-
+*/
 /*
   r 00
   u 10
