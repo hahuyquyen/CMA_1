@@ -8,35 +8,27 @@
 //////////////////////////////////////////////////////////////////
 void TaskCAN( void * pvParameters ) {
   const TickType_t xTicksToWait = pdMS_TO_TICKS(1);
-<<<<<<< Updated upstream:CMA_1/TASK_Can.ino
-  SerialCan.begin(9600, SERIAL_8N1, 26, 12); //12 tx 13 lÃ  rx(bau,se,rx,tx)
-  static Data_CAN Data_CAN;
-=======
-  //Data_CAN DataCan;
-  Data_CAN dataCanTaskCan;
->>>>>>> Stashed changes:CMA_1/TASK_Can.cpp
+
+   static Data_CAN Data_CAN;
+
   int tam = 0;
   unsigned long lastTimeSendCan = 0;
   TickType_t xLastWakeTime;
   xLastWakeTime = xTaskGetTickCount();
-  
+  Serial1.begin(9600, SERIAL_8N1, 26, 12); //12 tx 13 lÃ  rx(bau,se,rx,tx)
+
   for (;;) {
-    if (SerialCan.available()) {
-      uint8_t incomingData = SerialCan.read();
+    if (Serial1.available()) {
+      uint8_t incomingData = Serial1.read();
       if ( incomingData == canStartByte) {
         tam = 0;
       }
       else if ( incomingData == canStopByte) {
         if (TachSoKg(&can_data)) {
-<<<<<<< Updated upstream:CMA_1/TASK_Can.ino
-          if (can_data != Data_CAN.data_can) {
-            Data_CAN.data_can = can_data;
-=======
           if (can_data != dataCanTaskCan.data_can) {
               dataCanTaskCan.data_can = can_data;
-            
->>>>>>> Stashed changes:CMA_1/TASK_Can.cpp
-            if (can_data > 0.5) {
+
+          if (can_data > 0.5) {
               xQueueSend( Queue_can, &dataCanTaskCan, xTicksToWait );
             }
           }
@@ -82,13 +74,13 @@ boolean TachSoKg( double* soky) {
     }
   }
   for (int j = tam1; j < sizeof(UartCanData); j++) {
-    if ((UartCanData[j] == 0x41) || (UartCanData[j] == 0x40) || (UartCanData[j] == 0x48) || (UartCanData[j] == 0x44) || (UartCanData[j] == 0x45)) {
+    if ((UartCanData[j] == canNOD1) || (UartCanData[j] == canNOD2) || (UartCanData[j] == canNOD3) || (UartCanData[j] == canNOD4) || (UartCanData[j] == canNOD5)) {
      // *soky = 0;  //Serial.println(" ");
       *soky = *soky * soam;
       return false;
       break;
     }
-    if ((UartCanData[j] == 0x43) || (UartCanData[j] == 0x47) || (UartCanData[j] == 0x42) || (UartCanData[j] == 0x46)) {
+    if ((UartCanData[j] == canOD1) || (UartCanData[j] == canOD2) || (UartCanData[j] == canOD3) || (UartCanData[j] == canOD4)) {
       *soky = *soky * soam;  // so on dinh
       return true;
       break;

@@ -1,6 +1,6 @@
-#include <stdlib.h>
-#include "Arduino.h"
-#include "pins_arduino.h"
+//#include <stdlib.h>
+//#include "Arduino.h"
+//#include "pins_arduino.h"
 //#include "esp32-hal-uart.h"
 #define ALL_GOOD 0
 #define ERROR_COMMAND_RESPONSE_TIMEOUT 1

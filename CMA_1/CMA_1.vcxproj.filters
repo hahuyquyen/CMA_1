@@ -42,6 +42,7 @@
     <ClInclude Include="Variable_wifi.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+<<<<<<< HEAD
 <<<<<<< Updated upstream
 =======
     <ClInclude Include="cutf.h">
@@ -57,11 +58,23 @@
       <Filter>Header Files</Filter>
     </ClInclude>
 >>>>>>> Stashed changes
+=======
+    <ClInclude Include="cutf.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Header.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VarriableData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+>>>>>>> Ethernet
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="rfid.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+<<<<<<< HEAD
 <<<<<<< Updated upstream
 =======
     <ClCompile Include="cutf.cpp">
@@ -71,5 +84,10 @@
       <Filter>Source Files</Filter>
     </ClCompile>
 >>>>>>> Stashed changes
+=======
+    <ClCompile Include="cutf.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+>>>>>>> Ethernet
   </ItemGroup>
 </Project>
