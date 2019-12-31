@@ -21,10 +21,8 @@
     <None Include="MQTT.ino" />
     <None Include="SaveData.ino" />
     <None Include="SDCARD.ino" />
-    <None Include="TASK_Can.ino" />
     <None Include="Task_CheckData.ino" />
     <None Include="TASK_display.ino" />
-    <None Include="TASK_RFID.ino" />
     <None Include="UART_Inter.ino" />
     <None Include="webserver.ino" />
     <None Include="wifisetting.ino" />
@@ -51,16 +49,16 @@
     <ClInclude Include="StructCan.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="TASK_Can.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Header1.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="JT2850.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="StructRFID.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StructData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Digi28SS.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -71,10 +69,10 @@
     <ClCompile Include="rfid.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="TASK_Can.cpp">
+    <ClCompile Include="JT2850.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="JT2850.cpp">
+    <ClCompile Include="Digi28SS.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

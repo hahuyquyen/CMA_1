@@ -1,7 +1,7 @@
 /*
  http://192.168.100.86:4999/SetTimeRtc?timestamp=1576032486
  http://192.168.100.77:4999/setKhuVuc?i=2&kv=1
-
+  http://192.168.100.77:4999/set_id?id=58
 
  Mna Lan Dung
 
@@ -104,7 +104,10 @@ void getVariHtml(AsyncWebServerRequest* request, const __FlashStringHelper* id, 
 	}
 }
 void getVariIntHtml(AsyncWebServerRequest* request, const __FlashStringHelper* id, uint8_t* dataget) {
-	if (request->hasParam(id, true)) {
+	if (request->hasParam(id)) {
+		/*if (request->hasParam(F("i"))) {
+	stateMachine.giaidoanINOUT = request->getParam(F("i"))->value().toInt();
+}*/
 		* dataget = request->getParam(id)->value().toInt();
 	}
 }

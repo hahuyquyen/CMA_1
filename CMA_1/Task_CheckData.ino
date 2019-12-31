@@ -4,8 +4,8 @@
 void http_re(void* pvParameters) {
 	const TickType_t xTicksToWait = pdMS_TO_TICKS(1);
 	struct dataCan Data_CAN_TH;
-	Data_RFID dataRfidRoTH;
-	Data_RFID dataRfidNvTH;
+	struct Data_RFID dataRfidRoTH;
+	struct Data_RFID dataRfidNvTH;
 	Data_TH dataTHSend;
 	char idRFID_OLD[25];
 	unsigned long lastTimeGetQueueCan = 0;

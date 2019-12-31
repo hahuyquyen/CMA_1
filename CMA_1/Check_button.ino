@@ -171,7 +171,7 @@ void Check_button(void* pvParameters) {
 	// pinMode(pinAnalogPower, INPUT);
 	unsigned long lastTimeReadADC = 0;
 	unsigned long lastTimeGetRSSI = 0;
-	int powervalue;
+	//int powervalue;
 	/*while (digitalRead(pinReadPower) == LOW){
   #ifdef debug_UART
 	  //Serial.println("Wait ");

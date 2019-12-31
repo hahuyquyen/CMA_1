@@ -1,4 +1,4 @@
-/*
+
 #include "JT2850.h"
 void IRAM_ATTR array_to_string(byte* array, unsigned int len, char* buffer)
 {
@@ -17,8 +17,8 @@ void IRAM_ATTR array_to_string(byte* array, unsigned int len, char* buffer)
 void TaskRFID(void* pvParameters) {
 	static byte myEPC[12];
 	static byte myEPClength;
-	Data_RFID dataRfidRo;
-	Data_RFID dataRfidNV;
+	struct Data_RFID dataRfidRo;
+	struct Data_RFID dataRfidNV;
 	RFID JT2850;
 	const TickType_t xTicksToWait = pdMS_TO_TICKS(1);
 	SerialRFID.begin(9600);
@@ -33,7 +33,7 @@ void TaskRFID(void* pvParameters) {
 #endif
 			JT2850.set_mode_timming(2, rfidTimeOut); // Set mode eprom 0x70, mode timming
 			JT2850.set_timing_message(0x05, rfidTimeOut); //0x00 -> 0x64
-			JT2850.set_power(poinstateMachine->powerRFID, rfidTimeOut); // 00 -> 95
+			JT2850.set_power(stateMachine.powerRFID, rfidTimeOut); // 00 -> 95
 			JT2850.set_out_mode(1, rfidTimeOut);
 			JT2850.set_time_ner(0x05, rfidTimeOut); // tna so gui 1->255s
 			JT2850.set_reset_reader(rfidTimeOut);
@@ -78,4 +78,4 @@ void TaskRFID(void* pvParameters) {
 		vTaskDelayUntil(&xLastWakeTime, 20);
 	}
 	vTaskDelete(NULL);
-}*/
+}

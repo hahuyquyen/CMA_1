@@ -4,7 +4,6 @@ extern "C" {
 #include "freertos/timers.h"
 }
 #include <WiFi.h>
-#include <EEPROM.h>
 //#include <ETH.h>
 #include "Config.h"
 #include <Arduino.h>
@@ -29,12 +28,11 @@ extern "C" {
 #include "ESPmDNS.h"
 RemoteDebug Debug;
 #endif
-#include "StructCan.h"
-#include "StructRFID.h"
-#include "TASK_Can.h"
+#include "Digi28SS.h"
 #include "JT2850.h"
-//
 
+struct stateMachineConf stateMachine;
+struct statusPeripheralConf statusPeripheral;
 ModbusRTU mb;
 // RTC
 RTC_DS3231 rtc;
@@ -131,8 +129,8 @@ void send485PageAndData(uint16_t page, boolean dataSend = true);
 void LcdSeclectMode(uint8_t modeDisplay, Data_TH* dataLCDTH);
 
 void Check_button(void* pvParameters);
-void TaskRFID(void* pvParameters);
-void TaskCAN(void* pvParameters);
+//void TaskRFID(void* pvParameters);
+//void TaskCAN(void* pvParameters);
 void Display(void* pvParameters);
 void http_re(void* pvParameters);
 

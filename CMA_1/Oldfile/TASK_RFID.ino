@@ -22,7 +22,7 @@ A0 06 60 00 00 87 00 73
 [11:37:08 156] A0 06 60 00 00 90 00 6A A0 06 60 00 00 8F 00 6B
 [11:37:08 157] A0 0D 62 00 07 00 92 FF 07 00 C0 DF FF 03 B1
 */
-
+/*
 #include "rfid.h"
 void IRAM_ATTR array_to_string(byte* array, unsigned int len, char* buffer)
 {
@@ -101,3 +101,4 @@ void TaskRFID(void* pvParameters) {
 	}
 	vTaskDelete(NULL);
 }
+*/

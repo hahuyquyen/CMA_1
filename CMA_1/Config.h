@@ -7,6 +7,12 @@
 
 
 #define SerialRFID Serial2
+
+#define MaRo_RFID 0xE2
+#define MaNV_RFID 0x00
+#define MaLoaiCa_RFID 0x01
+#define rfidTimeOut 1000
+
 #define SerialCan Serial1
 
 #define WIFI_CONF_FORMAT {0, 0, 0, 1}
@@ -18,10 +24,7 @@
 #define time_2_lan_nhan_data 5000
 #define time_cho_nhan_RFID_NV 8000
 
-#define MaRo_RFID 0xE2
-#define MaNV_RFID 0x00
-#define MaLoaiCa_RFID 0x01
-#define rfidTimeOut 1000
+
 /*
 #define canNOD1 0x40
 #define canNOD2 0x41

@@ -1,11 +1,5 @@
-//static uint8_t UartCanData[11];
-#include "TASK_Can.h"
+#include "Digi28SS.h"
 
-//double can_data = 0;
-//static uint8_t UartCanData[11];
-//////////////////////////////////////////////////////////////////
-////// Task doc du lieu tu can DI28SS ////////////////////////////
-//////////////////////////////////////////////////////////////////
 void TaskCAN( void * pvParameters ) {
   const TickType_t xTicksToWait = pdMS_TO_TICKS(1);
   static struct dataCan dataCanTaskCan;
@@ -54,10 +48,6 @@ boolean TachSoKg( double* soky) {
   int hangtram = 0;
   double soam = 1;
   *soky = 0;
-   /*for (int j=0;j<sizeof(UartCanData);j++){
-     Serial.print(UartCanData[j], HEX);Serial.print("-");
-    }
-    Serial.println("");*/
   for (int j = 0; j < sizeof(UartCanData); j++) {
     if (UartCanData[j] != canNULLByte) {
       tam1 = j;
@@ -92,12 +82,3 @@ boolean TachSoKg( double* soky) {
   }
   return false;
 }
-
-
-/*
-  r 00
-  u 10
-  b 9600
-  rs 00
-  H 1
-*/
