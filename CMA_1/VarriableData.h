@@ -1,6 +1,7 @@
 ﻿/*
    cma2018LHP515
 */
+
 ///////////////////////
 //data Modbus /////////
 ///////////////////////
@@ -11,7 +12,7 @@ static struct modbusDataConf {
 	unsigned long timeSendKg;
 }modbusData;
 
-static struct statusPeripheralConf {
+ struct statusPeripheralConf {
 	struct mqttConf {
 		unsigned long lastTimeGetDataConfig;
 		unsigned long  timeTruyenMQTT;
@@ -41,6 +42,7 @@ static struct statusPeripheralConf {
 	uint32_t timeStampServer = 0;
 	boolean updateRFID = false;
 }statusPeripheral;
+// struct statusPeripheralConf *poinstatusPeripheral = &statusPeripheral;
 
 struct timeServerConf {
 	unsigned long sdReadEnd = 0;
@@ -55,7 +57,7 @@ struct timeServerConf {
 /////////////////////////////////////////////////////////////
 ///// Data status Button nhan           //////////////////////
 ////////////////////////////////////////////////////////////
-static struct stateMachineConf {
+struct stateMachineConf {
 	uint8_t bottonSelect;
 	uint8_t deviceStatus;
 	uint32_t hardwareId;
@@ -79,6 +81,7 @@ static struct stateMachineConf {
 		EEPROM.commit();
 	}
 } stateMachine;
+//struct stateMachineConf *poinstateMachine = &stateMachine;
 /////////////////////////////////////////////////////////////
 ///// Data trang thai LCD           //////////////////////
 ////////////////////////////////////////////////////////////
@@ -158,24 +161,5 @@ QueueHandle_t QueueRfidNV;
 QueueHandle_t Queue_mqtt;
 QueueHandle_t Queue_display;
 QueueHandle_t Queue_Time_blink;
-/////////////////////////////////////////////////////////////
-///// Data Tong Hop Task Checkdata           //////////////////////
-////////////////////////////////////////////////////////////
-typedef struct Data_TH {
-	char id_RFID[25];
-	char id_RFID_NV[25];
-	double data_weight;
-} Data_TH;
-/////////////////////////////////////////////////////////////
-///// Data Can DJ28SS           //////////////////////
-////////////////////////////////////////////////////////////
-typedef struct Data_CAN {
-	double data_can;
-} Data_CAN;
-/////////////////////////////////////////////////////////////
-///// Data RFID           //////////////////////
-////////////////////////////////////////////////////////////
-struct Data_RFID {
-	char id_RFID[25];
-	char id_RFID_Old[25];
-};
+
+double can_data = 0;

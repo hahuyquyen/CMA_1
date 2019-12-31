@@ -29,8 +29,11 @@ extern "C" {
 #include "ESPmDNS.h"
 RemoteDebug Debug;
 #endif
-//#include "Header.h"
-
+#include "StructCan.h"
+#include "StructRFID.h"
+#include "TASK_Can.h"
+#include "JT2850.h"
+//
 
 ModbusRTU mb;
 // RTC
@@ -192,7 +195,7 @@ void setup()
 	pinMode(pinLedRed, OUTPUT);
 	digitalWrite(pinLedGreen, HIGH);
 	digitalWrite(pinLedRed, HIGH);
-	Queue_can = xQueueCreate(3, sizeof(Data_CAN));
+	Queue_can = xQueueCreate(3, sizeof(dataCan));
 	QueueRfidRo = xQueueCreate(3, sizeof(Data_RFID));
 	QueueRfidNV = xQueueCreate(3, sizeof(Data_RFID));
 	Queue_mqtt = xQueueCreate(5, sizeof(Data_TH));

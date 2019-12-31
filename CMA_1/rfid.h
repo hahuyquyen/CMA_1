@@ -2,6 +2,8 @@
 //#include "Arduino.h"
 //#include "pins_arduino.h"
 //#include "esp32-hal-uart.h"
+#ifndef RFID_H
+#define RFID_H
 #define ALL_GOOD 0
 #define ERROR_COMMAND_RESPONSE_TIMEOUT 1
 #define ERROR_CORRUPT_RESPONSE 2
@@ -40,3 +42,4 @@ private:
 	uint8_t _head = 0;
   uint8_t _head_par = 0;
 };
+#endif

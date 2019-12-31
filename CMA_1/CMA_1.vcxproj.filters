@@ -39,9 +39,6 @@
     <ClInclude Include="cutf.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Header.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="rfid.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -51,12 +48,33 @@
     <ClInclude Include="VarriableData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="StructCan.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TASK_Can.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Header1.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="JT2850.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StructRFID.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cutf.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="rfid.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TASK_Can.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="JT2850.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

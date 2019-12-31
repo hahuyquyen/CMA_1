@@ -3,7 +3,7 @@
 
 void http_re(void* pvParameters) {
 	const TickType_t xTicksToWait = pdMS_TO_TICKS(1);
-	Data_CAN Data_CAN_TH;
+	struct dataCan Data_CAN_TH;
 	Data_RFID dataRfidRoTH;
 	Data_RFID dataRfidNvTH;
 	Data_TH dataTHSend;
