@@ -17,8 +17,6 @@ extern "C" {
 #include "RTClib.h"
 #include <SPI.h>
 #include <EasyButton.h>
-#include "cutf.h"
-#include <ModbusRTU.h>
 #include "Variable_wifi.h"
 #include "VarriableData.h"
 #define WEBSOCKET_DISABLED true
@@ -30,10 +28,11 @@ RemoteDebug Debug;
 #endif
 #include "Digi28SS.h"
 #include "JT2850.h"
+#include "Modbus485.h"
 
 struct stateMachineConf stateMachine;
 struct statusPeripheralConf statusPeripheral;
-ModbusRTU mb;
+modbus485HMI mb;
 // RTC
 RTC_DS3231 rtc;
 DateTime timeStamp;
@@ -118,12 +117,9 @@ int32_t getRSSI(const char* target_ssid);
 
 /*
 */
-void send485HMI(uint16_t address, uint16_t* kytu, uint8_t numByte);
-bool cb(Modbus::ResultCode event, uint16_t transactionId, void* data);
+//void send485HMI(uint16_t address, uint16_t* kytu, uint8_t numByte);
 void send485PageKg(uint16_t page, uint32_t kg);
 void send485Kg(uint32_t kg);
-void send485char(uint16_t address, char* kytu, uint8_t numByte);
-void send485Utf16(uint16_t address, char* kytu, uint8_t numByte);
 void sendSSID485();
 void send485PageAndData(uint16_t page, boolean dataSend = true);
 void LcdSeclectMode(uint8_t modeDisplay, Data_TH* dataLCDTH);
@@ -205,7 +201,7 @@ void setup()
 	xSignal_Display_checkdone = xSemaphoreCreateCounting(2, 0);
 	xreset_id_nv = xSemaphoreCreateCounting(2, 0);
 	xResetRfidMaRo = xSemaphoreCreateCounting(2, 0);
-	xMutexRS485 = xSemaphoreCreateMutex();
+	//xMutexRS485 = xSemaphoreCreateMutex();
 	xMutexMQTT= xSemaphoreCreateMutex();
 
 	EEPROM.begin(1024);

@@ -6,7 +6,7 @@
 //data Modbus /////////
 ///////////////////////
 static struct modbusDataConf {
-	wchar_t nameNvUtf16[64];
+	
 	uint16_t dataTruyen[20];
 	unsigned long timeSendSSID;
 	unsigned long timeSendKg;
@@ -50,14 +50,14 @@ static struct inforServerStruct {
 		uint8_t total = 0;
 		uint8_t userSelect;
 		uint16_t arrayType[15];
-		char arrayName[15][120];
+		char arrayName[15][80];
 	}nhaCC;
 
 	struct thanhPhamConf {
 		uint8_t total;
 		uint8_t userSelect;
 		uint16_t arrayType[15];
-		char arrayName[15][120];
+		char arrayName[15][150];
 	}thanhPham;
 	/*
 	struct giaiDoanConf{
@@ -92,7 +92,7 @@ static struct inforServerStruct {
 ///// Data Queue  FreeRTOS          //////////////////////
 ////////////////////////////////////////////////////////////
 
-SemaphoreHandle_t xMutexRS485;
+//SemaphoreHandle_t xMutexRS485;
 SemaphoreHandle_t xMutexMQTT;
 SemaphoreHandle_t xCountingSemaphore;
 SemaphoreHandle_t xSignal_FromRFID;

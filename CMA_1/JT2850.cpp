@@ -28,9 +28,6 @@ void TaskRFID(void* pvParameters) {
 	for (;;) {
 		if (statusPeripheral.updateRFID) {
 			statusPeripheral.updateRFID = false;
-#ifdef debug_Web
-			DebugData("Update RFID = 0");
-#endif
 			JT2850.set_mode_timming(2, rfidTimeOut); // Set mode eprom 0x70, mode timming
 			JT2850.set_timing_message(0x05, rfidTimeOut); //0x00 -> 0x64
 			JT2850.set_power(stateMachine.powerRFID, rfidTimeOut); // 00 -> 95
@@ -62,11 +59,6 @@ void TaskRFID(void* pvParameters) {
 							strncpy(dataRfidNV.id_RFID_Old, dataRfidNV.id_RFID, sizeof(dataRfidNV.id_RFID));
 							xQueueSend(QueueRfidNV, &dataRfidNV, xTicksToWait);
 						}
-					}
-					else {
-#ifdef debug_Web
-						DebugData("Error RFID = 0");
-#endif
 					}
 				}
 

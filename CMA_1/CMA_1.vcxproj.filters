@@ -43,9 +43,6 @@
     <ClInclude Include="Variable_wifi.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="VarriableData.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="StructCan.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -61,6 +58,12 @@
     <ClInclude Include="Digi28SS.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Modbus485.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VarriableData.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cutf.cpp">
@@ -73,6 +76,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Digi28SS.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Modbus485.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
