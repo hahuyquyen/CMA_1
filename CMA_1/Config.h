@@ -1,7 +1,20 @@
-#define debug_UART true
+//#define debug_UART true
+#define debug_Web true
+#define DebugData debugD
+#define DebugError debugE
+#define DebugInfor debugI
+//#define DebugWarning debugW
+
+
+#define SerialRFID Serial2
+
+#define MaRo_RFID 0xE2
+#define MaNV_RFID 0x00
+#define MaLoaiCa_RFID 0x01
+#define rfidTimeOut 1000
 
 #define SerialCan Serial1
-#define SerialRFID Serial2
+
 #define WIFI_CONF_FORMAT {0, 0, 0, 1}
 #define WIFI_CONF_START 0
 
@@ -12,6 +25,16 @@
 #define time_cho_nhan_RFID_NV 8000
 
 
+/*
+#define canNOD1 0x40
+#define canNOD2 0x41
+#define canNOD3 0x44
+#define canNOD4 0x45
+#define canNOD5 0x48
+#define canOD1 0x42
+#define canOD2 0x43
+#define canOD3 0x47
+#define canOD4 0x46
 #define can_dau_cham 0x2C
 #define can_dau_phay 0x2E
 #define can_LF 0x0A
@@ -20,18 +43,13 @@
 #define canStartByte 0x3D
 #define canStopByte 0x0D
 #define canNULLByte 0x20
+*/
 
-//#define uart_rfid_baud_rate 9600
-//#define time_out_display_data 5000
 
-#define MaRo_RFID 0xE2
-#define MaNV_RFID 0x00
-#define MaLoaiCa_RFID 0x01
-
-#define button_left_pin 36
+#define button_left_pin 39
 #define button_right_pin 34
+#define buttonExitPin 36
 #define button_ok_pin 35
-#define buttonExitPin 39
 #define buttonErrorPin 0
 #define pinPower 32
 #define pinReadPower 25
@@ -63,3 +81,16 @@
 #define sttKvFillerOUT 2
 #define sttKvSuaCaIN 3
 #define sttKvSuaCaOUT 4
+
+#define pageInfor 10
+#define pageNhaCC 12
+#define pageThanhPham 13
+#define pageComfirm 14
+#define pageRunning 15
+#define pagePopup 16
+
+#define mqttGetNhaCC 1
+#define mqttGetKV 2
+#define mqttGetThanhPham 3
+#define mqttGetTimeStamp 4
+#define mqttGetResetCa 5

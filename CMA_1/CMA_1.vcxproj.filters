@@ -21,10 +21,8 @@
     <None Include="MQTT.ino" />
     <None Include="SaveData.ino" />
     <None Include="SDCARD.ino" />
-    <None Include="TASK_Can.ino" />
     <None Include="Task_CheckData.ino" />
     <None Include="TASK_display.ino" />
-    <None Include="TASK_RFID.ino" />
     <None Include="UART_Inter.ino" />
     <None Include="webserver.ino" />
     <None Include="wifisetting.ino" />
@@ -36,15 +34,51 @@
     <ClInclude Include="Config.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="cutf.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="rfid.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Variable_wifi.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="StructCan.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="JT2850.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StructRFID.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StructData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Digi28SS.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Modbus485.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VarriableData.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="cutf.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="rfid.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="JT2850.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Digi28SS.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Modbus485.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

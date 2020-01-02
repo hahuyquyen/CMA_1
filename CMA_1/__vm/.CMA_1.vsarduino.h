@@ -15,7 +15,6 @@
 #define _VSARDUINO_H_
 #define __ESP32_esp32__
 #define __ESP32_ESP32__
-#define _VMDEBUG 1
 #define ESP_PLATFORM
 #define HAVE_CONFIG_H
 #define GCC_NOT_5_2_0 0
@@ -25,7 +24,7 @@
 #define ARDUINO_ESP32_DEV
 #define ARDUINO_ARCH_ESP32
 #define ESP32
-#define CORE_DEBUG_LEVEL 4
+#define CORE_DEBUG_LEVEL 0
 #define __cplusplus 201103L
 
 #define _Pragma(x)
@@ -112,8 +111,6 @@ typedef long pthread_cond_t;
 #include "MQTT.ino"
 #include "SDCARD.ino"
 #include "SaveData.ino"
-#include "TASK_Can.ino"
-#include "TASK_RFID.ino"
 #include "TASK_display.ino"
 #include "Task_CheckData.ino"
 #include "UART_Inter.ino"
