@@ -76,7 +76,7 @@ void LcdSeclectMode(uint8_t modeDisplay, Data_TH* dataLCDTH) {
 		mb.send485Utf16(8162, "\0", 28); // reset ten nv 
 		}
 		mb.send485Utf16(8000, inforServer.nhaCC.arrayName[inforServer.nhaCC.userSelect], 32);
-		mb.send485Utf16(8032, inforServer.thanhPham.arrayName[inforServer.thanhPham.userSelect], 64);
+		mb.send485Utf16(8032, inforServer.thanhPham.arrayName[inforServer.thanhPham.userSelect], 96);
 		send485PageAndData(pageRunning, false);
 		break;
 	case 2: //infor bat dau
@@ -90,7 +90,7 @@ void LcdSeclectMode(uint8_t modeDisplay, Data_TH* dataLCDTH) {
 		send485PageAndData(pageNhaCC, false);
 		break;
 	case 5: //thanh pham inforServer.thanhPham.arrayName[inforServer.thanhPham.userSelect] 
-		mb.send485Utf16(8032, inforServer.thanhPham.arrayName[inforServer.thanhPham.userSelect], 100);
+		mb.send485Utf16(8032, inforServer.thanhPham.arrayName[inforServer.thanhPham.userSelect], 96);
 		wchar_t nameNvUtf17[10];
 		//size_t inSize = strlen(inforServer.thanhPham.arrayName[inforServer.thanhPham.userSelect]);
 #ifdef debug_Web
@@ -100,7 +100,7 @@ void LcdSeclectMode(uint8_t modeDisplay, Data_TH* dataLCDTH) {
 		break;
 	case 6: // xac nhan
 		mb.send485Utf16(8000, inforServer.nhaCC.arrayName[inforServer.nhaCC.userSelect], 32);
-		mb.send485Utf16(8032, inforServer.thanhPham.arrayName[inforServer.thanhPham.userSelect], 64);
+		mb.send485Utf16(8032, inforServer.thanhPham.arrayName[inforServer.thanhPham.userSelect], 96);
 		send485PageAndData(pageComfirm, false);
 		break;
 	case 10: //infor setting

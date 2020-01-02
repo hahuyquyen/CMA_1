@@ -15,9 +15,9 @@ void modbus485HMI::senDataToDevice( uint16_t address, uint16_t* kytu, uint8_t nu
 }
 uint8_t modbus485HMI::send485Utf16(uint16_t address, char* kytu, uint8_t numByte) {
 	wmemset(nameNvUtf16, 0x0000, numByte);
-	size_t valuelen = utf8ztowchar(kytu, nameNvUtf16, 100);
+	size_t valuelen = utf8ztowchar(kytu, nameNvUtf16, numByte);
 	if (valuelen > 100) valuelen = 100;
-	senDataToDevice(address, (uint16_t*)nameNvUtf16, 100);
+	senDataToDevice(address, (uint16_t*)nameNvUtf16, numByte);
 	//senDataToDevice(address + 64, (uint16_t*)nameNvUtf16[64], 32);
 	return (uint8_t)valuelen;
 }
