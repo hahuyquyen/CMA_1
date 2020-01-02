@@ -62,7 +62,6 @@ boolean TachSoKg( double* soky) {
   }
   for (int j = tam1; j < sizeof(UartCanData); j++) {
     if ((UartCanData[j] == canNOD1) || (UartCanData[j] == canNOD2) || (UartCanData[j] == canNOD3) || (UartCanData[j] == canNOD4) || (UartCanData[j] == canNOD5)) {
-     // *soky = 0;  //Serial.println(" ");
       *soky = *soky * soam;
       return false;
       break;

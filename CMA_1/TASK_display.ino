@@ -12,23 +12,23 @@
 #define pageRunning 15
 #define pagePopup 16
  */
-/*void send485HMI(uint16_t address, uint16_t* kytu, uint8_t numByte) {
-	if (!mb.slave()) {
-		if (xSemaphoreTake(xMutexRS485, 1)) {
-			mb.senDataToDevice(address, kytu, numByte);
-		//	mb.writeHreg(1, address, kytu, numByte, cb); //ID man hinh
-		//	while (mb.slave()) { mb.task(); }
-			xSemaphoreGive(xMutexRS485);
-		}
-	}
-}*/
+ /*void send485HMI(uint16_t address, uint16_t* kytu, uint8_t numByte) {
+	 if (!mb.slave()) {
+		 if (xSemaphoreTake(xMutexRS485, 1)) {
+			 mb.senDataToDevice(address, kytu, numByte);
+		 //	mb.writeHreg(1, address, kytu, numByte, cb); //ID man hinh
+		 //	while (mb.slave()) { mb.task(); }
+			 xSemaphoreGive(xMutexRS485);
+		 }
+	 }
+ }*/
 void sendSSID485() {
 	modbusData.dataTruyen[0] = WiFi.localIP()[0];
 	modbusData.dataTruyen[1] = WiFi.localIP()[1];
 	modbusData.dataTruyen[2] = WiFi.localIP()[2];
 	modbusData.dataTruyen[3] = WiFi.localIP()[3];
 	mb.senDataToDevice(7920, modbusData.dataTruyen, 4);
-	mb.send485Utf16(7924, WiFiConf.sta_ssid, 16);	
+	mb.send485Utf16(7924, WiFiConf.sta_ssid, 16);
 }
 
 void send485PageAndData(uint16_t page, boolean dataSend) {
@@ -48,9 +48,9 @@ void send485PageKg(uint16_t page, uint32_t kg) {
 	modbusData.dataTruyen[0] = (uint16_t)kg;
 	modbusData.dataTruyen[1] = (uint16_t)kg >> 16;
 	modbusData.dataTruyen[2] = page;
-	mb.senDataToDevice(7898, modbusData.dataTruyen,3);
+	mb.senDataToDevice(7898, modbusData.dataTruyen, 3);
 }
-void send485Kg(uint32_t kg) { 
+void send485Kg(uint32_t kg) {
 	modbusData.dataTruyen[0] = (uint16_t)kg;
 	modbusData.dataTruyen[1] = (uint16_t)kg >> 16;
 	mb.senDataToDevice(7910, modbusData.dataTruyen, 2);
@@ -72,18 +72,19 @@ void LcdSeclectMode(uint8_t modeDisplay, Data_TH* dataLCDTH) {
 		send485PageKg(pagePopup, (uint32_t)(dataLCDTH->data_weight * 1000));
 		break;
 	case 1: //running
-		if (statusPeripheral.mqtt.updateName) {statusPeripheral.mqtt.updateName = false;
-		mb.send485Utf16(8162, "\0", 28); // reset ten nv 
+		if (statusPeripheral.mqtt.updateName) {
+			statusPeripheral.mqtt.updateName = false;
+			mb.send485Utf16(8162, "\0", 28); // reset ten nv 
 		}
 		mb.send485Utf16(8000, inforServer.nhaCC.arrayName[inforServer.nhaCC.userSelect], 32);
 		mb.send485Utf16(8032, inforServer.thanhPham.arrayName[inforServer.thanhPham.userSelect], 96);
 		send485PageAndData(pageRunning, false);
 		break;
 	case 2: //infor bat dau
-		send485PageAndData(pageInfor,true);
+		send485PageAndData(pageInfor, true);
 		break;
 	case 3: //infor bat dau
-		send485PageAndData(pageInfor,true);
+		send485PageAndData(pageInfor, true);
 		break;
 	case 4: //nha cung cap
 		mb.send485Utf16(8000, inforServer.nhaCC.arrayName[inforServer.nhaCC.userSelect], 32);
@@ -94,7 +95,7 @@ void LcdSeclectMode(uint8_t modeDisplay, Data_TH* dataLCDTH) {
 		wchar_t nameNvUtf17[10];
 		//size_t inSize = strlen(inforServer.thanhPham.arrayName[inforServer.thanhPham.userSelect]);
 #ifdef debug_Web
-		DebugData("Data %s , size : %d ",inforServer.thanhPham.arrayName[inforServer.thanhPham.userSelect], sizeof(nameNvUtf17) );
+		DebugData("Data %s , size : %d ", inforServer.thanhPham.arrayName[inforServer.thanhPham.userSelect], sizeof(nameNvUtf17));
 #endif
 		send485PageAndData(pageThanhPham, false);
 		break;
