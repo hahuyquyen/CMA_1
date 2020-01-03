@@ -53,8 +53,8 @@ WiFiClient espClient;
 /*
 SaveData
 */
-bool loadWiFiConf();
-bool saveWiFiConf(void);
+//bool loadWiFiConf();
+bool saveWiFiConf(void){ return setChar((char*)&WiFiConf, sizeof(WiFiConf)); }
 /*
 Button
 */
@@ -214,7 +214,8 @@ void setup()
 #endif
 	// Doc Eprom va khoi tao gia tri
 
-	loadWiFiConf();
+	//loadWiFiConf();
+	getChart((char*)&WiFiConf,sizeof(WiFiConf));
 	khoiTaoGiaTri();
 	if (!SPIFFS.begin(true)) {
 #ifdef debug_UART

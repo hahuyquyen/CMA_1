@@ -149,6 +149,7 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
 				inforServer.nhaCC.arrayType[i + 1] = jsonBuffer["d"][i]["i"].as<uint16_t>();
 				strlcpy(inforServer.nhaCC.arrayName[i + 1], jsonBuffer["d"][i]["n"], sizeof(inforServer.nhaCC.arrayName[i + 1]));
 			}
+			variLcdUpdate.updateLCD = true;
 			break;
 		case mqttGetKV:
 			if (!jsonBuffer.containsKey("s")) { return; }
@@ -170,6 +171,7 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
 				inforServer.thanhPham.arrayType[i + 1] = jsonBuffer["d"][i]["i"].as<uint16_t>();
 				strlcpy(inforServer.thanhPham.arrayName[i + 1], jsonBuffer["d"][i]["n"], sizeof(inforServer.thanhPham.arrayName[i + 1]));
 			}
+			variLcdUpdate.updateLCD = true;
 			statusPeripheral.mqtt.lastTimeGetDataConfig = 0;
 			break;
 		case mqttGetTimeStamp:

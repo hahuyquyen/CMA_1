@@ -1,8 +1,57 @@
-
+﻿
 #ifndef STRUCTDATA_H
 #define STRUCTDATA_H
 	#include <EEPROM.h>
 
+#define CONF_FORMAT {0, 0, 0, 1}
+#define CONF_START 0
+const uint8_t conf_format[4] = CONF_FORMAT;
+/*
+class epromsaveStruct :public EEPROMClass {
+public:
+
+	bool setChar(char* address, size_t chieudai) {
+		for (unsigned int t = 0; t < chieudai; t++) {
+			write(CONF_START + t, *(address + t));
+		}
+		return commit();
+	};
+	void getChart(char* address , size_t chieudai) {
+		if (read(CONF_START + 0) == conf_format[0] &&
+			read(CONF_START + 1) == conf_format[1] &&
+			read(CONF_START + 2) == conf_format[2] &&
+			read(CONF_START + 3) == conf_format[3])
+		{
+			for (unsigned int t = 0; t < chieudai; t++) {
+				*(address + t) = read(CONF_START + t); //& lÃ  Ä‘á»‹a chá»‰  cá»§a biáº¿n Struc, *lÃ  data tá»©c lÃ  gÃ¡n data trong Ã´ nhá»› struc báº±ng eprom Ä‘á»�c dc (char*) lÃ  Ã©p kiá»ƒu dá»¯ liá»‡u
+			}
+		}
+	};
+protected:
+private:
+
+	const uint8_t conf_format[4] = CONF_FORMAT;
+};
+extern epromsaveStruct EpromClass;
+*/
+
+static bool setChar(char* address, size_t chieudai) {
+	for (unsigned int t = 0; t < chieudai; t++) {
+		EEPROM.write(CONF_START + t, *(address + t));
+	}
+	return EEPROM.commit();
+};
+static void getChart(char* address, size_t chieudai) {
+	if (EEPROM.read(CONF_START + 0) == conf_format[0] &&
+		EEPROM.read(CONF_START + 1) == conf_format[1] &&
+		EEPROM.read(CONF_START + 2) == conf_format[2] &&
+		EEPROM.read(CONF_START + 3) == conf_format[3])
+	{
+		for (unsigned int t = 0; t < chieudai; t++) {
+			*(address + t) = EEPROM.read(CONF_START + t); //& lÃ  Ä‘á»‹a chá»‰  cá»§a biáº¿n Struc, *lÃ  data tá»©c lÃ  gÃ¡n data trong Ã´ nhá»› struc báº±ng eprom Ä‘á»�c dc (char*) lÃ  Ã©p kiá»ƒu dá»¯ liá»‡u
+		}
+	}
+};
 	/////////////////////////////////////////////////////////////
 	///// Data status Button nhan           //////////////////////
 	////////////////////////////////////////////////////////////
@@ -13,7 +62,7 @@
 		uint8_t powerRFID;
 		uint8_t giaidoanINOUT;
 		uint8_t giaidoanKV;
-		void getPowerRFID() { this->powerRFID = EEPROM.readInt(810); }
+		void getPowerRFID() { this->powerRFID = EEPROM.readInt(810);}
 		void setPowerRFID() { setdata8Bit(810, &this->powerRFID); }
 		void getIdControl() { this->hardwareId = EEPROM.readUInt(800); }
 		void setIdControl() { setdata32Bit(800, &this->hardwareId); }

@@ -125,9 +125,6 @@
     <None Include="TASK_display.ino">
       <FileType>CppCode</FileType>
     </None>
-    <None Include="UART_Inter.ino">
-      <FileType>CppCode</FileType>
-    </None>
     <None Include="webserver.ino">
       <FileType>CppCode</FileType>
     </None>

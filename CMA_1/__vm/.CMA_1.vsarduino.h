@@ -113,7 +113,6 @@ typedef long pthread_cond_t;
 #include "SaveData.ino"
 #include "TASK_display.ino"
 #include "Task_CheckData.ino"
-#include "UART_Inter.ino"
 #include "functions.ino"
 #include "webserver.ino"
 #include "wifisetting.ino"
