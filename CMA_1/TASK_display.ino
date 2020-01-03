@@ -55,6 +55,15 @@ void send485Kg(uint32_t kg) {
 	modbusData.dataTruyen[1] = (uint16_t)kg >> 16;
 	mb.senDataToDevice(7910, modbusData.dataTruyen, 2);
 }
+uint16_t getstatuswifi() {
+	uint16_t data=0;
+	mb.readHreg(1,7832,&data,1);
+	return data;
+}
+void setstatuswifi() {
+	uint16_t data = 0;
+	mb.senDataToDevice(7832, &data, 1);
+}
 void LcdSeclectMode(uint8_t modeDisplay, Data_TH* dataLCDTH) {
 	if (mb.slave()) { return; }
 	switch (modeDisplay) {
@@ -146,6 +155,15 @@ void Display(void* pvParameters) {
 		else  if ((xTaskGetTickCount() - modbusData.timeSendKg > 800) || (modbusData.timeSendSSID == 0)) {
 			modbusData.timeSendKg = xTaskGetTickCount();
 			send485Kg((can_data > 0) ? ((uint32_t)(can_data * 1000)) : 0);
+			uint16_t statuswwifi = getstatuswifi();
+			if (statuswwifi == 1) {
+				//if (statusPeripheral.wifi.statusConnectAP == false) { // khong ket noi wifi
+#ifdef debug_Web
+					DebugData("Set AP  %d ", statuswwifi);
+#endif
+				//}
+				setstatuswifi();
+			}
 		}
 		switch (stateMachine.deviceStatus) {
 			//////////////////////////////////////////////////////////////////
