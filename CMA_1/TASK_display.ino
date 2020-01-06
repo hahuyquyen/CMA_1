@@ -56,8 +56,12 @@ void send485Kg(uint32_t kg) {
 	mb.senDataToDevice(7910, modbusData.dataTruyen, 2);
 }
 uint16_t getstatuswifi() {
-	uint16_t data=0;
-	mb.readHreg(1,7832,&data,1);
+	uint16_t data = 0;
+	if (!mb.slave()) {
+		mb.readHreg(1, 7832, &data, 1, cb);
+		while (mb.slave()) { mb.task(); }
+		
+	}
 	return data;
 }
 void setstatuswifi() {
@@ -164,6 +168,9 @@ void Display(void* pvParameters) {
 				//}
 				setstatuswifi();
 			}
+#ifdef debug_Web
+			DebugData("Send   dât dis ");
+#endif
 		}
 		switch (stateMachine.deviceStatus) {
 			//////////////////////////////////////////////////////////////////

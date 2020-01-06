@@ -1,6 +1,6 @@
 #include <ModbusRTU.h>
 #include "cutf.h"
-
+bool cb(Modbus::ResultCode event, uint16_t transactionId, void* data);
 //extern SemaphoreHandle_t xMutexRS485;
 class modbus485HMI :public ModbusRTU {
 public:
