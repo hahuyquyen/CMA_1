@@ -111,7 +111,7 @@ void WiFiEvent(WiFiEvent_t event);
 void wifigotip();
 void wifiOnDisconnect(WiFiEventInfo_t info);
 void parseBytes1(const char* str, char sep, int address, int maxBytes, int base);
-void wifi_connect(byte _mode, wifi_mode_t wifi_mode, char* ssid, char* password, char* ap_ssid);
+void wifi_connect(byte _mode, wifi_mode_t wifi_mode, char* ssid, char* password, char* ap_ssid, bool statusModbus);
 void wifi_staticip(char* ip_in, char* gateway_in, char* subnet_in);
 int32_t getRSSI(const char* target_ssid);
 
@@ -147,8 +147,8 @@ void printProgress(size_t prg, size_t sz) {
 #define WEBSOCKET_PORT 83
 #endif
 */
-//////////////////////////////////////////////////////////////////
-////// Khoi tao gia trị mac dinh ////////////////////////////
+////////////////////////////////////////////////////////////////////
+////// Khoi tao gia trị mac dinh //////////////////////////////////
 //////////////////////////////////////////////////////////////////
 void khoiTaoGiaTri(boolean firstTime = true) {
 	if (firstTime) {
@@ -243,7 +243,7 @@ void setup()
 	}
 	else rtc.writeSqwPinMode(DS3231_OFF);
 #ifdef using_sta
-	wifi_connect(0, WIFI_STA, WiFiConf.sta_ssid, WiFiConf.sta_pwd, WiFiConf.ap_ssid);
+	wifi_connect(0, WIFI_STA, WiFiConf.sta_ssid, WiFiConf.sta_pwd, WiFiConf.ap_ssid,false);
 #else
 	wifi_connect(1, WIFI_AP, WiFiConf.sta_ssid, WiFiConf.sta_pwd, WiFiConf.ap_ssid);
 #endif
@@ -330,14 +330,14 @@ void loop()
 	Debug.handle();
 #endif   
 	vTaskDelayUntil(&xLastWakeTimeLoop, 20);
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////
 	//////  Reconnect Wifi        /////////////////////////////
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////
 	if (statusPeripheral.wifi.statusConnectAP == false) {
 		if ((statusPeripheral.wifi.counterWifiDisconnect == 15) && (xTaskGetTickCount() - statusPeripheral.wifi.lastTimeConnect > 500)) {
 			statusPeripheral.wifi.lastTimeConnect = xTaskGetTickCount();
 			WiFi.disconnect(true);
-			wifi_connect(2, WIFI_AP_STA, WiFiConf.sta_ssid, WiFiConf.sta_pwd, (char*)"esp32");
+			wifi_connect(2, WIFI_AP_STA, WiFiConf.sta_ssid, WiFiConf.sta_pwd, (char*)"esp32", false);
 			statusPeripheral.wifi.counterWifiDisconnect++;
 #ifdef debug_UART
 			printf("Wifi 2 che do: AP va STA\n");
@@ -349,7 +349,7 @@ void loop()
 		else if ((statusPeripheral.wifi.counterWifiDisconnect < 15) && (xTaskGetTickCount() - statusPeripheral.wifi.lastTimeConnect > 1000)) {
 			statusPeripheral.wifi.lastTimeConnect = xTaskGetTickCount();
 			statusPeripheral.wifi.counterWifiDisconnect = statusPeripheral.wifi.counterWifiDisconnect + 1;
-			wifi_connect(0, WIFI_STA, WiFiConf.sta_ssid, WiFiConf.sta_pwd, WiFiConf.ap_ssid);
+			wifi_connect(0, WIFI_STA, WiFiConf.sta_ssid, WiFiConf.sta_pwd, WiFiConf.ap_ssid,false);
 		}
 	}
 	/*
@@ -377,8 +377,8 @@ void loop()
 	}
 
 	//////////////////////////////////////////////////////////////////
-	////// lasttime yêu cau server tra data ////////////////////////////
-	//////////////////////////////////////////////////////////////////
+	////// lasttime yêu cau server tra data /////////////////////////
+	////////////////////////////////////////////////////////////////
 	if ((statusPeripheral.mqtt.statusMqttConnect) && (stateMachine.deviceStatus == deviceSetting)) {
 		if ((xTaskGetTickCount() - statusPeripheral.mqtt.lastTimeGetDataConfig > 1000) || (statusPeripheral.mqtt.lastTimeGetDataConfig == 0)) {
 			statusPeripheral.mqtt.lastTimeGetDataConfig = xTaskGetTickCount();
@@ -386,7 +386,7 @@ void loop()
 		}
 	}
 	///////////////////////////////////////////////////////////////////////
-	/// 1 giay nhan timestamp 1 lan ///////////////////////////////////////
+	/// 1 giay nhan timestamp 1 lan //////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////
 	if (xTaskGetTickCount() - statusPeripheral.RTC.lastTimeGetTimeStamp > 1000) {
 		statusPeripheral.RTC.lastTimeGetTimeStamp = xTaskGetTickCount();

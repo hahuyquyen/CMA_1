@@ -57,11 +57,12 @@ void send485Kg(uint32_t kg) {
 }
 uint16_t getstatuswifi() {
 	uint16_t data = 0;
-	if (!mb.slave()) {
+	/*if (!mb.slave()) {
 		mb.readHreg(1, 7832, &data, 1, cb);
 		while (mb.slave()) { mb.task(); }
 		
-	}
+	}*/
+	data = mb.readDataHMI(7832,1);
 	return data;
 }
 void setstatuswifi() {
@@ -162,15 +163,13 @@ void Display(void* pvParameters) {
 			uint16_t statuswwifi = getstatuswifi();
 			if (statuswwifi == 1) {
 				//if (statusPeripheral.wifi.statusConnectAP == false) { // khong ket noi wifi
+				wifi_connect(1, WIFI_AP, WiFiConf.sta_ssid, WiFiConf.sta_pwd,(char *)"ESP32", true);
 #ifdef debug_Web
 					DebugData("Set AP  %d ", statuswwifi);
 #endif
 				//}
 				setstatuswifi();
 			}
-#ifdef debug_Web
-			DebugData("Send   dât dis ");
-#endif
 		}
 		switch (stateMachine.deviceStatus) {
 			//////////////////////////////////////////////////////////////////
