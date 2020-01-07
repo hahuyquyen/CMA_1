@@ -36,7 +36,7 @@ modbus485HMI mb;
 // RTC
 RTC_DS3231 rtc;
 DateTime timeStamp;
-Data_TH dataEncoderJsonMqtt;
+struct Data_TH dataEncoderJsonMqtt;
 //LCD
 //SD CArd
 SPIClass SDSPI(HSPI);

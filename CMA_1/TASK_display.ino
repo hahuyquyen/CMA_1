@@ -125,13 +125,11 @@ void LcdSeclectMode(uint8_t modeDisplay, Data_TH* dataLCDTH) {
 	}
 }
 /*
-
-
 */
 
 void Display(void* pvParameters) {
 	boolean status_led = true;
-	Data_TH dataDisplayTH;
+	struct Data_TH dataDisplayTH;
 	unsigned long lastTimeBlinkLed = 0;
 	unsigned long timeoutDisplay = 0;
 	//  unsigned long timeoutLcdLangDaIn = 0;

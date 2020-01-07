@@ -6,7 +6,7 @@ void http_re(void* pvParameters) {
 	struct dataCan Data_CAN_TH;
 	struct Data_RFID dataRfidRoTH;
 	struct Data_RFID dataRfidNvTH;
-	Data_TH dataTHSend;
+	struct Data_TH dataTHSend;
 	char idRFID_OLD[25];
 	unsigned long lastTimeGetQueueCan = 0;
 	unsigned long lastTimeGetQueueRFID_Ro = 0;

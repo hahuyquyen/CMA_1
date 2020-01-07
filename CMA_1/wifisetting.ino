@@ -9,7 +9,6 @@
 /////////////////////////////////////////
 int32_t getRSSI(const char* target_ssid) {
 	byte available_networks = WiFi.scanNetworks();
-
 	for (int network = 0; network < available_networks; network++) {
 		if (strcmp(WiFi.SSID(network).c_str(), target_ssid) == 0) {
 			return WiFi.RSSI(network);
@@ -47,7 +46,7 @@ void wifiOnDisconnect(WiFiEventInfo_t info)
 		wifi_connect(0, WIFI_STA, WiFiConf.sta_ssid, WiFiConf.sta_pwd, WiFiConf.ap_ssid, false);
 	}
 	/*
-	   reason 201 la no AP found
+	   reason 201:  no AP found
 	*/
 }
 ////////////////////////////////////////////////////////////////////
@@ -93,7 +92,7 @@ void WiFiEvent(WiFiEvent_t event)
 	}
 }
 ////////////////////////////////////////////////////////////////////
-////// stach data ip //////////////////////////////////////////////
+////// tach data ip //////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////
 void parseBytes1(const char* str, char sep, int address, int maxBytes, int base) {
 	for (int i = 0; i < maxBytes; i++) {
@@ -111,7 +110,7 @@ void parseBytes1(const char* str, char sep, int address, int maxBytes, int base)
 ////// Cai dat che do wifi ////////////////////////////////////////
 //////////////////////////////////////////////////////////////////
 void wifi_connect(byte _mode, wifi_mode_t wifi_mode, char* ssid, char* password, char* ap_ssid , bool statusModbus) {
-	if (modbusData.connectAP) {
+	if (modbusData.connectAP) { //Neu Nhan cai dat tu HMI thi khong duoc reset
 		return;
 	}
 	if (statusModbus) {
