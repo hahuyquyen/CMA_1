@@ -25,7 +25,7 @@ static void getChart(char* address, size_t chieudai) {
 		EEPROM.read(CONF_START + 3) == conf_format[3])
 	{
 		for (unsigned int t = 0; t < chieudai; t++) {
-			*(address + t) = EEPROM.read(CONF_START + t); //& lÃ  Ä‘á»‹a chá»‰  cá»§a biáº¿n Struc, *lÃ  data tá»©c lÃ  gÃ¡n data trong Ã´ nhá»› struc báº±ng eprom Ä‘á»�c dc (char*) lÃ  Ã©p kiá»ƒu dá»¯ liá»‡u
+			*(address + t) = EEPROM.read(CONF_START + t); 
 		}
 	}
 };

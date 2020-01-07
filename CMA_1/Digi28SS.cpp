@@ -23,7 +23,7 @@ void TaskCAN( void * pvParameters ) {
               xQueueSend( Queue_can, &dataCanTaskCan, xTicksToWait );
             }
           }
-          else if (xTaskGetTickCount() - lastTimeSendCan > 1000) {
+          else if (xTaskGetTickCount() - lastTimeSendCan > timeSche) {
             lastTimeSendCan = xTaskGetTickCount();
             if (can_data > 0.5) {
               xQueueSend( Queue_can, &dataCanTaskCan, xTicksToWait );

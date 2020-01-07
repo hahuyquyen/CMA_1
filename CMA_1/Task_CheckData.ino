@@ -99,12 +99,13 @@ void http_re(void* pvParameters) {
 					if (GetSttKhuVuc() == sttKvSuaCaOUT) {
 						tt = false;
 						if (strcmp(dataTHSend.id_RFID, idRFID_OLD) != 0) {
-							strncpy(idRFID_OLD, dataTHSend.id_RFID, sizeof(dataTHSend.id_RFID));if (Data_CAN_TH.data_can > 0.5) tt = true;
+							strncpy(idRFID_OLD, dataTHSend.id_RFID, sizeof(dataTHSend.id_RFID));
+							if (Data_CAN_TH.data_can > 0.5) tt = true;
 							canDataOutOld = Data_CAN_TH.data_can;
 						}
 						else {
 							double tam = Data_CAN_TH.data_can > canDataOutOld ? Data_CAN_TH.data_can - canDataOutOld : canDataOutOld - Data_CAN_TH.data_can;
-							if ((tam > 0.8) && (Data_CAN_TH.data_can > 0.5)) { tt = true; }
+							if ((tam > 0.3) && (Data_CAN_TH.data_can > 0.5)) { tt = true; }
 							canDataOutOld = Data_CAN_TH.data_can;
 						}
 					}
