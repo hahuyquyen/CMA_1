@@ -4,10 +4,11 @@
 #define DebugError debugE
 #define DebugInfor debugI
 //#define DebugWarning debugW
-
-
+#define using_sta true
 #define SerialRFID Serial2
-
+#define WIFI_CONF_FORMAT {0, 0, 0, 1}
+#define WIFI_CONF_START 0
+/*
 #define MaRo_RFID 0xE2
 #define MaNV_RFID 0x00
 #define MaLoaiCa_RFID 0x01
@@ -15,10 +16,13 @@
 
 #define SerialCan Serial1
 
-#define WIFI_CONF_FORMAT {0, 0, 0, 1}
-#define WIFI_CONF_START 0
 
-#define using_sta true
+*/
+
+
+
+
+
 
 #define web_port 4999
 #define time_2_lan_nhan_data 5000

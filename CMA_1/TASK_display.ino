@@ -1,27 +1,3 @@
-
-// uint16_t dataTruyen[20];
-/*bool cb(Modbus::ResultCode event, uint16_t transactionId, void* data) {
-	//Serial.printf_P("Request result: 0x%02X, Mem: %d\n", event, transactionId);
-	return true;
-}*/
-/*
- * #define pageInfor 10
-#define pageNhaCC 12
-#define pageThanhPham 13
-#define pageComfirm 14
-#define pageRunning 15
-#define pagePopup 16
- */
- /*void send485HMI(uint16_t address, uint16_t* kytu, uint8_t numByte) {
-	 if (!mb.slave()) {
-		 if (xSemaphoreTake(xMutexRS485, 1)) {
-			 mb.senDataToDevice(address, kytu, numByte);
-		 //	mb.writeHreg(1, address, kytu, numByte, cb); //ID man hinh
-		 //	while (mb.slave()) { mb.task(); }
-			 xSemaphoreGive(xMutexRS485);
-		 }
-	 }
- }*/
 void sendSSID485() {
 	modbusData.dataTruyen[0] = WiFi.localIP()[0];
 	modbusData.dataTruyen[1] = WiFi.localIP()[1];

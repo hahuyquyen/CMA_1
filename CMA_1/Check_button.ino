@@ -5,7 +5,7 @@
 EasyButton button_right(button_right_pin, 50, true);
 EasyButton button_ok(button_ok_pin, 50, true);
 EasyButton buttonExit(buttonExitPin, 50, true);
-EasyButton buttonError(buttonErrorPin, 50, true);
+//EasyButton buttonError(buttonErrorPin, 50, true);
 //EasyButton buttonPower(pinReadPower, 500, true);
 //////////////////////////////////////////////////////////////////
 ////// Button POWER ///////////////////////////////////////////////
@@ -98,13 +98,6 @@ void onPressed_ok() {
 		else stateMachine.bottonSelect = 2;
 	}
 	else stateMachine.bottonSelect = stateMachine.bottonSelect + 1;
-	/*- if  ((stateMachine.bottonSelect == 1) && (inforServer.giaiDoan.cheDoInOut == cheDoOut )) {
-	   stateMachine.bottonSelect = 3;
-	 }
-	 else {*/
-
-	 // }
-
 	if (stateMachine.bottonSelect > 4) {
 		stateMachine.deviceStatus = deviceRunning;
 	}
@@ -118,9 +111,6 @@ void onPressed_ok() {
 void onPressedExit() {
 	stateMachine.bottonSelect = 0;
 	stateMachine.deviceStatus = deviceSetting;
-#ifdef debug_UART
-	// Serial.println("onPressed_vitri");
-#endif
 #ifdef debug_Web
 	DebugData("Button - onPressed Exit");
 #endif
@@ -135,9 +125,6 @@ void onPressedExit() {
 ////// Button Error ///////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////
 void onPressedError() {
-#ifdef debug_UART
-	//Serial.println("onPressed");
-#endif
 #ifdef debug_Web
 	DebugData("Button - onPressed_Error");
 #endif
@@ -153,22 +140,15 @@ void onPressedError() {
 //////////////////////////////////////////////////////////////////
 void Check_button(void* pvParameters) {
 	pinMode(pinReadPower, INPUT_PULLUP);
-	// button_left.begin();
 	button_right.begin();
 	buttonExit.begin();
 	button_ok.begin();
-	buttonError.begin();
-	// buttonPower.begin();
-	 //button_left.onPressedFor(80, onPressed_left);
 	button_right.onPressedFor(30, onPressed_right);
 	buttonExit.onPressedFor(30, onPressedExit);
 	button_ok.onPressedFor(30, onPressed_ok);
-	buttonError.onPressedFor(30, onPressedError);
-	//uttonPower.onPressedFor(700, onPressedPower);
 	pinMode(pinReadPower, INPUT_PULLUP);
 	TickType_t xLastWakeTime;
 	xLastWakeTime = xTaskGetTickCount();
-	// pinMode(pinAnalogPower, INPUT);
 	unsigned long lastTimeReadADC = 0;
 	unsigned long lastTimeGetRSSI = 0;
 	//int powervalue;
@@ -191,12 +171,7 @@ void Check_button(void* pvParameters) {
 			button_right.read();
 			button_ok.read();
 		}
-		// button_left.read();
 		buttonExit.read();
-		buttonError.read();
-		// buttonPower.read();
-
-
 	 ///////////////////////////////////////
 	 // 5s get Power 1 lan ////////////////
 	  //////////////////////////////////////
@@ -204,8 +179,6 @@ void Check_button(void* pvParameters) {
 			lastTimeReadADC = xTaskGetTickCount();
 			//  statusPeripheral.powerValue = adc1_get_raw( ADC1_CHANNEL_5);
 		   //   statusPeripheral.powerValue = map(statusPeripheral.powerValue, 2000, 4096, 0, 100); // Can Map dien ap tu 2.6->3.3 la 0-<>100
-#ifdef debug_UART          
-#endif
 #ifdef debug_Web
 	   //   DebugData("Power : %d", statusPeripheral.powerValue);
 #endif
@@ -226,16 +199,3 @@ void Check_button(void* pvParameters) {
 	}
 	vTaskDelete(NULL);
 }
-
-
-/*  for (int tangTam = 0 ; tangTam < inforServer.thanhPham.total ; tangTam ++){
-				 inforServer.userSelectThanhPham = inforServer.userSelectThanhPham - 1;
-				if ((inforServer.PhanLoaiKV == PhanLoai::Fil_IN)||(inforServer.PhanLoaiKV == PhanLoai::Fil_OUT)){
-					if (inforServer.userSelectThanhPham == 0) break;
-					if (inforServer.sttGdThanhPham[inforServer.userSelectThanhPham] == 1) {break;}
-				}
-				else if ((inforServer.PhanLoaiKV == PhanLoai::LANG_IN)||(inforServer.PhanLoaiKV == PhanLoai::LANG_OUT)){
-					if (inforServer.userSelectThanhPham == 0) break;
-					if (inforServer.sttGdThanhPham[inforServer.userSelectThanhPham] == 2) {break;}
-				}
-  }*/
