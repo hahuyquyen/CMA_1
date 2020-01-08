@@ -25,7 +25,7 @@ void TaskRFID(void* pvParameters) {
 	JT2850.begin(SerialRFID);
 	TickType_t xLastWakeTime;
 	xLastWakeTime = xTaskGetTickCount();
-	statusPeripheral.updateRFID = true;
+	statusPeripheral.updateRFID = true; // cai dat khi chay , check neu khong can thi bo
 	for (;;) {
 		if (statusPeripheral.updateRFID) {
 			statusPeripheral.updateRFID = false;

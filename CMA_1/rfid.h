@@ -4,15 +4,15 @@
 //#include "esp32-hal-uart.h"
 #ifndef RFID_H
 #define RFID_H
-#define ALL_GOOD 0
-#define ERROR_COMMAND_RESPONSE_TIMEOUT 1
-#define ERROR_CORRUPT_RESPONSE 2
-#define ERROR_WRONG_OPCODE_RESPONSE 3
-#define RESPONSE_SUCCESS 11
-#define RESPONSE_FAIL 12
+#define ALL_GOOD						0
+#define ERROR_COMMAND_RESPONSE_TIMEOUT	1
+#define ERROR_CORRUPT_RESPONSE			2
+#define ERROR_WRONG_OPCODE_RESPONSE		3
+#define RESPONSE_SUCCESS				11
+#define RESPONSE_FAIL					12
 
-#define MAX_MSG_SIZE 30
-#define COMMAND_TIME_OUT 2000 
+#define MAX_MSG_SIZE		30
+#define COMMAND_TIME_OUT	2000 
 class RFID
 {
 public:

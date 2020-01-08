@@ -113,9 +113,6 @@
     <None Include="MQTT.ino">
       <FileType>CppCode</FileType>
     </None>
-    <None Include="SaveData.ino">
-      <FileType>CppCode</FileType>
-    </None>
     <None Include="SDCARD.ino">
       <FileType>CppCode</FileType>
     </None>
