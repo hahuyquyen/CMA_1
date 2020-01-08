@@ -8,47 +8,10 @@
 #define SerialRFID Serial2
 #define WIFI_CONF_FORMAT {0, 0, 0, 1}
 #define WIFI_CONF_START 0
-/*
-#define MaRo_RFID 0xE2
-#define MaNV_RFID 0x00
-#define MaLoaiCa_RFID 0x01
-#define rfidTimeOut 1000
-
-#define SerialCan Serial1
-
-
-*/
-
-
-
-
-
 
 #define web_port 4999
 #define time_2_lan_nhan_data 5000
 #define time_cho_nhan_RFID_NV 8000
-
-
-/*
-#define canNOD1 0x40
-#define canNOD2 0x41
-#define canNOD3 0x44
-#define canNOD4 0x45
-#define canNOD5 0x48
-#define canOD1 0x42
-#define canOD2 0x43
-#define canOD3 0x47
-#define canOD4 0x46
-#define can_dau_cham 0x2C
-#define can_dau_phay 0x2E
-#define can_LF 0x0A
-#define can_CR 0x0D
-#define can_Minus 0x2D
-#define canStartByte 0x3D
-#define canStopByte 0x0D
-#define canNULLByte 0x20
-*/
-
 
 #define button_left_pin 39
 #define button_right_pin 34
@@ -70,21 +33,23 @@
 #define kvSuaCa 2
 #define kvNotChoose 0
 
+#define sttKvFillerIN 1
+#define sttKvFillerOUT 2
+#define sttKvSuaCaIN 3
+#define sttKvSuaCaOUT 4
+
 #define stateChooseINOUT 0
 #define stateChooseKV 1
 #define stateChooseNhaCC 2
 #define stateChooseThanhPham 3
+#define stateChooseConfirm 4
+#define stateChooseRunning 5
 
 #define deviceSetting 0
 #define deviceRunning 1
 #define deviceError 2
 #define deviceLowPower 3
 #define deviceTurnOff 4
-
-#define sttKvFillerIN 1
-#define sttKvFillerOUT 2
-#define sttKvSuaCaIN 3
-#define sttKvSuaCaOUT 4
 
 #define pageInfor 10
 #define pageNhaCC 12
@@ -98,3 +63,23 @@
 #define mqttGetThanhPham 3
 #define mqttGetTimeStamp 4
 #define mqttGetResetCa 5
+
+
+#define statusDisplayPopup 0
+#define statusDisplayRunning 1
+#define statusDisplayInfor 2
+#define statusDisplayNhaCC 4
+#define statusDisplayThanhPham 5
+#define statusDisplayXacNhan 6
+
+#define rs485HMIAddresStatusApMode 7832
+#define rs485HMIAddresKgPopup 7898
+#define rs485HMIAddresPage 7900
+#define rs485HMIAddressKg 7910
+#define rs485HMIAddresIP 7920
+#define rs485HMIAddresSSID 7924
+#define rs485HMIAddresNameNhaCC 8000
+#define rs485HMIAddresNameThanhPham 8032
+#define rs485HMIAddresRFIDNV 8150
+#define rs485HMIAddresRFIDRo 8156
+#define rs485HMIAddresNameNhanVien 8162

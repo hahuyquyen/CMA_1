@@ -47,8 +47,6 @@ void ConnectToMqtt() {
 //////////////////////////////////////////////////////////////////
 void EncoderJsonMqtt() {
 	DynamicJsonDocument doc(300);
-	//doc["k"] = inforServer.giaiDoan.cheDoInOut;
-   // doc["x"] = inforServer.giaiDoan.arrayType[inforServer.giaiDoan.userSelect];
 	doc["k"] = stateMachine.giaidoanINOUT;
 	doc["x"] = stateMachine.giaidoanKV;
 	doc["b"] = dataEncoderJsonMqtt.id_RFID;
@@ -59,7 +57,6 @@ void EncoderJsonMqtt() {
 	doc["c"] = inforServer.nhaCC.arrayType[inforServer.nhaCC.userSelect];
 	doc["p"] = inforServer.thanhPham.arrayType[inforServer.thanhPham.userSelect];
 	doc["r"] = 0;
-	//char buffer[500];
 	char* msg1 = (char*)calloc(300, 1);
 	serializeJson(doc, msg1, 300);
 	char textToWrite[16];
@@ -74,8 +71,8 @@ void EncoderJsonMqtt() {
 #endif
 	//char tam[] = "/data";
 	SendDataMqtt(inforServer.mqttConfig.topicSenData, msg1);
-	free(msg1);
-	doc.clear(); // giai phong bo nho
+	free(msg1);  // giai phong bo nho msg
+	doc.clear(); // giai phong bo nho json
 }
 //////////////////////////////////////////////////////////////////
 ////// Setting MQTT ///////////////////////////////////////////////
@@ -120,8 +117,6 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
 #ifdef debug_Web
 	DebugInfor("MQTT: %s ,ND: %s ", topic, payload);
 #endif
-	// Bo nho lon hon 1kb thay vi dung Static chuyen qua dung DynamicJsonDocument no cap phat malloc va free
-   // StaticJsonDocument<1500> jsonBuffer;
 	DynamicJsonDocument jsonBuffer(2048);
 	DeserializationError error = deserializeJson(jsonBuffer, payload);
 	if (error) {
@@ -132,7 +127,8 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
 		DebugError("error js");
 #endif
 	}
-	else if ((strcmp(WiFiConf.mqtt_subto1, topic) == 0) || (strcmp(inforServer.mqttConfig.topicGetConfig, topic) == 0)) {
+	else if ((strcmp(WiFiConf.mqtt_subto1, topic) == 0)
+		 || (strcmp(inforServer.mqttConfig.topicGetConfig, topic) == 0)) {
 		/*
 		  Nhan thong tin server cai dat ca lam viec
 		*/
@@ -244,10 +240,12 @@ void checkSendMQTTConfig() {
 	if (statusPeripheral.timeStampServer == 0) {
 		SendDataConfigMqtt(mqttGetTimeStamp, 0);
 	}
-	else if ((stateMachine.giaidoanINOUT == 1) && (inforServer.nhaCC.total == 0)) {
+	else if ((stateMachine.giaidoanINOUT == 1)
+		&& (inforServer.nhaCC.total == 0)) {
 		SendDataConfigMqtt(mqttGetNhaCC, 0);
 	}
-	else if ((stateMachine.giaidoanINOUT == 1) && (inforServer.thanhPham.total == 0)) { // laf dau vao
+	else if ((stateMachine.giaidoanINOUT == 1)
+		&& (inforServer.thanhPham.total == 0)) { // laf dau vao
 		SendDataConfigMqtt(mqttGetThanhPham, stateMachine.giaidoanKV);
 	}
 }

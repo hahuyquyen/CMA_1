@@ -2,7 +2,7 @@
 #ifndef STRUCTDATA_H
 #define STRUCTDATA_H
 //#define NO_GLOBAL_EEPROM
-	#include <EEPROM.h>
+#include <EEPROM.h>
 
 #define CONF_FORMAT {0, 0, 0, 1}
 #define CONF_START 0
@@ -12,6 +12,11 @@
 #define addressEpromGiaiDoan 811
 
 const uint8_t conf_format[4] = CONF_FORMAT;
+
+static bool settingEprom() {
+	EEPROM.begin(1024);
+};
+
 static bool setChar(char* address, size_t chieudai) {
 	for (unsigned int t = 0; t < chieudai; t++) {
 		EEPROM.write(CONF_START + t, *(address + t));
@@ -54,6 +59,7 @@ struct stateMachineConf {
 		void setdata8Bit(uint16_t address, uint8_t* value) {
 			EEPROM.writeInt(address, *value);
 			EEPROM.commit();
+			
 		}
 };
 struct statusPeripheralConf {
@@ -87,7 +93,7 @@ struct statusPeripheralConf {
 		boolean updateRFID = false;
 };
 
-
 extern struct stateMachineConf stateMachine;
 extern struct statusPeripheralConf statusPeripheral;
+
 #endif

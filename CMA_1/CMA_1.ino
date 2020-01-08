@@ -201,25 +201,17 @@ void setup()
 	xSignal_Display_checkdone = xSemaphoreCreateCounting(2, 0);
 	xreset_id_nv = xSemaphoreCreateCounting(2, 0);
 	xResetRfidMaRo = xSemaphoreCreateCounting(2, 0);
-	//xMutexRS485 = xSemaphoreCreateMutex();
 	xMutexMQTT= xSemaphoreCreateMutex();
 
-	EEPROM.begin(1024);
+	settingEprom();
 	stateMachine.getIdControl();
 	stateMachine.getPowerRFID();
-
-#ifdef debug_UART
-	Serial.print("ID Device : ");
-	Serial.println(stateMachine.hardwareId);
-#endif
 	// Doc Eprom va khoi tao gia tri
-
 	//loadWiFiConf();
 	getChart((char*)&WiFiConf,sizeof(WiFiConf));
 	khoiTaoGiaTri();
 	if (!SPIFFS.begin(true)) {
 #ifdef debug_UART
-
 		printf("An Error has occurred while mounting SPIFFS\n");
 #endif
 	}
@@ -244,8 +236,6 @@ void setup()
 	else rtc.writeSqwPinMode(DS3231_OFF);
 #ifdef using_sta
 	wifi_connect(0, WIFI_STA, WiFiConf.sta_ssid, WiFiConf.sta_pwd, WiFiConf.ap_ssid,false);
-#else
-	wifi_connect(1, WIFI_AP, WiFiConf.sta_ssid, WiFiConf.sta_pwd, WiFiConf.ap_ssid);
 #endif
 	wifi_staticip(WiFiConf.sta_ip, WiFiConf.sta_gateway, WiFiConf.sta_subnet);
 	WiFi.onEvent(WiFiEvent);
@@ -263,9 +253,7 @@ void setup()
 	Debug.showProfiler(true); // Profiler (Good to measure times, to optimize codes)
 	Debug.showColors(true); // Colors
 #endif
-
 	Update.onProgress(printProgress);
-
 	//Free RTOS
 	xTaskCreatePinnedToCore(
 		Check_button,   /* Function to implement the task */
@@ -276,37 +264,37 @@ void setup()
 		NULL,       /* Task handle. */
 		0);  /* Core where the task should run */
 	xTaskCreatePinnedToCore(
-		Display,   /* Function to implement the task */
-		"Display", /* Name of the task */
-		4096,      /* Stack size in words */
-		NULL,       /* Task input parameter */
-		12,          /* Priority of the task */
-		NULL,       /* Task handle. */
-		0);  /* Core where the task should run */
+		Display,   
+		"Display", 
+		4096,      
+		NULL,       
+		12,          
+		NULL,       
+		0);  
 	xTaskCreatePinnedToCore(
-		TaskCAN,   /* Function to implement the task */
-		"TaskCAN", /* Name of the task */
-		3072,      /* Stack size in words */
-		NULL,       /* Task input parameter */
-		13,          /* Priority of the task */
-		NULL,       /* Task handle. */
-		1);  /* Core where the task should run */
+		TaskCAN,   
+		"TaskCAN",
+		3072,     
+		NULL,      
+		13,         
+		NULL,       
+		1);  
 	xTaskCreatePinnedToCore(
-		http_re,   /* Function to implement the task */
-		"http_re", /* Name of the task */
-		4096,      /* Stack size in words */
-		NULL,       /* Task input parameter */
-		14,          /* Priority of the task */
-		NULL,       /* Task handle. */
-		1);  /* Core where the task should run */
+		http_re,   
+		"http_re", 
+		4096,     
+		NULL,       
+		14,         
+		NULL,      
+		1);  
 	xTaskCreatePinnedToCore(
-		TaskRFID,   /* Function to implement the task */
-		"TaskRFID", /* Name of the task */
-		3072,      /* Stack size in words */
-		NULL,       /* Task input parameter */
-		15,          /* Priority of the task */
-		NULL,       /* Task handle. */
-		1);  /* Core where the task should run */
+		TaskRFID,  
+		"TaskRFID", 
+		3072,      
+		NULL,       
+		15,         
+		NULL,       
+		1);  
 	  //MQTT
 	mqttReconnectTimer = xTimerCreate("mqttTimer", pdMS_TO_TICKS(2000), pdFALSE, (void*)0, reinterpret_cast<TimerCallbackFunction_t>(ConnectToMqtt));
 	mqttClient.onConnect(onMqttConnect);

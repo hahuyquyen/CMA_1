@@ -2,13 +2,8 @@
    cma2018LHP515
 
 */
-/*const char ServerMQTT[] PROGMEM = "ServerMQTT";
-const char PortMQTT[] PROGMEM = "PortMQTT";
-const char USERMQTT[] PROGMEM = "USERMQTT";
-const char PASSMQTT[] PROGMEM = "PASSMQTT";
-const char SUBTopic1[] PROGMEM = "SUBTopic1";*/
-const char dataHtmlType[] PROGMEM = "text/plain";
 
+const char dataHtmlType[] PROGMEM = "text/plain";
 
 const char ramChoDuLieu[] = "Chờ Dữ Liệu"; // dung can lây FPSTR(ramChoDuLieu) và strlcpy_P  tiet kiem RAM cho heap memory
 const char ramChuaChon[] = "Chưa Chọn";

@@ -75,7 +75,9 @@ void http_re(void* pvParameters) {
 			////////////////////////////////////////////////
 			//// Check giai doan 1: Nhan ma NV va Kg ///////
 			///////////////////////////////////////////////      
-			if ((lastTimeGetQueueCan > lastTimeGetQueueRFID_Ro + 300) && (lastTimeGetQueueRFID_Ro > 0)) { // chỉ nhận khi dữ liệu cân lớn hơn dữ liệu rfid 500 stick
+			if ((lastTimeGetQueueCan > lastTimeGetQueueRFID_Ro + 300) 
+				&& (lastTimeGetQueueRFID_Ro > 0)) 
+			{ // chỉ nhận khi dữ liệu cân lớn hơn dữ liệu rfid 500 stick
 				timeCompareMode1 = lastTimeGetQueueCan - lastTimeGetQueueRFID_Ro;
 				////////////////////////////////////////////////
 				//// Thoi gian giua 2 lan nhan du lieu ///////
@@ -150,7 +152,9 @@ void http_re(void* pvParameters) {
 			//// Check giai doan 2: Chi dung cho giai doan sua ca IN ///////
 			///////////////////////////////////////////////////////////////    
 			if (GetSttKhuVuc() == sttKvSuaCaIN) {
-				if ((lastTimeGetQueueRFID_NV > lastTimeGetData_RoVaCan) && (lastTimeGetData_RoVaCan > 0)) {
+				if ((lastTimeGetQueueRFID_NV > lastTimeGetData_RoVaCan) 
+					&& (lastTimeGetData_RoVaCan > 0)) 
+				{
 					timeCompareMode2 = lastTimeGetQueueRFID_NV - lastTimeGetData_RoVaCan;
 					////////////////////////////////////////////////
 					//// Thoi gian giua 2 lan nhan du lieu ///////
@@ -182,7 +186,9 @@ void http_re(void* pvParameters) {
 #endif
 					}
 				}
-				else if ((lastTimeGetData_RoVaCan > 0) && (xTaskGetTickCount() - lastTimeGetData_RoVaCan > time_cho_nhan_RFID_NV)) {
+				else if ((lastTimeGetData_RoVaCan > 0) 
+					&& (xTaskGetTickCount() - lastTimeGetData_RoVaCan > time_cho_nhan_RFID_NV)) 
+				{
 					xSemaphoreGive(xResetRfidMaRo); // Gửi tín hiệu để reset mã rỗ
 					lastTimeGetData_RoVaCan = 0;
 #ifdef debug_UART

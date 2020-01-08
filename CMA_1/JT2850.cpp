@@ -19,12 +19,13 @@ void TaskRFID(void* pvParameters) {
 	static byte myEPClength;
 	struct Data_RFID dataRfidRo;
 	struct Data_RFID dataRfidNV;
-	RFID JT2850;
+	struct RFID JT2850;
 	const TickType_t xTicksToWait = pdMS_TO_TICKS(1);
 	SerialRFID.begin(9600);
 	JT2850.begin(SerialRFID);
 	TickType_t xLastWakeTime;
 	xLastWakeTime = xTaskGetTickCount();
+	statusPeripheral.updateRFID = true;
 	for (;;) {
 		if (statusPeripheral.updateRFID) {
 			statusPeripheral.updateRFID = false;
