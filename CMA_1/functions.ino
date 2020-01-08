@@ -3,8 +3,8 @@ boolean compareWithZero(uint8_t* data) {
 	return false;
 }
 
-//////////////////////////////////////////////////////////////////
-////// Tra ve STT Khu Vuc 1,2,3,4 thay vi 1-1 1-2 2-1 2-2 ////////////////////////////
+////////////////////////////////////////////////////////////////////
+////// Tra ve STT Khu Vuc 1,2,3,4 thay vi 1-1 1-2 2-1 2-2 /////////
 //////////////////////////////////////////////////////////////////
 uint8_t GetSttKhuVuc() {
 	uint8_t bien = 0;
@@ -21,8 +21,8 @@ uint8_t GetSttKhuVuc() {
 	}
 	return bien;
 }
-/////////////////////////////////////////////////////////////////////////
-////// Save Time to RTC ////////////////////////////
+////////////////////////////////////////////////////////////////////
+////// Save Time to RTC                ////////////////////////////
 //////////////////////////////////////////////////////////////////
 void SetTimeRtc(uint32_t timestampSave) {
 #ifdef debug_UART
@@ -38,18 +38,12 @@ void SetTimeRtc(uint32_t timestampSave) {
 
 #ifdef debug_Web
 		DebugData("Set TimeStamp %lu", (unsigned long)tam);
-#else
-		Serial.print("Set TimeStamp: ");
-		Serial.println(tam);
 #endif
 	}
 	else {
 
 #ifdef debug_Web
 		DebugData("Khong Set TimeStamp %lu", (unsigned long)tam);
-#else
-		Serial.print("Khong set TimeStamp: ");
-		Serial.println(tam);
 #endif
 	}
 }

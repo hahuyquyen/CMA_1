@@ -36,7 +36,7 @@ modbus485HMI mb;
 // RTC
 RTC_DS3231 rtc;
 DateTime timeStamp;
-Data_TH dataEncoderJsonMqtt;
+struct Data_TH dataEncoderJsonMqtt;
 //LCD
 //SD CArd
 SPIClass SDSPI(HSPI);
@@ -53,8 +53,8 @@ WiFiClient espClient;
 /*
 SaveData
 */
-bool loadWiFiConf();
-bool saveWiFiConf(void);
+//bool loadWiFiConf();
+bool saveWiFiConf(void){ return setChar((char*)&WiFiConf, sizeof(WiFiConf)); }
 /*
 Button
 */
@@ -111,7 +111,7 @@ void WiFiEvent(WiFiEvent_t event);
 void wifigotip();
 void wifiOnDisconnect(WiFiEventInfo_t info);
 void parseBytes1(const char* str, char sep, int address, int maxBytes, int base);
-void wifi_connect(byte _mode, wifi_mode_t wifi_mode, char* ssid, char* password, char* ap_ssid);
+void wifi_connect(byte _mode, wifi_mode_t wifi_mode, char* ssid, char* password, char* ap_ssid, bool statusModbus);
 void wifi_staticip(char* ip_in, char* gateway_in, char* subnet_in);
 int32_t getRSSI(const char* target_ssid);
 
@@ -147,8 +147,8 @@ void printProgress(size_t prg, size_t sz) {
 #define WEBSOCKET_PORT 83
 #endif
 */
-//////////////////////////////////////////////////////////////////
-////// Khoi tao gia trị mac dinh ////////////////////////////
+////////////////////////////////////////////////////////////////////
+////// Khoi tao gia trị mac dinh //////////////////////////////////
 //////////////////////////////////////////////////////////////////
 void khoiTaoGiaTri(boolean firstTime = true) {
 	if (firstTime) {
@@ -201,24 +201,17 @@ void setup()
 	xSignal_Display_checkdone = xSemaphoreCreateCounting(2, 0);
 	xreset_id_nv = xSemaphoreCreateCounting(2, 0);
 	xResetRfidMaRo = xSemaphoreCreateCounting(2, 0);
-	//xMutexRS485 = xSemaphoreCreateMutex();
 	xMutexMQTT= xSemaphoreCreateMutex();
 
-	EEPROM.begin(1024);
+	settingEprom();
 	stateMachine.getIdControl();
 	stateMachine.getPowerRFID();
-
-#ifdef debug_UART
-	Serial.print("ID Device : ");
-	Serial.println(stateMachine.hardwareId);
-#endif
 	// Doc Eprom va khoi tao gia tri
-
-	loadWiFiConf();
+	//loadWiFiConf();
+	getChart((char*)&WiFiConf,sizeof(WiFiConf));
 	khoiTaoGiaTri();
 	if (!SPIFFS.begin(true)) {
 #ifdef debug_UART
-
 		printf("An Error has occurred while mounting SPIFFS\n");
 #endif
 	}
@@ -242,9 +235,7 @@ void setup()
 	}
 	else rtc.writeSqwPinMode(DS3231_OFF);
 #ifdef using_sta
-	wifi_connect(0, WIFI_STA, WiFiConf.sta_ssid, WiFiConf.sta_pwd, WiFiConf.ap_ssid);
-#else
-	wifi_connect(1, WIFI_AP, WiFiConf.sta_ssid, WiFiConf.sta_pwd, WiFiConf.ap_ssid);
+	wifi_connect(0, WIFI_STA, WiFiConf.sta_ssid, WiFiConf.sta_pwd, WiFiConf.ap_ssid,false);
 #endif
 	wifi_staticip(WiFiConf.sta_ip, WiFiConf.sta_gateway, WiFiConf.sta_subnet);
 	WiFi.onEvent(WiFiEvent);
@@ -262,9 +253,7 @@ void setup()
 	Debug.showProfiler(true); // Profiler (Good to measure times, to optimize codes)
 	Debug.showColors(true); // Colors
 #endif
-
 	Update.onProgress(printProgress);
-
 	//Free RTOS
 	xTaskCreatePinnedToCore(
 		Check_button,   /* Function to implement the task */
@@ -275,37 +264,37 @@ void setup()
 		NULL,       /* Task handle. */
 		0);  /* Core where the task should run */
 	xTaskCreatePinnedToCore(
-		Display,   /* Function to implement the task */
-		"Display", /* Name of the task */
-		4096,      /* Stack size in words */
-		NULL,       /* Task input parameter */
-		12,          /* Priority of the task */
-		NULL,       /* Task handle. */
-		0);  /* Core where the task should run */
+		Display,   
+		"Display", 
+		4096,      
+		NULL,       
+		12,          
+		NULL,       
+		0);  
 	xTaskCreatePinnedToCore(
-		TaskCAN,   /* Function to implement the task */
-		"TaskCAN", /* Name of the task */
-		3072,      /* Stack size in words */
-		NULL,       /* Task input parameter */
-		13,          /* Priority of the task */
-		NULL,       /* Task handle. */
-		1);  /* Core where the task should run */
+		TaskCAN,   
+		"TaskCAN",
+		3072,     
+		NULL,      
+		13,         
+		NULL,       
+		1);  
 	xTaskCreatePinnedToCore(
-		http_re,   /* Function to implement the task */
-		"http_re", /* Name of the task */
-		4096,      /* Stack size in words */
-		NULL,       /* Task input parameter */
-		14,          /* Priority of the task */
-		NULL,       /* Task handle. */
-		1);  /* Core where the task should run */
+		http_re,   
+		"http_re", 
+		4096,     
+		NULL,       
+		14,         
+		NULL,      
+		1);  
 	xTaskCreatePinnedToCore(
-		TaskRFID,   /* Function to implement the task */
-		"TaskRFID", /* Name of the task */
-		3072,      /* Stack size in words */
-		NULL,       /* Task input parameter */
-		15,          /* Priority of the task */
-		NULL,       /* Task handle. */
-		1);  /* Core where the task should run */
+		TaskRFID,  
+		"TaskRFID", 
+		3072,      
+		NULL,       
+		15,         
+		NULL,       
+		1);  
 	  //MQTT
 	mqttReconnectTimer = xTimerCreate("mqttTimer", pdMS_TO_TICKS(2000), pdFALSE, (void*)0, reinterpret_cast<TimerCallbackFunction_t>(ConnectToMqtt));
 	mqttClient.onConnect(onMqttConnect);
@@ -329,14 +318,14 @@ void loop()
 	Debug.handle();
 #endif   
 	vTaskDelayUntil(&xLastWakeTimeLoop, 20);
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////
 	//////  Reconnect Wifi        /////////////////////////////
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////
 	if (statusPeripheral.wifi.statusConnectAP == false) {
 		if ((statusPeripheral.wifi.counterWifiDisconnect == 15) && (xTaskGetTickCount() - statusPeripheral.wifi.lastTimeConnect > 500)) {
 			statusPeripheral.wifi.lastTimeConnect = xTaskGetTickCount();
 			WiFi.disconnect(true);
-			wifi_connect(2, WIFI_AP_STA, WiFiConf.sta_ssid, WiFiConf.sta_pwd, (char*)"esp32");
+			wifi_connect(2, WIFI_AP_STA, WiFiConf.sta_ssid, WiFiConf.sta_pwd, (char*)"esp32", false);
 			statusPeripheral.wifi.counterWifiDisconnect++;
 #ifdef debug_UART
 			printf("Wifi 2 che do: AP va STA\n");
@@ -348,7 +337,7 @@ void loop()
 		else if ((statusPeripheral.wifi.counterWifiDisconnect < 15) && (xTaskGetTickCount() - statusPeripheral.wifi.lastTimeConnect > 1000)) {
 			statusPeripheral.wifi.lastTimeConnect = xTaskGetTickCount();
 			statusPeripheral.wifi.counterWifiDisconnect = statusPeripheral.wifi.counterWifiDisconnect + 1;
-			wifi_connect(0, WIFI_STA, WiFiConf.sta_ssid, WiFiConf.sta_pwd, WiFiConf.ap_ssid);
+			wifi_connect(0, WIFI_STA, WiFiConf.sta_ssid, WiFiConf.sta_pwd, WiFiConf.ap_ssid,false);
 		}
 	}
 	/*
@@ -376,8 +365,8 @@ void loop()
 	}
 
 	//////////////////////////////////////////////////////////////////
-	////// lasttime yêu cau server tra data ////////////////////////////
-	//////////////////////////////////////////////////////////////////
+	////// lasttime yêu cau server tra data /////////////////////////
+	////////////////////////////////////////////////////////////////
 	if ((statusPeripheral.mqtt.statusMqttConnect) && (stateMachine.deviceStatus == deviceSetting)) {
 		if ((xTaskGetTickCount() - statusPeripheral.mqtt.lastTimeGetDataConfig > 1000) || (statusPeripheral.mqtt.lastTimeGetDataConfig == 0)) {
 			statusPeripheral.mqtt.lastTimeGetDataConfig = xTaskGetTickCount();
@@ -385,7 +374,7 @@ void loop()
 		}
 	}
 	///////////////////////////////////////////////////////////////////////
-	/// 1 giay nhan timestamp 1 lan ///////////////////////////////////////
+	/// 1 giay nhan timestamp 1 lan //////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////
 	if (xTaskGetTickCount() - statusPeripheral.RTC.lastTimeGetTimeStamp > 1000) {
 		statusPeripheral.RTC.lastTimeGetTimeStamp = xTaskGetTickCount();

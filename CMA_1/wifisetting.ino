@@ -4,12 +4,11 @@
   https://demo-dijiudu.readthedocs.io/en/latest/api-guides/wifi.html
   [AsyncTCP.cpp:953] _poll(): 0x3ffe16e0 != 0x3ffe2678
 */
-//////////////////////////////////////
-// GEt RSSI Theo Name Wifi//////////////
+///////////////////////////////////////////
+// GEt RSSI Theo Name Wifi  //////////////
 /////////////////////////////////////////
 int32_t getRSSI(const char* target_ssid) {
 	byte available_networks = WiFi.scanNetworks();
-
 	for (int network = 0; network < available_networks; network++) {
 		if (strcmp(WiFi.SSID(network).c_str(), target_ssid) == 0) {
 			return WiFi.RSSI(network);
@@ -17,8 +16,8 @@ int32_t getRSSI(const char* target_ssid) {
 	}
 	return 0;
 }
-//////////////////////////////////////////////////////////////////
-////// even wifi mat ket noi ////////////////////////////
+////////////////////////////////////////////////////////////////////
+////// even wifi mat ket noi           ////////////////////////////
 //////////////////////////////////////////////////////////////////
 void wifiOnDisconnect(WiFiEventInfo_t info)
 {
@@ -44,21 +43,21 @@ void wifiOnDisconnect(WiFiEventInfo_t info)
 #ifdef debug_Web
 		DebugError("Wifi: assoc leave");
 #endif
-		wifi_connect(0, WIFI_STA, WiFiConf.sta_ssid, WiFiConf.sta_pwd, WiFiConf.ap_ssid);
+		wifi_connect(0, WIFI_STA, WiFiConf.sta_ssid, WiFiConf.sta_pwd, WiFiConf.ap_ssid, false);
 	}
 	/*
-	   reason 201 la no AP found
+	   reason 201:  no AP found
 	*/
 }
-//////////////////////////////////////////////////////////////////
-////// Event wifi nhan IP ////////////////////////////
+////////////////////////////////////////////////////////////////////
+////// Event wifi nhan IP /////////////////////////////////////////
 //////////////////////////////////////////////////////////////////
 void wifigotip()
 {
 	if (statusPeripheral.wifi.ApConnect) {
 		//WiFi.disconnect(true);
 		WiFi.softAPdisconnect();
-		wifi_connect(0, WIFI_STA, WiFiConf.sta_ssid, WiFiConf.sta_pwd, WiFiConf.ap_ssid);
+		wifi_connect(0, WIFI_STA, WiFiConf.sta_ssid, WiFiConf.sta_pwd, WiFiConf.ap_ssid, false);
 		return;
 	}
 	statusPeripheral.wifi.statusConnectAP = true;
@@ -75,8 +74,8 @@ void wifigotip()
 	free(time_blink);
 	ConnectToMqtt();
 }
-//////////////////////////////////////////////////////////////////
-////// event trang thai wifi ////////////////////////////
+////////////////////////////////////////////////////////////////////
+////// event trang thai wifi //////////////////////////////////////
 //////////////////////////////////////////////////////////////////
 void WiFiEvent(WiFiEvent_t event)
 {
@@ -92,8 +91,8 @@ void WiFiEvent(WiFiEvent_t event)
 	default: break;
 	}
 }
-//////////////////////////////////////////////////////////////////
-////// stach data ip ////////////////////////////
+////////////////////////////////////////////////////////////////////
+////// tach data ip //////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////
 void parseBytes1(const char* str, char sep, int address, int maxBytes, int base) {
 	for (int i = 0; i < maxBytes; i++) {
@@ -107,10 +106,16 @@ void parseBytes1(const char* str, char sep, int address, int maxBytes, int base)
 		str++;
 	}
 }
+////////////////////////////////////////////////////////////////////
+////// Cai dat che do wifi ////////////////////////////////////////
 //////////////////////////////////////////////////////////////////
-////// Cai dat che do wifi ////////////////////////////
-//////////////////////////////////////////////////////////////////
-void wifi_connect(byte _mode, wifi_mode_t wifi_mode, char* ssid, char* password, char* ap_ssid) {
+void wifi_connect(byte _mode, wifi_mode_t wifi_mode, char* ssid, char* password, char* ap_ssid , bool statusModbus) {
+	if (modbusData.connectAP) { //Neu Nhan cai dat tu HMI thi khong duoc reset
+		return;
+	}
+	if (statusModbus) {
+		modbusData.connectAP = true;
+	}
 	WiFi.disconnect(true);///
 	WiFi.mode(wifi_mode);
 	if (_mode == 0) {
@@ -127,8 +132,8 @@ void wifi_connect(byte _mode, wifi_mode_t wifi_mode, char* ssid, char* password,
 		WiFi.softAP(ap_ssid, "12345678");
 	}
 }
-//////////////////////////////////////////////////////////////////
-////// Cai dat static ip cho wifi  ////////////////////////////
+////////////////////////////////////////////////////////////////////
+////// Cai dat static ip cho wifi  ////////////////////////////////
 //////////////////////////////////////////////////////////////////
 void wifi_staticip(char* ip_in, char* gateway_in, char* subnet_in) {
 	//if (atoi(WiFiConf.choose_dhcp) == 0){

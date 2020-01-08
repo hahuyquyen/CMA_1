@@ -4,6 +4,15 @@ bool cb(Modbus::ResultCode event, uint16_t transactionId, void* data) {
 	//Serial.printf_P("Request result: 0x%02X, Mem: %d\n", event, transactionId);
 	return true;
 }
+
+uint16_t modbus485HMI::readDataHMI(uint16_t address, uint8_t numByte) {
+	uint16_t tv = 0;
+	if (!slave()) {
+		readHreg(idHMI, address, &tv, numByte, cb);
+		while (slave()) { task(); }
+	}
+	return tv;
+}
 void modbus485HMI::senDataToDevice(uint16_t address, uint16_t* kytu, uint8_t numByte) {
 	if (!slave()) {
 		if (xSemaphoreTake(xMutexRS485, 1)) {

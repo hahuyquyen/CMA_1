@@ -1,4 +1,4 @@
-#ifndef TASK_Can_H
+﻿#ifndef TASK_Can_H
 #define TASK_Can_H
   #include "Arduino.h"
   #include "StructCan.h"
@@ -19,7 +19,7 @@
   #define canStartByte 0x3D
   #define canStopByte 0x0D
   #define canNULLByte 0x20
-  
+  #define timeSche 1000   ///1000ms sẽ gửi data tới queue 1 lần  
   extern QueueHandle_t Queue_can;
   extern double can_data;
   static uint8_t UartCanData[11];

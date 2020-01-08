@@ -28,7 +28,7 @@ void SdReInit(File* masterFile) {
 	delay(200);
 	if (!SD.begin(15, SDSPI, 6000000)) {
 		statusPeripheral.mqtt.timeTruyenMQTT = 3000;
-#ifdef debug_UART
+#ifdef debug_UART`																																																``````																							
 		Serial.println("Reinit Card : Failed");
 #endif
 #ifdef debug_Web

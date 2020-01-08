@@ -4,6 +4,7 @@
 //////////////////////////////////////////////////////////////////
 ////// Save Data EPPROOM //////////////////////////////////////
 //////////////////////////////////////////////////////////////////
+/*
 bool loadWiFiConf() {
 	if (EEPROM.read(WIFI_CONF_START + 0) == wifi_conf_format[0] &&
 		EEPROM.read(WIFI_CONF_START + 1) == wifi_conf_format[1] &&
@@ -16,17 +17,21 @@ bool loadWiFiConf() {
 		return true;
 	}
 	return false;
-}
+}*/
 //////////////////////////////////////////////////////////////////
 ////// Load Data eprom //////////////////////////////////////
 //////////////////////////////////////////////////////////////////
-bool saveWiFiConf(void) {
+/*bool saveWiFiConf(void) {
 	for (unsigned int t = 0; t < sizeof(WiFiConf); t++) {
 		EEPROM.write(WIFI_CONF_START + t, *((char*)&WiFiConf + t));
 	}
 	return EEPROM.commit();
+}*/
+/*
+bool saveWiFiConf(void) {
+	return setChar((char*)&WiFiConf, sizeof(WiFiConf));
 }
-
+*/
 /*
   bool loaddata() {
 	uint8_t bien=0;

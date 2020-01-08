@@ -10,8 +10,14 @@ static struct modbusDataConf {
 	uint16_t dataTruyen[20];
 	unsigned long timeSendSSID;
 	unsigned long timeSendKg;
-}modbusData;
-
+	bool connectAP;
+}modbusData = {
+	0,
+	0,
+	0,
+	false
+};
+//modbusData.connectAP
 
 // struct statusPeripheralConf *poinstatusPeripheral = &statusPeripheral;
 

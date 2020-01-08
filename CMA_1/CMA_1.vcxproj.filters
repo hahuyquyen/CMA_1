@@ -23,7 +23,6 @@
     <None Include="SDCARD.ino" />
     <None Include="Task_CheckData.ino" />
     <None Include="TASK_display.ino" />
-    <None Include="UART_Inter.ino" />
     <None Include="webserver.ino" />
     <None Include="wifisetting.ino" />
   </ItemGroup>
