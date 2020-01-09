@@ -14,12 +14,12 @@
 	    <div class="row"> 
 			<label for="button">DHCP :<span class="req"></span></label>
 			<select name='button' class="dropbtn" >
-			<script type="text/javascript">
-						var bien= %CHOOSEDHCP%
-						if (bien==0) {document.write("<option value=\"0\" selected>STATIC</option><option value=\"1\" >DHCP</option>") }
-						else {document.write("<option value=\"0\">STATIC</option><option value=\"1\" selected >DHCP</option>")}
-			</script>	 
-			 </select> 
+				<script type="text/javascript">
+					var bien= %CHOOSEDHCP%
+					if (bien==0) {document.write("<option value=\"0\" selected>STATIC</option><option value=\"1\" >DHCP</option>") }
+					else {document.write("<option value=\"0\">STATIC</option><option value=\"1\" selected >DHCP</option>")}
+				</script>	 
+			</select> 
 		</div> 
 		<p></p>
 		 <!--
@@ -41,20 +41,19 @@
             <input type="text" name="html_ssid" class="txt" value="%SSID%">
         </div>
         <div class="row">
-                <label for="html_wpa_password">Pass:<span class="req"></span></label>
-                <input type="password" name="html_wpa_password" class="txt" value="%PASS%">
+            <label for="html_wpa_password">Pass:<span class="req"></span></label>
+            <input type="password" name="html_wpa_password" class="txt" value="%PASS%">
         </div>
         <div class="row"><label for="html_ip_wifi">ip:<span class="req"></span></label>
-                    <input type="text" name="html_ip_wifi" class="txt" value="%IP%">
+            <input type="text" name="html_ip_wifi" class="txt" value="%IP%">
         </div>
         <div class="row"><label for="html_gateway_wifi">Gateway:<span class="req"></span></label>
-                        <input type="text" name="html_gateway_wifi" class="txt" value="%GATEWAY%">
+            <input type="text" name="html_gateway_wifi" class="txt" value="%GATEWAY%">
         </div>
-		 <div class="row"><label for="html_sub_wifi">SUB :<span class="req"></span></label>
-                    <input type="text" name="html_sub_wifi" class="txt" value="%SUB%">
-         </div>
-                    <input type="submit" id="submitbtn" name="submitbtn" tabindex="5" value="Send">
-
+		<div class="row"><label for="html_sub_wifi">SUB :<span class="req"></span></label>
+            <input type="text" name="html_sub_wifi" class="txt" value="%SUB%">
+        </div>
+        <input type="submit" id="submitbtn" name="submitbtn" tabindex="5" value="Send">
     </form>
     <p></p>
 </body>
