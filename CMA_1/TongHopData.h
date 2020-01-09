@@ -5,8 +5,9 @@
 #include "StructRFID.h"
 #include "StructData.h"
 #include "Config.h"
+#include <RemoteDebug.h>
 
-
+extern RemoteDebug Debug;
 extern QueueHandle_t Queue_can;
 extern QueueHandle_t QueueRfidRo;
 extern QueueHandle_t QueueRfidNV;

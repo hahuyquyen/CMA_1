@@ -20,7 +20,6 @@
     <None Include="functions.ino" />
     <None Include="MQTT.ino" />
     <None Include="SDCARD.ino" />
-    <None Include="Task_CheckData.ino" />
     <None Include="TASK_display.ino" />
     <None Include="webserver.ino" />
     <None Include="wifisetting.ino" />
@@ -63,9 +62,6 @@
       <Filter>Resource Files</Filter>
     </ClInclude>
     <ClInclude Include="TongHopData.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="function.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -58,7 +58,7 @@ String processor(const String& var) {
 		return atoi(WiFiConf.choose_dhcp) == 1 ? String(1) : String(0);
 	}
 	else if (var == F("VERSION")) {
-		return String("V1.1 9/1/2020");
+		return String("V1.1 Ngày 9/1/2020");
 	}
 	return String();
 }

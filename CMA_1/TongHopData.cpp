@@ -22,16 +22,11 @@ void http_re(void* pvParameters) {
 
 	for (;;) {
 		boolean baoLed = false;
-		/*
-		 * Nhận Cân
-		 */
+
 		if (xQueueReceive(Queue_can, &Data_CAN_TH, (TickType_t)1) == pdPASS) {
 			lastTimeGetQueueCan = xTaskGetTickCount();
 		}
-		/*
-		 * Nhận mã RFID mã Rổ
-		 * Nếu khu fille thì không nhận mã rỗ.
-		 */
+
 		if (xQueueReceive(QueueRfidRo, &dataRfidRoTH, (TickType_t)1) == pdPASS) {
 			if (strcmp(dataRfidRoTH.id_RFID, "000000000000000000000000") != 0) {
 				baoLed = true;
@@ -40,15 +35,20 @@ void http_re(void* pvParameters) {
 				}
 			}
 		}
-		/*
-		 * Nhận mã RFID
-		 * Nếu là khu Filler chỉ nhận mã rỗ thì swap time tới mã rỗ để khỏi viết lại code
-		 */
+
+		//Nhận mã RFID
+		//Nếu là khu Filler chỉ nhận mã rỗ thì swap time tới mã rỗ để khỏi viết lại code
+
 		if (xQueueReceive(QueueRfidNV, &dataRfidNvTH, (TickType_t)1) == pdPASS) {
 			if (strcmp(dataRfidNvTH.id_RFID, "000000000000000000000000") != 0) {
 				baoLed = true;
 				if (stateMachine.giaidoanKV == kvFille) { lastTimeGetQueueRFID_Ro = xTaskGetTickCount(); }
 				else lastTimeGetQueueRFID_NV = xTaskGetTickCount();
+			}
+			else {
+#ifdef debug_Web
+				DebugData("Error RFID = 0");
+#endif
 			}
 		}
 		//////////////////////////////////////////
@@ -88,24 +88,24 @@ void http_re(void* pvParameters) {
 					}
 					dataTHSend.data_weight = Data_CAN_TH.data_can;
 					boolean tt = true;
-					/*
-					 Kiem tra giai doan sua ca ngo ra, co can 2 lan
-					 Neu khac ro thi van can binh thuong
-					 neu cung ma ro trong 2 lần lien tiep phải khac so kg
-					 */
-					if (GetSttKhuVuc() == sttKvSuaCaOUT) {
-						tt = false;
-						if (strcmp(dataTHSend.id_RFID, idRFID_OLD) != 0) {
-							strncpy(idRFID_OLD, dataTHSend.id_RFID, sizeof(dataTHSend.id_RFID));
-							if (Data_CAN_TH.data_can > 0.5) tt = true;
-							canDataOutOld = Data_CAN_TH.data_can;
+					///
+					// Kiem tra giai doan sua ca ngo ra, co can 2 lan
+					// Neu khac ro thi van can binh thuong
+					// neu cung ma ro trong 2 lần lien tiep phải khac so kg
+					
+						if (GetSttKhuVuc() == sttKvSuaCaOUT) {
+							tt = false;
+							if (strcmp(dataTHSend.id_RFID, idRFID_OLD) != 0) {
+								strncpy(idRFID_OLD, dataTHSend.id_RFID, sizeof(dataTHSend.id_RFID));
+								if (Data_CAN_TH.data_can > 0.5) tt = true;
+								canDataOutOld = Data_CAN_TH.data_can;
+							}
+							else {
+								double tam = Data_CAN_TH.data_can > canDataOutOld ? Data_CAN_TH.data_can - canDataOutOld : canDataOutOld - Data_CAN_TH.data_can;
+								if ((tam > 0.3) && (Data_CAN_TH.data_can > 0.5)) { tt = true; }
+								canDataOutOld = Data_CAN_TH.data_can;
+							}
 						}
-						else {
-							double tam = Data_CAN_TH.data_can > canDataOutOld ? Data_CAN_TH.data_can - canDataOutOld : canDataOutOld - Data_CAN_TH.data_can;
-							if ((tam > 0.3) && (Data_CAN_TH.data_can > 0.5)) { tt = true; }
-							canDataOutOld = Data_CAN_TH.data_can;
-						}
-					}
 					////////////////
 					if (tt) {
 						xQueueSend(Queue_display, &dataTHSend, xTicksToWait);
@@ -113,6 +113,9 @@ void http_re(void* pvParameters) {
 							xSemaphoreGive(xreset_id_nv);
 						}
 						else { // nêu khong có check 2 lan thi gui mqtt 
+#ifdef debug_Web
+							DebugData("CHECK OUT: Time: %ld - Kg: %f - RFID: %s", timeCompareMode1, dataTHSend.data_weight, dataTHSend.id_RFID);
+#endif
 							xQueueSend(Queue_mqtt, &dataTHSend, xTicksToWait);
 						}
 					}
@@ -124,6 +127,9 @@ void http_re(void* pvParameters) {
 			}
 
 			else if ((lastTimeGetQueueRFID_Ro > 0) && (xTaskGetTickCount() - lastTimeGetQueueRFID_Ro > time_2_lan_nhan_data)) {
+#ifdef debug_Web
+				DebugData("Over time: Ma Ro va Can");
+#endif
 				lastTimeGetQueueRFID_Ro = 0;
 				xSemaphoreGive(xreset_id_nv);
 				// if ((inforServer.giaiDoan.arrayType[inforServer.giaiDoan.userSelect] != kvSuaCa)||(inforServer.giaiDoan.cheDoInOut == cheDoOut)){
@@ -145,7 +151,9 @@ void http_re(void* pvParameters) {
 					if (timeCompareMode2 < time_cho_nhan_RFID_NV) {
 						lastTimeGetData_RoVaCan = lastTimeGetQueueRFID_NV;
 						strncpy(dataTHSend.id_RFID_NV, dataRfidNvTH.id_RFID, sizeof(dataRfidNvTH.id_RFID));
-
+#ifdef debug_Web
+						DebugData("CHECK IN: Time: %ld - Kg: %f - RFID: %s - RFID NV: %s", timeCompareMode2, dataTHSend.data_weight, dataTHSend.id_RFID, dataTHSend.id_RFID_NV);
+#endif
 						xQueueSend(Queue_display, &dataTHSend, xTicksToWait);
 						xQueueSend(Queue_mqtt, &dataTHSend, xTicksToWait);
 						timeCompareMode2 = 10000;
@@ -155,7 +163,9 @@ void http_re(void* pvParameters) {
 					else {
 						xSemaphoreGive(xSignal_Display_checkdone);
 						lastTimeGetQueueRFID_NV = 0;
-
+#ifdef debug_Web
+						DebugData("TIme out check rfid nv");
+#endif
 					}
 				}
 				else if ((lastTimeGetData_RoVaCan > 0)
@@ -163,7 +173,9 @@ void http_re(void* pvParameters) {
 				{
 					xSemaphoreGive(xResetRfidMaRo); // Gửi tín hiệu để reset mã rỗ
 					lastTimeGetData_RoVaCan = 0;
-
+#ifdef debug_Web
+					DebugData("Over time: Ma NV va ");
+#endif
 					xSemaphoreGive(xSignal_Display_checkdone);
 				}
 			}

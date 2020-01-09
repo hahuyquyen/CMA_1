@@ -48,7 +48,10 @@ void onPressed_ok() {
 		else stateMachine.bottonSelect = stateChooseNhaCC;
 	}
 	else stateMachine.bottonSelect = stateMachine.bottonSelect + 1;
-	if (stateMachine.bottonSelect > 4) {
+	// Bo qua buoc chon confirm 
+	if (stateMachine.bottonSelect == stateChooseConfirm) { stateMachine.bottonSelect = stateChooseRunning; }
+	
+	if (stateMachine.bottonSelect > 4) { 
 		stateMachine.deviceStatus = deviceRunning;
 	}
 	if (stateMachine.deviceStatus == deviceSetting) { variLcdUpdate.stateDisplayLCD = 1; }
