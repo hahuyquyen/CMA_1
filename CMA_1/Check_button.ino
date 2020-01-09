@@ -28,7 +28,7 @@ void onPressed_right() {
 		inforServer.changeData(true, &inforServer.thanhPham.userSelect, inforServer.thanhPham.total);
 	}
 	if (stateMachine.deviceStatus == deviceSetting) { variLcdUpdate.stateDisplayLCD = 1; }
-	variLcdUpdate.numScroll = 0;
+	//variLcdUpdate.numScroll = 0;
 	variLcdUpdate.updateLCD = true;
 #ifdef debug_Web
 	DebugData("Button - onPressed Right");
@@ -52,12 +52,12 @@ void onPressed_ok() {
 		stateMachine.deviceStatus = deviceRunning;
 	}
 	if (stateMachine.deviceStatus == deviceSetting) { variLcdUpdate.stateDisplayLCD = 1; }
-	variLcdUpdate.numScroll = 0;
+	//variLcdUpdate.numScroll = 0;
 	variLcdUpdate.updateLCD = true;
 }
 //////////////////////////////////////////////////////////////////
-////// Button EXit ///////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////
+////// Button EXit //////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
 void onPressedExit() {
 	stateMachine.bottonSelect = 0;
 	stateMachine.deviceStatus = deviceSetting;
@@ -72,8 +72,8 @@ void onPressedExit() {
 	variLcdUpdate.updateLCD = true;
 }
 //////////////////////////////////////////////////////////////////
-////// Button Error ///////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////
+////// Button Error /////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
 /*void onPressedError() {
 #ifdef debug_Web
 	DebugData("Button - onPressed_Error");

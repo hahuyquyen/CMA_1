@@ -62,6 +62,12 @@
     <ClInclude Include="VarriableData.h">
       <Filter>Resource Files</Filter>
     </ClInclude>
+    <ClInclude Include="TongHopData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="function.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cutf.cpp">
@@ -77,6 +83,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Modbus485.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TongHopData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

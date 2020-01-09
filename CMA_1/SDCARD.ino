@@ -28,9 +28,6 @@ void SdReInit(File* masterFile) {
 	delay(200);
 	if (!SD.begin(15, SDSPI, 6000000)) {
 		statusPeripheral.mqtt.timeTruyenMQTT = 3000;
-#ifdef debug_UART`																																																``````																							
-		Serial.println("Reinit Card : Failed");
-#endif
 #ifdef debug_Web
 		DebugData("Reinit Card : Failed");
 #endif
@@ -57,9 +54,6 @@ void SdReOpenFolder() {
 	if (!root_CMA) {
 		statusPeripheral.sdCard.statusConnect = false;
 	}
-#ifdef debug_UART
-	Serial.println("Read Folder SD CATRĐ");
-#endif
 }
 /////////////////////////////////////////////////
 // Open Next File                   //////////////
@@ -106,17 +100,11 @@ void SdDeleteFile(fs::FS& fs, const char* path) {
   //////////////////////////////////////////////////////////////////
 
 void SdRenameFile(fs::FS& fs, const char* path1, const char* path2) {
-#ifdef debug_UART
-	Serial.printf("Rename %s to %s\n", path1, path2);
-#endif
 #ifdef debug_Web
 	DebugData("Rename %s to %s", path1, path2);
 #endif
 	if (!fs.rename(path1, path2)) {
 		statusPeripheral.sdCard.statusConnect = false;
-#ifdef debug_UART
-		Serial.println("Rename failed");
-#endif
 #ifdef debug_Web
 		DebugData("Rename failed");
 #endif
@@ -136,13 +124,13 @@ void SdReadFile(fs::FS& fs, const char* path, uint32_t len) {
 	uint8_t numLineRepeat = 0;
 	while (file.available()) {
 		msg1[num_] = file.read();
-		if (msg1[num_] == 'r') { numLineRepeat = num_; } // vi tri truong r la rêpat
+		if (msg1[num_] == 'r') { numLineRepeat = num_; }
 		num_ = num_ + 1;
 	}
 	msg1[num_] = '\0';
 	file.close();
 	uint8_t numCounterACK = (uint8_t)msg1[numLineRepeat + 3];
-	if (numCounterACK < 52) {  //48~0 -> 52~4
+	if (numCounterACK < 52) {  //ascii to number : 48~0 -> 52~4
 		numCounterACK = numCounterACK + 1;
 		msg1[numLineRepeat + 3] = numCounterACK;
 		SdWriteFile(SD, path, msg1);

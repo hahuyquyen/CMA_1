@@ -111,7 +111,6 @@ typedef long pthread_cond_t;
 #include "MQTT.ino"
 #include "SDCARD.ino"
 #include "TASK_display.ino"
-#include "Task_CheckData.ino"
 #include "functions.ino"
 #include "webserver.ino"
 #include "wifisetting.ino"

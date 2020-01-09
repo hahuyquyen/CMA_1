@@ -1,6 +1,6 @@
 
 
-
+/*
 void http_re(void* pvParameters) {
 	const TickType_t xTicksToWait = pdMS_TO_TICKS(1);
 	struct dataCan Data_CAN_TH;
@@ -22,16 +22,11 @@ void http_re(void* pvParameters) {
 
 	for (;;) {
 		boolean baoLed = false;
-		/*
-		 * Nhận Cân
-		 */
+
 		if (xQueueReceive(Queue_can, &Data_CAN_TH, (TickType_t)1) == pdPASS) {
 			lastTimeGetQueueCan = xTaskGetTickCount();
 		}
-		/*
-		 * Nhận mã RFID mã Rổ
-		 * Nếu khu fille thì không nhận mã rỗ.
-		 */
+
 		if (xQueueReceive(QueueRfidRo, &dataRfidRoTH, (TickType_t)1) == pdPASS) {
 			if (strcmp(dataRfidRoTH.id_RFID, "000000000000000000000000") != 0) {
 				baoLed = true;
@@ -40,10 +35,10 @@ void http_re(void* pvParameters) {
 				}
 			}
 		}
-		/*
-		 * Nhận mã RFID
-		 * Nếu là khu Filler chỉ nhận mã rỗ thì swap time tới mã rỗ để khỏi viết lại code
-		 */
+		
+		 //Nhận mã RFID
+		 //Nếu là khu Filler chỉ nhận mã rỗ thì swap time tới mã rỗ để khỏi viết lại code
+		 
 		if (xQueueReceive(QueueRfidNV, &dataRfidNvTH, (TickType_t)1) == pdPASS) {
 			if (strcmp(dataRfidNvTH.id_RFID, "000000000000000000000000") != 0) {
 				baoLed = true;
@@ -93,11 +88,11 @@ void http_re(void* pvParameters) {
 					}
 					dataTHSend.data_weight = Data_CAN_TH.data_can;
 					boolean tt = true;
-					/*
-					 Kiem tra giai doan sua ca ngo ra, co can 2 lan
-					 Neu khac ro thi van can binh thuong
-					 neu cung ma ro trong 2 lần lien tiep phải khac so kg
-					 */
+					///
+					// Kiem tra giai doan sua ca ngo ra, co can 2 lan
+					// Neu khac ro thi van can binh thuong
+					// neu cung ma ro trong 2 lần lien tiep phải khac so kg
+					 /
 					if (GetSttKhuVuc() == sttKvSuaCaOUT) {
 						tt = false;
 						if (strcmp(dataTHSend.id_RFID, idRFID_OLD) != 0) {
@@ -111,16 +106,13 @@ void http_re(void* pvParameters) {
 							canDataOutOld = Data_CAN_TH.data_can;
 						}
 					}
+					////////////////
 					if (tt) {
 						xQueueSend(Queue_display, &dataTHSend, xTicksToWait);
 						if (GetSttKhuVuc() == sttKvSuaCaIN) {   //Neu Sua Ca Ngo Vao thi reset ma Nhan vien
 							xSemaphoreGive(xreset_id_nv);
 						}
-						else { // nêu khong có check 2 lan thi gui mqtt
-#ifdef debug_UART  
-
-					  //printf("CHECK OUT: Time: %ld - Kg: %f - RFID: %s \n",timeCompareMode1,dataTHSend.data_weight,dataTHSend.id_RFID);
-#endif 
+						else { // nêu khong có check 2 lan thi gui mqtt 
 #ifdef debug_Web
 							DebugData("CHECK OUT: Time: %ld - Kg: %f - RFID: %s", timeCompareMode1, dataTHSend.data_weight, dataTHSend.id_RFID);
 #endif
@@ -135,9 +127,6 @@ void http_re(void* pvParameters) {
 			}
 
 			else if ((lastTimeGetQueueRFID_Ro > 0) && (xTaskGetTickCount() - lastTimeGetQueueRFID_Ro > time_2_lan_nhan_data)) {
-#ifdef debug_UART
-				printf("Over time: Ma Ro va Can \n");
-#endif 
 #ifdef debug_Web
 				DebugData("Over time: Ma Ro va Can");
 #endif
@@ -162,9 +151,6 @@ void http_re(void* pvParameters) {
 					if (timeCompareMode2 < time_cho_nhan_RFID_NV) {
 						lastTimeGetData_RoVaCan = lastTimeGetQueueRFID_NV;
 						strncpy(dataTHSend.id_RFID_NV, dataRfidNvTH.id_RFID, sizeof(dataRfidNvTH.id_RFID));
-#ifdef debug_UART
-						printf("CHECK IN: Time: %ld - Kg: %f - RFID: %s - RFID NV: %s\n", timeCompareMode2, dataTHSend.data_weight, dataTHSend.id_RFID, dataTHSend.id_RFID_NV);
-#endif
 #ifdef debug_Web
 						DebugData("CHECK IN: Time: %ld - Kg: %f - RFID: %s - RFID NV: %s", timeCompareMode2, dataTHSend.data_weight, dataTHSend.id_RFID, dataTHSend.id_RFID_NV);
 #endif
@@ -177,10 +163,6 @@ void http_re(void* pvParameters) {
 					else {
 						xSemaphoreGive(xSignal_Display_checkdone);
 						lastTimeGetQueueRFID_NV = 0;
-#ifdef debug_UART   
-
-						//printf("TIme out check rfid nv \n");
-#endif
 #ifdef debug_Web
 						DebugData("TIme out check rfid nv");
 #endif
@@ -191,10 +173,6 @@ void http_re(void* pvParameters) {
 				{
 					xSemaphoreGive(xResetRfidMaRo); // Gửi tín hiệu để reset mã rỗ
 					lastTimeGetData_RoVaCan = 0;
-#ifdef debug_UART
-
-					// printf("Over time: Ma NV va \n"); 
-#endif    
 #ifdef debug_Web
 					DebugData("Over time: Ma NV va ");
 #endif
@@ -206,3 +184,4 @@ void http_re(void* pvParameters) {
 	}
 	vTaskDelete(NULL);
 }
+*/
