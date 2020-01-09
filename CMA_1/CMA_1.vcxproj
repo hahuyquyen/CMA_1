@@ -113,13 +113,7 @@
     <None Include="MQTT.ino">
       <FileType>CppCode</FileType>
     </None>
-    <None Include="SaveData.ino">
-      <FileType>CppCode</FileType>
-    </None>
     <None Include="SDCARD.ino">
-      <FileType>CppCode</FileType>
-    </None>
-    <None Include="Task_CheckData.ino">
       <FileType>CppCode</FileType>
     </None>
     <None Include="TASK_display.ino">
@@ -150,6 +144,7 @@
     </ClInclude>
     <ClInclude Include="StructCan.h" />
     <ClInclude Include="Digi28SS.h" />
+    <ClInclude Include="TongHopData.h" />
     <ClInclude Include="Variable_wifi.h">
       <FileType>CppCode</FileType>
     </ClInclude>
@@ -164,6 +159,7 @@
     <ClCompile Include="Modbus485.cpp" />
     <ClCompile Include="rfid.cpp" />
     <ClCompile Include="Digi28SS.cpp" />
+    <ClCompile Include="TongHopData.cpp" />
   </ItemGroup>
   <PropertyGroup>
     <DebuggerFlavor>VisualMicroDebugger</DebuggerFlavor>

@@ -55,16 +55,12 @@ void wifiOnDisconnect(WiFiEventInfo_t info)
 void wifigotip()
 {
 	if (statusPeripheral.wifi.ApConnect) {
-		//WiFi.disconnect(true);
 		WiFi.softAPdisconnect();
 		wifi_connect(0, WIFI_STA, WiFiConf.sta_ssid, WiFiConf.sta_pwd, WiFiConf.ap_ssid, false);
 		return;
 	}
 	statusPeripheral.wifi.statusConnectAP = true;
 	statusPeripheral.wifi.counterWifiDisconnect = 0;
-#ifdef debug_UART
-	printf("Wifi %s\n", WiFi.localIP().toString().c_str());
-#endif
 #ifdef debug_Web
 	DebugData("Wifi %s", WiFi.localIP().toString().c_str());
 #endif
@@ -91,9 +87,9 @@ void WiFiEvent(WiFiEvent_t event)
 	default: break;
 	}
 }
-////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////
 ////// tach data ip //////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////
 void parseBytes1(const char* str, char sep, int address, int maxBytes, int base) {
 	for (int i = 0; i < maxBytes; i++) {
 		if (address == 1) local_IP[i] = strtoul(str, NULL, base);

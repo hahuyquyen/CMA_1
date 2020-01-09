@@ -19,9 +19,7 @@
     <None Include="Check_button.ino" />
     <None Include="functions.ino" />
     <None Include="MQTT.ino" />
-    <None Include="SaveData.ino" />
     <None Include="SDCARD.ino" />
-    <None Include="Task_CheckData.ino" />
     <None Include="TASK_display.ino" />
     <None Include="webserver.ino" />
     <None Include="wifisetting.ino" />
@@ -63,6 +61,9 @@
     <ClInclude Include="VarriableData.h">
       <Filter>Resource Files</Filter>
     </ClInclude>
+    <ClInclude Include="TongHopData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cutf.cpp">
@@ -78,6 +79,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Modbus485.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TongHopData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

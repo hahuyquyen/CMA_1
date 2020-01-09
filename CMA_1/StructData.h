@@ -15,6 +15,7 @@ const uint8_t conf_format[4] = CONF_FORMAT;
 
 static bool settingEprom() {
 	EEPROM.begin(1024);
+ return false;
 };
 
 static bool setChar(char* address, size_t chieudai) {
@@ -25,9 +26,9 @@ static bool setChar(char* address, size_t chieudai) {
 };
 static void getChart(char* address, size_t chieudai) {
 	if (EEPROM.read(CONF_START + 0) == conf_format[0] &&
-		EEPROM.read(CONF_START + 1) == conf_format[1] &&
-		EEPROM.read(CONF_START + 2) == conf_format[2] &&
-		EEPROM.read(CONF_START + 3) == conf_format[3])
+		  EEPROM.read(CONF_START + 1) == conf_format[1] &&
+		  EEPROM.read(CONF_START + 2) == conf_format[2] &&
+		  EEPROM.read(CONF_START + 3) == conf_format[3])
 	{
 		for (unsigned int t = 0; t < chieudai; t++) {
 			*(address + t) = EEPROM.read(CONF_START + t); 

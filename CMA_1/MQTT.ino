@@ -126,6 +126,7 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
 #ifdef debug_Web
 		DebugError("error js");
 #endif
+
 	}
 	else if ((strcmp(WiFiConf.mqtt_subto1, topic) == 0)
 		 || (strcmp(inforServer.mqttConfig.topicGetConfig, topic) == 0)) {
@@ -139,7 +140,8 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
 			inforServer.nhaCC.total = jsonBuffer["l"].as<uint8_t>();
 			for (int i = 0; i < inforServer.nhaCC.total; i++) {
 				if (jsonBuffer["d"][i].isNull()) {
-					inforServer.nhaCC.total = 0;return;
+					inforServer.nhaCC.total = 0;
+					return;
 				} // Fix loi thieu data
 				if (i == 15)break; //fix tran array cua data
 				inforServer.nhaCC.arrayType[i + 1] = jsonBuffer["d"][i]["i"].as<uint16_t>();
@@ -237,15 +239,18 @@ void SendDataConfigMqtt(uint8_t loaiconfig = 0, uint8_t maboxung = 0) {
 //Check Get Config /////////////////////////////////
 ///////////////////////////////////////////////////
 void checkSendMQTTConfig() {
-	if (statusPeripheral.timeStampServer == 0) {
+	if (statusPeripheral.timeStampServer == 0) 
+	{
 		SendDataConfigMqtt(mqttGetTimeStamp, 0);
 	}
 	else if ((stateMachine.giaidoanINOUT == 1)
-		&& (inforServer.nhaCC.total == 0)) {
+		&& (inforServer.nhaCC.total == 0)) 
+	{
 		SendDataConfigMqtt(mqttGetNhaCC, 0);
 	}
 	else if ((stateMachine.giaidoanINOUT == 1)
-		&& (inforServer.thanhPham.total == 0)) { // laf dau vao
+		&& (inforServer.thanhPham.total == 0)) 
+	{ // laf dau vao
 		SendDataConfigMqtt(mqttGetThanhPham, stateMachine.giaidoanKV);
 	}
 }

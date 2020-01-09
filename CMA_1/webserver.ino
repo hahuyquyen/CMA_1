@@ -57,7 +57,9 @@ String processor(const String& var) {
 	else if (var == F("CHOOSEDHCP")) {
 		return atoi(WiFiConf.choose_dhcp) == 1 ? String(1) : String(0);
 	}
-
+	else if (var == F("VERSION")) {
+		return String("V1.1 Ngày 9/1/2020");
+	}
 	return String();
 }
 /*
@@ -105,9 +107,6 @@ void getVariHtml(AsyncWebServerRequest* request, const __FlashStringHelper* id, 
 }
 void getVariIntHtml(AsyncWebServerRequest* request, const __FlashStringHelper* id, uint8_t* dataget) {
 	if (request->hasParam(id)) {
-		/*if (request->hasParam(F("i"))) {
-	stateMachine.giaidoanINOUT = request->getParam(F("i"))->value().toInt();
-}*/
 		* dataget = request->getParam(id)->value().toInt();
 	}
 }
@@ -116,7 +115,7 @@ void setupWiFiConf(void) {
 		request->send(SPIFFS, "/2.css", F("text/css"));
 		});
 	server.on("/", HTTP_GET, [](AsyncWebServerRequest* request) {
-		request->send(SPIFFS, F("/index.html"));
+		request->send(SPIFFS, F("/index.html"), String(), false, processor);
 		});
 	server.on("/wifi_conf", HTTP_GET, [](AsyncWebServerRequest* request) {
 		request->send(SPIFFS, F("/wifi_conf.html"), String(), false, processor);
@@ -133,12 +132,6 @@ void setupWiFiConf(void) {
 	server.on("/setKhuVuc", HTTP_GET, [](AsyncWebServerRequest* request) {
 		getVariIntHtml(request, F("i"), &stateMachine.giaidoanINOUT);
 		getVariIntHtml(request, F("kv"), &stateMachine.giaidoanKV);
-		/*if (request->hasParam(F("i"))) {
-			stateMachine.giaidoanINOUT = request->getParam(F("i"))->value().toInt();
-		}
-		if (request->hasParam(F("kv"))) {
-			stateMachine.giaidoanKV = request->getParam(F("kv"))->value().toInt();
-		}*/
 		stateMachine.setGiaiDoan();
 		stateMachine.setKV();
 		request->send(200, PSTR(dataHtmlType), F("OK ...."));

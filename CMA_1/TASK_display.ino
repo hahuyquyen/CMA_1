@@ -32,18 +32,19 @@ void send485Kg(uint32_t kg) {
 	mb.senDataToDevice(rs485HMIAddressKg, modbusData.dataTruyen, 2);
 }
 uint16_t getstatuswifi() {
-	uint16_t data = 0;
-	/*if (!mb.slave()) {
-		mb.readHreg(1, 7832, &data, 1, cb);
-		while (mb.slave()) { mb.task(); }
-		
-	}*/
-	data = mb.readDataHMI(rs485HMIAddresStatusApMode,1);
-	return data;
+	return mb.readDataHMI(rs485HMIAddresStatusApMode,1);
 }
 void setstatuswifi() {
 	uint16_t data = 0;
 	mb.senDataToDevice(rs485HMIAddresStatusApMode, &data, 1);
+}
+void send485NameTP() {
+	mb.send485Utf16(rs485HMIAddresNameThanhPham, inforServer.thanhPham.arrayName[inforServer.thanhPham.userSelect], 96);
+
+};
+void send485NameNhaCC() {
+	mb.send485Utf16(rs485HMIAddresNameNhaCC, inforServer.nhaCC.arrayName[inforServer.nhaCC.userSelect], 32);
+
 }
 void LcdSeclectMode(uint8_t modeDisplay, Data_TH* dataLCDTH) {
 	if (mb.slave()) { return; }
@@ -66,8 +67,8 @@ void LcdSeclectMode(uint8_t modeDisplay, Data_TH* dataLCDTH) {
 			statusPeripheral.mqtt.updateName = false;
 			mb.send485Utf16(rs485HMIAddresNameNhanVien, "\0", 28); // reset ten nv 
 		}
-		mb.send485Utf16(rs485HMIAddresNameNhaCC, inforServer.nhaCC.arrayName[inforServer.nhaCC.userSelect], 32);
-		mb.send485Utf16(rs485HMIAddresNameThanhPham, inforServer.thanhPham.arrayName[inforServer.thanhPham.userSelect], 96);
+		send485NameTP();
+		send485NameNhaCC();
 		send485PageAndData(pageRunning, false);
 		break;
 	case statusDisplayInfor: //infor bat dau
@@ -77,24 +78,17 @@ void LcdSeclectMode(uint8_t modeDisplay, Data_TH* dataLCDTH) {
 		send485PageAndData(pageInfor, true);
 		break;
 	case statusDisplayNhaCC: //nha cung cap
-		mb.send485Utf16(rs485HMIAddresNameNhaCC, inforServer.nhaCC.arrayName[inforServer.nhaCC.userSelect], 32);
+		send485NameNhaCC();
 		send485PageAndData(pageNhaCC, false);
 		break;
 	case statusDisplayThanhPham: //thanh pham inforServer.thanhPham.arrayName[inforServer.thanhPham.userSelect] 
-		mb.send485Utf16(rs485HMIAddresNameThanhPham, inforServer.thanhPham.arrayName[inforServer.thanhPham.userSelect], 96);
-		wchar_t nameNvUtf17[10];
-		//size_t inSize = strlen(inforServer.thanhPham.arrayName[inforServer.thanhPham.userSelect]);
-#ifdef debug_Web
-		DebugData("Data %s , size : %d ", inforServer.thanhPham.arrayName[inforServer.thanhPham.userSelect], sizeof(nameNvUtf17));
-#endif
+		send485NameTP();
 		send485PageAndData(pageThanhPham, false);
 		break;
 	case statusDisplayXacNhan: // xac nhan
-		mb.send485Utf16(rs485HMIAddresNameNhaCC, inforServer.nhaCC.arrayName[inforServer.nhaCC.userSelect], 32);
-		mb.send485Utf16(rs485HMIAddresNameThanhPham, inforServer.thanhPham.arrayName[inforServer.thanhPham.userSelect], 96);
+		send485NameNhaCC();
+		send485NameTP();
 		send485PageAndData(pageComfirm, false);
-		break;
-	case 10: //infor setting
 		break;
 	default:
 		break;
@@ -108,7 +102,6 @@ void Display(void* pvParameters) {
 	struct Data_TH dataDisplayTH;
 	unsigned long lastTimeBlinkLed = 0;
 	unsigned long timeoutDisplay = 0;
-	//  unsigned long timeoutLcdLangDaIn = 0;
 	unsigned long lastBlinkLCD = 0;
 	uint16_t Time_blink = 1000;
 	uint16_t Time_check = 2500;
@@ -116,14 +109,14 @@ void Display(void* pvParameters) {
 	mb.begin(&Serial);
 	mb.master();
 	LcdSeclectMode(statusDisplayInfor, &dataDisplayTH);
-	variLcdUpdate.stateDisplayLCD = 1;
-	uint8_t daucham_lcd = 0;
+	variLcdUpdate.stateDisplayLCD = statusDisplayRunning;
+	//uint8_t daucham_lcd = 0;
 	boolean statusBuzzer = false;
 	digitalWrite(pinLedGreen, HIGH);
 	digitalWrite(pinLedRed, HIGH);
 	TickType_t xLastWakeTime;
 	xLastWakeTime = xTaskGetTickCount();
-	uint16_t mahinh = 10;
+	//uint16_t mahinh = 10;
 
 	for (;;) {
 
@@ -150,7 +143,7 @@ void Display(void* pvParameters) {
 		case deviceRunning: //////////////////////////////////////////////
 		  //////////////////////////////////////////////////////////////////
 			if (xQueueReceive(Queue_display, &dataDisplayTH, (TickType_t)1) == pdPASS) {
-				variLcdUpdate.stateDisplayLCD = 0;  //popup man hinh
+				variLcdUpdate.stateDisplayLCD = statusDisplayPopup;  //popup man hinh
 				variLcdUpdate.updateLCD = true;  // popup tuc thi
 				if ((dataDisplayTH.id_RFID_NV[0] == 'x') && (GetSttKhuVuc() == sttKvSuaCaIN)) {
 #ifdef debug_UART
@@ -162,9 +155,6 @@ void Display(void* pvParameters) {
 					digitalWrite(pinLedGreen, LOW);
 				}
 				else if (GetSttKhuVuc() == sttKvSuaCaIN) {
-#ifdef debug_UART   
-					Serial.println(" Da Nhan du thong tin");
-#endif
 #ifdef debug_Web
 					DebugData("Da Nhan du thong tin");
 #endif
@@ -178,9 +168,9 @@ void Display(void* pvParameters) {
 					digitalWrite(pinBuzzer, statusBuzzer);
 				}
 			}
-			// Turn Off Buzzer, LED
+ 
 			if (xSemaphoreTake(xSignal_Display_checkdone, 1)) { //Che do IN qua timeout se tat
-				variLcdUpdate.stateDisplayLCD = 1;
+				variLcdUpdate.stateDisplayLCD = statusDisplayRunning;
 				variLcdUpdate.updateLCD = true;  // 
 				statusBuzzer = false;
 				digitalWrite(pinBuzzer, statusBuzzer);
@@ -193,15 +183,19 @@ void Display(void* pvParameters) {
 				digitalWrite(pinLedGreen, HIGH);
 			}
 			if ((xTaskGetTickCount() - timeoutDisplay > Time_check) && (timeoutDisplay > 0)) {
-				variLcdUpdate.stateDisplayLCD = 1;
+				variLcdUpdate.stateDisplayLCD = statusDisplayRunning;
 				variLcdUpdate.updateLCD = true;  // popup tuc thi
 				timeoutDisplay = 0;
 			}
+			///////////////////////////////////////////////////////////////////////////
+			/// Nhan Time Blink LED , phiên bản cũ khong dung  co the bo /////////////
+			/////////////////////////////////////////////////////////////////////////
 			xQueueReceive(Queue_Time_blink, &Time_blink, (TickType_t)1);
 			if (xTaskGetTickCount() - lastTimeBlinkLed > Time_blink) {
 				lastTimeBlinkLed = xTaskGetTickCount();
 				status_led = !status_led;
 			}
+			////////////////////////////////////////////
 			printDebugHeap();
 			switch (variLcdUpdate.stateDisplayLCD) {
 			case statusDisplayPopup: //Hien thi popUp 
@@ -248,5 +242,3 @@ void Display(void* pvParameters) {
 unsigned long getTimeSendHeapDebug = 0;
 void printDebugHeap() {
 }
-
-

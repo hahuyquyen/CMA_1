@@ -6,7 +6,6 @@
 //data Modbus /////////
 ///////////////////////
 static struct modbusDataConf {
-	
 	uint16_t dataTruyen[20];
 	unsigned long timeSendSSID;
 	unsigned long timeSendKg;
@@ -37,14 +36,15 @@ struct timeServerConf {
 ///// Data trang thai LCD           //////////////////////
 ////////////////////////////////////////////////////////////
 struct variLcdUpdateConf {
-	int numScroll;
+	//int numScroll;
 	boolean updateLCD;
 	uint8_t stateDisplayLCD;
-	boolean firstDisplay;
+//	boolean firstDisplay;
 } variLcdUpdate = {
-  0,
+//  0,
   false,
   0
+//  false
 };
 /////////////////////////////////////////////////////////////
 ///// Data luu du lieu nhan tu server //////////////////////

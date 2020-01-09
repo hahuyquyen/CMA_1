@@ -29,6 +29,7 @@ RemoteDebug Debug;
 #include "Digi28SS.h"
 #include "JT2850.h"
 #include "Modbus485.h"
+#include "TongHopData.h"
 
 struct stateMachineConf stateMachine;
 struct statusPeripheralConf statusPeripheral;
@@ -61,7 +62,7 @@ Button
 //void onPressed_left();
 void onPressed_ok();
 void onPressed_right();
-void onPressedError();
+//void onPressedError();
 void onPressedExit();
 void onPressedPower();
 /*
@@ -125,10 +126,10 @@ void send485PageAndData(uint16_t page, boolean dataSend = true);
 void LcdSeclectMode(uint8_t modeDisplay, Data_TH* dataLCDTH);
 
 void Check_button(void* pvParameters);
-//void TaskRFID(void* pvParameters);
-//void TaskCAN(void* pvParameters);
+//void TaskRFID(void* pvParameters); // trong file JT2850
+//void TaskCAN(void* pvParameters); // trong file Digi28ss
 void Display(void* pvParameters);
-void http_re(void* pvParameters);
+//void http_re(void* pvParameters); // trong file TongHopData.cpp
 
 
 size_t content_len;
@@ -327,9 +328,6 @@ void loop()
 			WiFi.disconnect(true);
 			wifi_connect(2, WIFI_AP_STA, WiFiConf.sta_ssid, WiFiConf.sta_pwd, (char*)"esp32", false);
 			statusPeripheral.wifi.counterWifiDisconnect++;
-#ifdef debug_UART
-			printf("Wifi 2 che do: AP va STA\n");
-#endif
 #ifdef debug_Web
 			DebugData("Wifi 2 che do: AP va STA");
 #endif

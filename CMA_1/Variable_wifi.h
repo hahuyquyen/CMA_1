@@ -5,7 +5,7 @@
 
 const char dataHtmlType[] PROGMEM = "text/plain";
 
-const char ramChoDuLieu[] = "Chờ Dữ Liệu"; // dung can lây FPSTR(ramChoDuLieu) và strlcpy_P  tiet kiem RAM cho heap memory
+const char ramChoDuLieu[] = "Chờ Dữ Liệu";
 const char ramChuaChon[] = "Chưa Chọn";
 const uint8_t wifi_conf_format[] = WIFI_CONF_FORMAT;
 TickType_t xLastWakeTimeLoop;
@@ -53,5 +53,5 @@ const char* update_password = "123456";
 static IPAddress local_IP(192, 168, 1, 241);
 static IPAddress gateway(192, 168, 1, 1);
 static IPAddress subnet(255, 255, 255, 0);
-static IPAddress primaryDNS(8, 8, 8, 8); //optional
-static IPAddress secondaryDNS(8, 8, 4, 4); //optional
+static IPAddress primaryDNS(8, 8, 8, 8); 
+static IPAddress secondaryDNS(8, 8, 4, 4);
