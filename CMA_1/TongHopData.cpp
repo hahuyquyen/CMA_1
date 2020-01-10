@@ -35,10 +35,8 @@ void http_re(void* pvParameters) {
 				}
 			}
 		}
-
 		//Nhận mã RFID
 		//Nếu là khu Filler chỉ nhận mã rỗ thì swap time tới mã rỗ để khỏi viết lại code
-
 		if (xQueueReceive(QueueRfidNV, &dataRfidNvTH, (TickType_t)1) == pdPASS) {
 			if (strcmp(dataRfidNvTH.id_RFID, "000000000000000000000000") != 0) {
 				baoLed = true;
@@ -91,8 +89,7 @@ void http_re(void* pvParameters) {
 					///
 					// Kiem tra giai doan sua ca ngo ra, co can 2 lan
 					// Neu khac ro thi van can binh thuong
-					// neu cung ma ro trong 2 lần lien tiep phải khac so kg
-					
+					// neu cung ma ro trong 2 lần lien tiep phải khac so kg					
 						if (GetSttKhuVuc() == sttKvSuaCaOUT) {
 							tt = false;
 							if (strcmp(dataTHSend.id_RFID, idRFID_OLD) != 0) {

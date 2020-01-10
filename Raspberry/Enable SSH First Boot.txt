@@ -1,0 +1,10 @@
+Raspberry Pi: Enable SSH before first boot
+by DXSdata | Nov 6, 2017 | Administration, Linux | 1 comment
+
+
+ 
+When you copy a fresh Rasbian “Lite” image (headless, i.e. only terminal) to your Pi’s SD card (e.g. with Win32DiskImager), you might would like to enable SSH by default. Otherwise, you would have to connect at least a separate HDMI monitor and a keyboard to enable it.
+
+Solution
+
+Within the boot partition of the SD card (which can also be accessed via Windows Explorer), create a simple file called “ssh” (no extension!).

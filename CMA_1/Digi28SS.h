@@ -2,6 +2,11 @@
 #define TASK_Can_H
   #include "Arduino.h"
   #include "StructCan.h"
+  #define SerialCan Serial1
+#define baudrateCan 9600
+#define typeUartCan SERIAL_8N1
+#define txUARTCan 12
+#define rxUARTCan 26
   #define canNOD1       0x40
   #define canNOD2       0x41
   #define canNOD3       0x44

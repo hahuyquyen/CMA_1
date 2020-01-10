@@ -18,4 +18,8 @@
 		char id_RFID[25];
 		char id_RFID_Old[25];
 	};
+	/*struct Data_TH {
+		struct Data_RFID RFID;
+		double soky;
+	};*/
 #endif

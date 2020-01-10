@@ -16,9 +16,6 @@ static struct modbusDataConf {
 	0,
 	false
 };
-//modbusData.connectAP
-
-// struct statusPeripheralConf *poinstatusPeripheral = &statusPeripheral;
 
 struct timeServerConf {
 	unsigned long sdReadEnd = 0;
@@ -36,15 +33,11 @@ struct timeServerConf {
 ///// Data trang thai LCD           //////////////////////
 ////////////////////////////////////////////////////////////
 struct variLcdUpdateConf {
-	//int numScroll;
 	boolean updateLCD;
 	uint8_t stateDisplayLCD;
-//	boolean firstDisplay;
 } variLcdUpdate = {
-//  0,
   false,
   0
-//  false
 };
 /////////////////////////////////////////////////////////////
 ///// Data luu du lieu nhan tu server //////////////////////
@@ -91,14 +84,11 @@ static struct inforServerStruct {
 		if (chedo) { *userSelect = (*userSelect > (totaldata - 1)) ? 0 : (*userSelect + 1); }
 		else *userSelect = *userSelect - 1;
 	}
-	//char ssssssss[6533];inforServer.mqttConfig.topicSenData
 } inforServer;
 
 /////////////////////////////////////////////////////////////
 ///// Data Queue  FreeRTOS          //////////////////////
 ////////////////////////////////////////////////////////////
-
-//SemaphoreHandle_t xMutexRS485;
 SemaphoreHandle_t xMutexMQTT;
 SemaphoreHandle_t xCountingSemaphore;
 SemaphoreHandle_t xSignal_FromRFID;
