@@ -39,3 +39,6 @@ GET data RFID
 ![alt text](https://github.com/annhan/CMA_1/blob/master/imgae/mqtt.png)
 ![alt text](https://github.com/annhan/CMA_1/blob/master/imgae/wifi.png)
 ![alt text](https://github.com/annhan/CMA_1/blob/master/imgae/mqtt_web.png)
+
+# Cài đặt thiết bị cân:
+- Cài đặt device ID: Sử dụng tool " Advanced rest client" của google để cài đặt device ID
